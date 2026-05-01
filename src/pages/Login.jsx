@@ -21,7 +21,7 @@ function GoogleIcon() {
 }
 
 export default function Login() {
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, resetPassword } = useAuth();
   const navigate   = useNavigate();
   const location   = useLocation();
   const from       = location.state?.from?.pathname || '/';
@@ -32,6 +32,7 @@ export default function Login() {
   const [loading,  setLoading]  = useState(false);
   const [gLoading, setGLoading] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [notice,   setNotice]   = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -45,6 +46,19 @@ export default function Login() {
       if (looksLikePausedBackend(err)) setHelpOpen(true);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleForgot() {
+    setError(''); setNotice('');
+    if (!email.trim()) { setError('Enter your email above, then choose "Forgot password?".'); return; }
+    try {
+      await resetPassword(email.trim());
+      // Same message whether or not the address has an account.
+      setNotice('If that email has an account, a reset link is on its way.');
+    } catch (err) {
+      setError(err.message || 'Could not send the reset email.');
+      if (looksLikePausedBackend(err)) setHelpOpen(true);
     }
   }
 
@@ -66,6 +80,7 @@ export default function Login() {
         <div className="form-subtitle">Sign in to your PaperVault account</div>
 
         {error && <div className="inline-error">{error}</div>}
+        {notice && <div className="form-hint" role="status">{notice}</div>}
 
         <button className="btn-google" onClick={handleGoogle} disabled={gLoading || loading}>
           <GoogleIcon /> {gLoading ? 'Redirecting…' : 'Continue with Google'}
@@ -93,6 +108,9 @@ export default function Login() {
               required
             />
           </div>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={handleForgot} style={{ marginBottom: 12 }}>
+            Forgot password?
+          </button>
           <button type="submit" className="form-submit" disabled={loading || gLoading}>
             {loading ? 'Signing in…' : 'Sign In'}
           </button>

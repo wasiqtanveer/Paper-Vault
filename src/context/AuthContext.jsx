@@ -78,6 +78,13 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   }
 
+  async function resetPassword(email) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) throw error;
+  }
+
   async function signOut() {
     setSigningOut(true);
     await supabase.auth.signOut();
@@ -89,7 +96,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, user, profile, profileReady, loading, signingOut, signIn, signInWithGoogle, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ session, user, profile, profileReady, loading, signingOut, signIn, signInWithGoogle, resetPassword, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
