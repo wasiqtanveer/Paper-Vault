@@ -7,6 +7,7 @@ import { FileText, CheckCircle, Clock, ShieldCheck, Settings2, Users, KeyRound, 
 import { supabase } from '../lib/supabase';
 import { deleteImage } from '../lib/storage';
 import { logActivity } from '../lib/activity';
+import { MIN_PASSWORD_LENGTH } from '../lib/authRules';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import StatusBadge from '../components/StatusBadge';
@@ -82,7 +83,7 @@ export default function Profile() {
   async function handleChangePassword(e) {
     e.preventDefault();
     setPwError(''); setPwSuccess(false);
-    if (pwForm.next.length < 6) { setPwError('Password must be at least 6 characters.'); return; }
+    if (pwForm.next.length < MIN_PASSWORD_LENGTH) { setPwError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`); return; }
     if (pwForm.next !== pwForm.confirm) { setPwError('Passwords do not match.'); return; }
     setPwLoading(true);
     // Re-authenticate first to verify current password
@@ -236,7 +237,7 @@ export default function Profile() {
                       <label className="form-label">New Password</label>
                       <input
                         type="password"
-                        placeholder="Min. 6 characters"
+                        placeholder={`Min. ${MIN_PASSWORD_LENGTH} characters`}
                         value={pwForm.next}
                         onChange={e => setPwForm(f => ({ ...f, next: e.target.value }))}
                         required
