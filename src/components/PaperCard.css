@@ -1,0 +1,149 @@
+.papers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 220px));
+  gap: 12px;
+  padding: 0 28px 28px;
+  justify-content: start;
+  align-items: stretch;
+}
+
+/* Make framer-motion wrapper fill the grid cell height */
+.papers-grid > div {
+  height: 100%;
+}
+
+/* On narrower viewports let cards fill the row */
+@media (max-width: 900px) {
+  .papers-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    justify-content: initial;
+  }
+}
+@media (max-width: 600px) {
+  .papers-grid {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 0 0 20px;
+  }
+}
+
+.paper-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  height: 100%;
+}
+/* Dark mode hover — card goes near-black */
+.paper-card:hover {
+  background: #080808;
+  border-color: #080808;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.85);
+  text-decoration: none;
+}
+.paper-card:hover .paper-card-body {
+  background: #080808;
+}
+.paper-card:hover .paper-card-footer {
+  border-top-color: #1a1a1a;
+}
+.paper-card:hover .paper-card-date {
+  background: #111111;
+  border-color: #1c1c1c;
+}
+.paper-card:hover .paper-card-image-placeholder {
+  background: #0f0f0f;
+}
+
+/* Light mode hover — card goes pure white with dark border */
+[data-theme="light"] .paper-card:hover {
+  background: #ffffff;
+  border-color: #111111;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.14);
+}
+[data-theme="light"] .paper-card:hover .paper-card-body {
+  background: #ffffff;
+}
+[data-theme="light"] .paper-card:hover .paper-card-footer {
+  border-top-color: #e8e8e8;
+}
+[data-theme="light"] .paper-card:hover .paper-card-date {
+  background: #f5f5f5;
+  border-color: #ddd;
+}
+[data-theme="light"] .paper-card:hover .paper-card-image-placeholder {
+  background: #f0f0f0;
+}
+
+.paper-card-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--bg-elevated);
+  display: block;
+}
+
+.paper-card-image-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 32px;
+}
+
+.paper-card-body {
+  padding: 13px 15px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.paper-card-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.paper-card-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  flex: 1;
+}
+
+.paper-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 9px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.paper-card-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.paper-card-uploader {
+  font-size: 11px;
+  color: var(--text-muted);
+}

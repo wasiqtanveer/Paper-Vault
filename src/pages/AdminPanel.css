@@ -1,0 +1,204 @@
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--border);
+  gap: 1px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.metric-card {
+  background: var(--bg-secondary);
+  padding: 20px 22px;
+}
+
+.metric-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.admin-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.admin-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+
+.admin-section-header .section-title { margin-bottom: 0; }
+
+.admin-section-header input {
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.admin-section-body { padding: 14px 18px; }
+
+.admin-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+@media (max-width: 768px) { .admin-two-col { grid-template-columns: 1fr; } }
+
+.add-subject-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.add-subject-row input { flex: 1; }
+
+.admin-row-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-end;
+  white-space: nowrap;
+}
+
+/* Subjects/Teachers tables: name takes all space, actions fixed */
+.admin-two-col .admin-section td:first-child { width: 100%; }
+.admin-two-col .admin-section td:last-child  { width: 1%; white-space: nowrap; text-align: right; }
+
+/* Users table: role column CustomSelect gets a fixed width */
+.users-table td:nth-child(3) { width: 150px; }
+.users-table td:nth-child(3) .custom-select { width: 130px; }
+
+/* Activity table */
+.activity-table { table-layout: fixed; width: 100%; }
+.activity-table th,
+.activity-table td { vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.act-chevron-cell { color: var(--text-muted); width: 28px; padding-right: 0; }
+.act-cell-name    { color: var(--text-primary); font-weight: 500; font-size: 13px; }
+.act-cell-paper   { color: var(--text-secondary); font-size: 12px; }
+.act-cell-when    { color: var(--text-muted); font-size: 12px; }
+.act-muted        { color: var(--text-muted); font-size: 12px; }
+.act-empty        { text-align: center; color: var(--text-muted); padding: 20px !important; }
+
+.act-row          { cursor: pointer; }
+.act-row:hover    { background: var(--bg-elevated); }
+.act-row-open     { background: var(--bg-elevated); }
+
+.act-expand-row td { padding: 0 !important; border-bottom: 1px solid var(--border); }
+.act-expand-cell  { padding: 0 !important; }
+
+.act-history {
+  padding: 12px 20px 14px 40px;
+  border-top: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+.act-history-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.act-history-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.act-history-row:last-child { border-bottom: none; }
+.act-history-step {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.act-history-by {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+}
+.act-history-when {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.act-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Role pills — same height as select, consistent look */
+.role-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.role-pill-owner {
+  background: var(--status-approved-bg);
+  border-color: var(--status-approved-bdr);
+  color: var(--status-approved);
+  font-weight: 600;
+}
+.role-pill-admin {
+  background: var(--status-pending-bg);
+  border-color: var(--status-pending-bdr);
+  color: var(--status-pending);
+}
+
+/* Make the role select same height as pills */
+.admin-section td select {
+  width: auto;
+  height: 30px;
+  padding: 0 8px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 768px) {
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+}

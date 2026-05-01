@@ -1,0 +1,109 @@
+.upload-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.exam-type-row {
+  display: flex;
+  gap: 8px;
+}
+.exam-type-btn {
+  flex: 1;
+  padding: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.exam-type-btn:hover {
+  border-color: var(--border-focus);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+.exam-type-btn.active {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+  font-weight: 600;
+}
+
+.title-reset-btn {
+  margin-left: 8px;
+  font-size: 11px;
+  color: var(--accent-blue);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  text-decoration: underline;
+}
+
+.upload-zone {
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  background: var(--bg-secondary);
+  margin-bottom: 4px;
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: var(--border-focus);
+  background: var(--bg-elevated);
+}
+.upload-zone.drag-over { border-style: solid; }
+
+.upload-zone-icon { font-size: 28px; color: var(--text-muted); margin-bottom: 8px; }
+.upload-zone-text { font-size: 13.5px; color: var(--text-secondary); }
+.upload-zone-sub  { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+.upload-preview {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-top: 10px;
+}
+.upload-preview img {
+  width: 100%;
+  max-height: 280px;
+  object-fit: contain;
+  background: var(--bg-elevated);
+  display: block;
+}
+.upload-preview-meta {
+  padding: 9px 13px;
+  background: var(--bg-secondary);
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+}
+
+.upload-success-card {
+  max-width: 440px;
+  margin: 40px auto;
+  text-align: center;
+  padding: 48px 32px;
+}
+.upload-success-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--status-approved-bg);
+  border: 1px solid var(--status-approved-bdr);
+  color: var(--status-approved);
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}

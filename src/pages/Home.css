@@ -1,0 +1,49 @@
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  background: var(--border);
+  gap: 1px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+.stat-card {
+  background: var(--bg-secondary);
+  padding: 20px 24px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -1.5px;
+  line-height: 1;
+}
+
+.stat-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 5px;
+}
+
+/* Hero search inside topbar */
+.home-search-wrap {
+  position: relative;
+  flex: 1;
+  max-width: 360px;
+}
+
+@media (max-width: 900px) {
+  .stats-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
