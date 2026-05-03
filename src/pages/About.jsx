@@ -97,11 +97,11 @@ export default function About() {
               <div className="about-card-icon project"><ExternalLink size={18} /></div>
               <div className="about-card-title">Another Project for Students</div>
               <div className="about-card-body">
-                <p>Also built <strong>CRT Attendance App</strong> — a university attendance tracking tool that helps students monitor their attendance across courses and get alerts before they fall short of the required percentage.</p>
+                <p>Also built <strong>CR Attendance App</strong> — a university attendance tracking tool that helps students monitor their attendance across courses and get alerts before they fall short of the required percentage.</p>
               </div>
               <a href="https://crattendanceapp.vercel.app/login" target="_blank" rel="noreferrer"
                 className="btn btn-ghost" style={{ marginTop: 16, alignSelf: 'flex-start' }}>
-                <ExternalLink size={14} /> Open CRT Attendance App
+                <ExternalLink size={14} /> Open CR Attendance App
               </a>
             </motion.div>
 
