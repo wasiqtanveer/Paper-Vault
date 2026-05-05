@@ -33,6 +33,7 @@
   color: var(--text-primary);
   margin-bottom: 4px;
   letter-spacing: -0.4px;
+  text-align: center;
 }
 
 .form-subtitle {
@@ -40,6 +41,7 @@
   color: var(--text-secondary);
   margin-bottom: 28px;
   line-height: 1.5;
+  text-align: center;
 }
 
 .form-submit {
