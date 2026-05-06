@@ -82,6 +82,11 @@ select option {
   transition: margin-left 0.22s ease;
 }
 
+/* ── Mobile topbar placeholder ───────────────────── */
+/* The mobile topbar is position:sticky inside its own flow.
+   On mobile the app-shell/main-content height model doesn't apply —
+   we let the page scroll naturally. */
+
 /* ── Top bar ─────────────────────────────────────── */
 .topbar {
   position: sticky;
@@ -384,15 +389,29 @@ tbody tr:last-child td { border-bottom: none; }
 
 /* ── Responsive ──────────────────────────────────── */
 @media (max-width: 768px) {
+  /* Let the shell grow naturally — no fixed height or hidden overflow */
   .app-shell {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
   }
+
+  /* main-content fills remaining space and scrolls naturally */
   .main-content {
     margin-left: 0 !important;
     height: auto;
+    min-height: calc(100dvh - 52px); /* subtract mobile topbar height */
+    overflow-y: visible;
+    overflow-x: hidden;
+    flex: 1;
   }
-  .page-inner { padding: 14px 16px; }
+
+  /* Hide the desktop topbar on pages that have one (PaperViewer etc.)
+     The mobile topbar from Sidebar handles the top chrome */
   .topbar     { padding: 0 16px; height: 48px; }
+  .page-inner { padding: 14px 16px; }
 
   /* Topbar search shrinks */
   .search-wrapper { max-width: 100% !important; }

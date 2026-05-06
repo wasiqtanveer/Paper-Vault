@@ -71,7 +71,7 @@ function Shell() {
   return (
     <div className="app-shell">
       <Sidebar />
-      <main className="main-content">
+      <main className="main-content" id="main-scroll">
         <Suspense fallback={<PageFallback />}>
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
