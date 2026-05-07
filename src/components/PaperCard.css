@@ -15,15 +15,19 @@
 /* On narrower viewports let cards fill the row */
 @media (max-width: 900px) {
   .papers-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     justify-content: initial;
+    padding: 0 16px 24px;
   }
 }
 @media (max-width: 600px) {
   .papers-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
     padding: 0 0 20px;
   }
+  .paper-card-title { font-size: 12px; }
+  .paper-card-body  { padding: 10px 11px; }
 }
 
 .paper-card {
