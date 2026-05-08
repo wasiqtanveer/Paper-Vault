@@ -23,6 +23,7 @@ const Profile      = lazy(routeLoaders['/profile']);
 const ModDashboard = lazy(routeLoaders['/mod']);
 const AdminPanel   = lazy(routeLoaders['/admin']);
 const About        = lazy(routeLoaders['/about']);
+const NotFound     = lazy(() => import('./pages/NotFound'));
 const HallOfFame   = lazy(routeLoaders['/hall-of-fame']);
 
 // Route code is prefetched at idle, so this only shows on a genuinely cold
@@ -134,6 +135,7 @@ function Shell() {
               <Route path="/reset-password" element={<PageWrap><ResetPassword /></PageWrap>} />
               <Route path="/about"         element={<PageWrap><About /></PageWrap>} />
               <Route path="/hall-of-fame" element={<PageWrap><HallOfFame /></PageWrap>} />
+              <Route path="*"          element={<PageWrap><NotFound /></PageWrap>} />
             </Routes>
           </AnimatePresence>
         </Suspense>
