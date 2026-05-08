@@ -113,7 +113,7 @@ export default function Browse() {
           <div className="empty-state">No papers found. Try adjusting filters.</div>
         ) : (
           <>
-            <div className="papers-grid" style={{ padding: 0 }}>
+            <div className="papers-grid papers-grid-inner">
               {papers.map((p, i) => <PaperCard key={p.id} paper={p} index={i} />)}
             </div>
             {hasMore && (
