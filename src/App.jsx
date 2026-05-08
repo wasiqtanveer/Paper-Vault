@@ -9,6 +9,7 @@ import Sidebar from './components/Sidebar';
 import ProtectedRoute from './components/ProtectedRoute';
 import { PageSkeleton, ShellSkeleton } from './components/Skeleton';
 import WelcomeModal from './components/WelcomeModal';
+import ErrorBoundary from './components/ErrorBoundary';
 import { EASE_OUT } from './lib/motion';
 import { routeLoaders, prefetchAllRoutes } from './lib/routes';
 
@@ -148,6 +149,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <MotionConfig reducedMotion="user">
+        <ErrorBoundary>
         <ThemeProvider>
           <SoundProvider>
             <AuthProvider>
@@ -157,6 +159,7 @@ export default function App() {
             </AuthProvider>
           </SoundProvider>
         </ThemeProvider>
+        </ErrorBoundary>
       </MotionConfig>
     </BrowserRouter>
   );
