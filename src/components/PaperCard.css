@@ -20,11 +20,9 @@
 
 @media (max-width: 600px) {
   .papers-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 10px;
   }
-  .paper-card-title { font-size: 12px; }
-  .paper-card-body  { padding: 10px 11px; }
 }
 
 .paper-card {
