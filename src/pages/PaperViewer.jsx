@@ -73,6 +73,13 @@ export default function PaperViewer() {
     setShowEdit(true);
   }
 
+  // navigate(-1) would leave the site when the paper was opened from a direct
+  // link; React Router's history index is 0 for the first page of a session.
+  function goBack() {
+    if (window.history.state?.idx > 0) navigate(-1);
+    else navigate('/browse');
+  }
+
   async function handleDownload() {
     setDownloading(true);
     try {
@@ -219,7 +226,7 @@ export default function PaperViewer() {
     // parent, so this is an enter-only fade rather than a true crossfade.
     <motion.div className="page-content" initial={CONTENT_SWAP.initial} animate={CONTENT_SWAP.animate}>
       <div className="topbar">
-        <button className="btn btn-ghost btn-sm" onClick={() => navigate(-1)} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+        <button className="btn btn-ghost btn-sm" onClick={goBack} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
           <ArrowLeft size={14} /> Back
         </button>
         {canEdit && (
