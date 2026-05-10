@@ -51,8 +51,11 @@ export default function Register() {
       });
   }, []);
 
+  // Keyed on whether a countdown is running, not its value: depending on
+  // `countdown` re-created the interval on every tick.
+  const counting = countdown > 0;
   useEffect(() => {
-    if (countdown <= 0) return;
+    if (!counting) return;
     timerRef.current = setInterval(() => {
       setCountdown(c => {
         if (c <= 1) { clearInterval(timerRef.current); return 0; }
@@ -60,7 +63,7 @@ export default function Register() {
       });
     }, 1000);
     return () => clearInterval(timerRef.current);
-  }, [countdown]);
+  }, [counting]);
 
   function set(key) { return e => setForm(f => ({ ...f, [key]: e.target.value })); }
 
