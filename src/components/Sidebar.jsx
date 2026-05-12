@@ -14,6 +14,31 @@ import { useSound } from '../context/SoundContext';
 import ThemeLogo from './ThemeLogo';
 import './Sidebar.css';
 
+/* Declared at module level so it keeps its identity between renders; defining it
+   inside SidebarContent remounted every link on each render. */
+function NavItem({ to, end, icon: Icon, label, collapsed, onNav }) {
+  const navCls = ({ isActive }) =>
+    'nav-link' + (isActive ? ' active' : '') + (collapsed ? ' nav-link-icon-only' : '');
+  return (
+    <NavLink
+      to={to}
+      end={end}
+      className={navCls}
+      title={collapsed ? label : undefined}
+      aria-label={collapsed ? label : undefined}
+      onClick={onNav}
+      // Warm the chunk on intent rather than on click. Pointer/focus lands
+      // well before the navigation does, so the route is already resolved and
+      // the transition never gets replaced by the Suspense spinner.
+      onPointerEnter={() => prefetchRoute(to)}
+      onFocus={() => prefetchRoute(to)}
+    >
+      <Icon size={16} className="nav-link-icon" />
+      {!collapsed && <span className="nav-link-label">{label}</span>}
+    </NavLink>
+  );
+}
+
 /* ── Shared inner nav content (used by both desktop sidebar and mobile drawer) ── */
 function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dropRef, user, profile, theme, toggle }) {
   const initials = profile?.full_name
@@ -23,44 +48,20 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
   const isAdmin = profile?.role === 'admin';
   const { enabled: soundEnabled, toggle: toggleSound } = useSound();
 
-  const navCls = ({ isActive }) =>
-    'nav-link' + (isActive ? ' active' : '') + (collapsed ? ' nav-link-icon-only' : '');
-
-  function NavItem({ to, end, icon: Icon, label }) {
-    return (
-      <NavLink
-        to={to}
-        end={end}
-        className={navCls}
-        title={collapsed ? label : undefined}
-        aria-label={collapsed ? label : undefined}
-        onClick={onNav}
-        // Warm the chunk on intent rather than on click. Pointer/focus lands
-        // well before the navigation does, so the route is already resolved and
-        // the transition never gets replaced by the Suspense spinner.
-        onPointerEnter={() => prefetchRoute(to)}
-        onFocus={() => prefetchRoute(to)}
-      >
-        <Icon size={16} className="nav-link-icon" />
-        {!collapsed && <span className="nav-link-label">{label}</span>}
-      </NavLink>
-    );
-  }
-
   return (
     <>
       {!collapsed && <div className="nav-section-label">Navigation</div>}
-      <NavItem to="/" end icon={Home} label="Home" />
-      <NavItem to="/browse" icon={LayoutGrid} label="Browse Papers" />
-      {user && <NavItem to="/upload" icon={Upload} label="Upload Paper" />}
+      <NavItem collapsed={collapsed} onNav={onNav} to="/" end icon={Home} label="Home" />
+      <NavItem collapsed={collapsed} onNav={onNav} to="/browse" icon={LayoutGrid} label="Browse Papers" />
+      {user && <NavItem collapsed={collapsed} onNav={onNav} to="/upload" icon={Upload} label="Upload Paper" />}
 
       {isMod && (
         <>
           {!collapsed && <div className="nav-section-label">Moderation</div>}
-          <NavItem to="/mod" icon={ShieldCheck} label="Mod Dashboard" />
+          <NavItem collapsed={collapsed} onNav={onNav} to="/mod" icon={ShieldCheck} label="Mod Dashboard" />
         </>
       )}
-      {isAdmin && <NavItem to="/admin" icon={Settings2} label="Admin Panel" />}
+      {isAdmin && <NavItem collapsed={collapsed} onNav={onNav} to="/admin" icon={Settings2} label="Admin Panel" />}
 
       <div className="sidebar-spacer" />
 
@@ -89,8 +90,8 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
         {!collapsed && <span>{soundEnabled ? 'Sound On' : 'Sound Off'}</span>}
       </button>
 
-      <NavItem to="/about"        icon={Info}   label="About" />
-      <NavItem to="/hall-of-fame" icon={Trophy} label="Hall of Fame" />
+      <NavItem collapsed={collapsed} onNav={onNav} to="/about"        icon={Info}   label="About" />
+      <NavItem collapsed={collapsed} onNav={onNav} to="/hall-of-fame" icon={Trophy} label="Hall of Fame" />
 
       {user ? (
         <div className="sidebar-bottom">
