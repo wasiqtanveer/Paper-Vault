@@ -1,1 +1,45 @@
 /* Register shares form-page / form-card styles from Login.css */
+
+.rate-limit-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 8px 0 4px;
+  gap: 8px;
+}
+
+.rate-limit-icon {
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.rate-limit-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+
+.rate-limit-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.rate-limit-countdown {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -2px;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin: 4px 0;
+}
+
+.rate-limit-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
