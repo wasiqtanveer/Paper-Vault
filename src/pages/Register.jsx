@@ -12,15 +12,22 @@ export default function Register() {
   const [error,     setError]     = useState('');
   const [loading,   setLoading]   = useState(false);
   const [sent,      setSent]      = useState(false);
-  const [countdown, setCountdown] = useState(0); // seconds remaining when rate-limited
+  const [countdown, setCountdown] = useState(() => {
+    const until = localStorage.getItem('pv_ratelimit_until');
+    if (!until) return 0;
+    const secs = Math.ceil((Number(until) - Date.now()) / 1000);
+    return secs > 0 ? secs : 0;
+  });
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (countdown <= 0) return;
+    if (countdown <= 0) { localStorage.removeItem('pv_ratelimit_until'); return; }
     timerRef.current = setInterval(() => {
-      setCountdown(c => {
-        if (c <= 1) { clearInterval(timerRef.current); return 0; }
-        return c - 1;
+      setCountdown(() => {
+        const until = localStorage.getItem('pv_ratelimit_until');
+        const secs = Math.ceil((Number(until) - Date.now()) / 1000);
+        if (secs <= 0) { clearInterval(timerRef.current); localStorage.removeItem('pv_ratelimit_until'); return 0; }
+        return secs;
       });
     }, 1000);
     return () => clearInterval(timerRef.current);
@@ -53,7 +60,9 @@ export default function Register() {
       if (signUpError) {
         const msg = signUpError.message || '';
         if (msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('too many') || msg.toLowerCase().includes('limit')) {
-          setCountdown(3600); // 1 hour countdown
+          const until = Date.now() + 3600 * 1000;
+          localStorage.setItem('pv_ratelimit_until', String(until));
+          setCountdown(3600);
         } else if (msg.toLowerCase().includes('sending') || msg.toLowerCase().includes('email') || msg === '{}' || msg === '') {
           setError('We couldn\'t send a confirmation email right now. Please try again in a moment.');
         } else if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already been registered')) {
