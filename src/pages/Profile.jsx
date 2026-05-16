@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { FileText, CheckCircle, Clock, ShieldCheck, Settings2, Users, KeyRound, ChevronDown } from 'lucide-react';
+import { FileText, CheckCircle, Clock, ShieldCheck, Settings2, Users, KeyRound, ChevronDown, Pencil } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { deleteImage } from '../lib/storage';
 import { useAuth } from '../context/AuthContext';
@@ -21,6 +21,13 @@ export default function Profile() {
   const [modStats,  setModStats]  = useState(null);
   const [userCount, setUserCount] = useState(null);
   const [loading,   setLoading]   = useState(true);
+
+  // Edit name accordion
+  const [nameOpen,    setNameOpen]    = useState(false);
+  const [nameValue,   setNameValue]   = useState('');
+  const [nameLoading, setNameLoading] = useState(false);
+  const [nameError,   setNameError]   = useState('');
+  const [nameSuccess, setNameSuccess] = useState(false);
 
   // Change password accordion
   const [pwOpen,    setPwOpen]    = useState(false);
@@ -81,6 +88,19 @@ export default function Profile() {
     addToast('Password updated successfully.', 'success');
   }
 
+  async function handleChangeName(e) {
+    e.preventDefault();
+    setNameError(''); setNameSuccess(false);
+    if (!nameValue.trim()) { setNameError('Name cannot be empty.'); return; }
+    setNameLoading(true);
+    const { error } = await supabase.from('profiles').update({ full_name: nameValue.trim() }).eq('id', user.id);
+    setNameLoading(false);
+    if (error) { setNameError(error.message); return; }
+    setNameSuccess(true);
+    addToast('Name updated.', 'success');
+    setTimeout(() => { setNameOpen(false); setNameSuccess(false); }, 1500);
+  }
+
   async function handleDelete(paper) {
     if (!window.confirm('Delete this paper?')) return;
     try { await deleteImage(paper.image_url); } catch (_) {}
@@ -122,8 +142,42 @@ export default function Profile() {
           </div>
         </motion.div>
 
-        {/* Change password accordion */}
+        {/* Edit name accordion */}
         <motion.div className="pw-accordion" {...fadeUp(1)}>
+          <button
+            className={'pw-accordion-trigger' + (nameOpen ? ' open' : '')}
+            onClick={() => { setNameOpen(v => !v); setNameValue(profile?.full_name ?? ''); setNameError(''); setNameSuccess(false); }}
+          >
+            <span className="pw-accordion-label"><Pencil size={14} /> Edit Name</span>
+            <ChevronDown size={14} className={'pw-accordion-chevron' + (nameOpen ? ' rotated' : '')} />
+          </button>
+          <AnimatePresence initial={false}>
+            {nameOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.22, ease: 'easeInOut' }}
+                style={{ overflow: 'hidden' }}
+              >
+                <form className="pw-form" onSubmit={handleChangeName}>
+                  {nameSuccess && <div className="pw-success">Name updated!</div>}
+                  {nameError   && <div className="form-error">{nameError}</div>}
+                  <div className="form-group" style={{ marginBottom: 12 }}>
+                    <label className="form-label">Display Name</label>
+                    <input value={nameValue} onChange={e => setNameValue(e.target.value)} placeholder="Your full name" />
+                  </div>
+                  <button type="submit" className="btn btn-primary btn-sm" disabled={nameLoading}>
+                    {nameLoading ? 'Saving…' : 'Save Name'}
+                  </button>
+                </form>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Change password accordion */}
+        <motion.div className="pw-accordion" {...fadeUp(2)}>
           <button
             className={'pw-accordion-trigger' + (pwOpen ? ' open' : '')}
             onClick={() => { setPwOpen(v => !v); setPwError(''); setPwSuccess(false); }}
@@ -190,7 +244,7 @@ export default function Profile() {
         </motion.div>
 
         {/* Upload stats */}
-        <motion.div className="profile-stats-row" {...fadeUp(2)}>
+        <motion.div className="profile-stats-row" {...fadeUp(3)}>
           <div className="profile-stat">
             <FileText size={16} className="profile-stat-icon" />
             <div className="profile-stat-value">{uploadedCount}</div>
@@ -210,7 +264,7 @@ export default function Profile() {
 
         {/* Mod stats */}
         {isMod && modStats && (
-          <motion.div className="profile-section" {...fadeUp(3)}>
+          <motion.div className="profile-section" {...fadeUp(5)}>
             <div className="profile-section-title">
               <ShieldCheck size={15} />
               Moderation Activity
@@ -234,7 +288,7 @@ export default function Profile() {
 
         {/* Admin section */}
         {isAdmin && (
-          <motion.div className="profile-section" {...fadeUp(4)}>
+          <motion.div className="profile-section" {...fadeUp(6)}>
             <div className="profile-section-title">
               <Settings2 size={15} />
               Admin Overview
