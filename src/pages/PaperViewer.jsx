@@ -124,8 +124,10 @@ export default function PaperViewer() {
     if (!ok) return;
     // Row first: if it fails nothing is lost. Deleting the image first could
     // leave a live paper pointing at a missing file.
-    const { error: err } = await supabase.from('papers').delete().eq('id', id);
+    const { data: removed, error: err } = await supabase.from('papers').delete().eq('id', id).select('id');
     if (err) { addToast(err.message, 'error'); return; }
+    // RLS filters a forbidden delete to zero rows without raising an error.
+    if (!removed?.length) { addToast('Could not delete this paper. You may not have permission.', 'error'); return; }
     deleteImage(paper.image_url).catch(() => {});
     invalidatePapers();
     await logActivity({ action: 'delete', user, profile, fallbackRole: 'student', paperId: id, paperTitle: paper?.title });
