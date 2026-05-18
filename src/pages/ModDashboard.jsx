@@ -6,6 +6,23 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import './ModDashboard.css';
 
+function ModCardSkeleton() {
+  return (
+    <div className="mod-paper-card">
+      <div className="skel mod-skel-img" />
+      <div className="skel mod-skel-line" style={{ width: '85%', marginBottom: 8 }} />
+      <div className="skel mod-skel-line" style={{ width: '60%', marginBottom: 16 }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="skel mod-skel-line" style={{ width: 48 }} />
+        <div style={{ display: 'flex', gap: 5 }}>
+          <div className="skel" style={{ width: 32, height: 28, borderRadius: 6 }} />
+          <div className="skel" style={{ width: 32, height: 28, borderRadius: 6 }} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ModDashboard() {
   const { user, profile } = useAuth();
   const { addToast } = useToast();
@@ -62,34 +79,6 @@ export default function ModDashboard() {
   const openReports   = reports.filter(r => !r.resolved);
   const closedReports = reports.filter(r => r.resolved);
 
-  function PaperCard({ p }) {
-    const date = new Date(p.uploaded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    return (
-      <div className="mod-paper-card">
-        {p.image_url && (
-          <Link to={`/paper/${p.id}`}>
-            <img src={p.image_url} alt={p.title} className="mod-paper-thumb" />
-          </Link>
-        )}
-        <div className="mod-paper-title">{p.title}</div>
-        <div className="mod-paper-desc">
-          {p.subjects?.name ?? '—'} · {p.year}{p.profiles?.full_name ? ` · ${p.profiles.full_name}` : ''}
-        </div>
-        <div className="mod-card-footer">
-          <span className="mod-card-date">{date}</span>
-          <div className="mod-card-actions">
-            <button className="btn-approve" title="Approve" onClick={() => updateStatus(p.id, 'approved')}>
-              <Check size={13} />
-            </button>
-            <button className="btn-reject" title="Reject" onClick={() => updateStatus(p.id, 'rejected')}>
-              <X size={13} />
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="page-content">
       <div className="topbar">
@@ -109,13 +98,41 @@ export default function ModDashboard() {
         </div>
 
         {loading ? (
-          <div className="spinner-wrap"><div className="spinner" /></div>
+          <div className="mod-grid">
+            {Array.from({ length: 6 }).map((_, i) => <ModCardSkeleton key={i} />)}
+          </div>
         ) : tab === 'pending' ? (
           pending.length === 0 ? (
             <div className="empty-state">No pending papers — all caught up.</div>
           ) : (
             <div className="mod-grid">
-              {pending.map(p => <PaperCard key={p.id} p={p} />)}
+              {pending.map(p => {
+                const date = new Date(p.uploaded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                return (
+                  <div key={p.id} className="mod-paper-card">
+                    {p.image_url && (
+                      <Link to={`/paper/${p.id}`}>
+                        <img src={p.image_url} alt={p.title} className="mod-paper-thumb" />
+                      </Link>
+                    )}
+                    <div className="mod-paper-title">{p.title}</div>
+                    <div className="mod-paper-desc">
+                      {p.subjects?.name ?? '—'} · {p.year}{p.profiles?.full_name ? ` · ${p.profiles.full_name}` : ''}
+                    </div>
+                    <div className="mod-card-footer">
+                      <span className="mod-card-date">{date}</span>
+                      <div className="mod-card-actions">
+                        <button className="btn-approve" title="Approve" onClick={() => updateStatus(p.id, 'approved')}>
+                          <Check size={13} />
+                        </button>
+                        <button className="btn-reject" title="Reject" onClick={() => updateStatus(p.id, 'rejected')}>
+                          <X size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )
         ) : (
@@ -131,7 +148,7 @@ export default function ModDashboard() {
                   <div className="table-wrap">
                     <table>
                       <thead>
-                        <tr><th>Paper</th><th>Paper Status</th><th>Reason</th><th>Reporter</th><th>Reported</th><th></th></tr>
+                        <tr><th>Paper</th><th>Status</th><th>Reason</th><th>Reporter</th><th>Date</th><th></th></tr>
                       </thead>
                       <tbody>
                         {openReports.map(r => (
@@ -154,9 +171,7 @@ export default function ModDashboard() {
                               {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             </td>
                             <td>
-                              <button className="btn btn-ghost btn-sm" onClick={() => resolveReport(r.id)}>
-                                Resolve
-                              </button>
+                              <button className="btn btn-ghost btn-sm" onClick={() => resolveReport(r.id)}>Resolve</button>
                             </td>
                           </tr>
                         ))}
@@ -165,7 +180,6 @@ export default function ModDashboard() {
                   </div>
                 </>
               )}
-
               {closedReports.length > 0 && (
                 <>
                   <div className="reports-section-label reports-section-label-closed">
@@ -174,7 +188,7 @@ export default function ModDashboard() {
                   <div className="table-wrap">
                     <table>
                       <thead>
-                        <tr><th>Paper</th><th>Reason</th><th>Reporter</th><th>Reported</th></tr>
+                        <tr><th>Paper</th><th>Reason</th><th>Reporter</th><th>Date</th></tr>
                       </thead>
                       <tbody>
                         {closedReports.map(r => (

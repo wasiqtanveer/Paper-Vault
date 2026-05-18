@@ -1,15 +1,59 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import './Home.css';
 import PaperCard from '../components/PaperCard';
 
+function useCountUp(target, duration = 1200) {
+  const [val, setVal] = useState(0);
+  const raf = useRef(null);
+  useEffect(() => {
+    if (target === 0) { setVal(0); return; }
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      setVal(Math.round(ease * target));
+      if (p < 1) raf.current = requestAnimationFrame(tick);
+    }
+    raf.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf.current);
+  }, [target, duration]);
+  return val;
+}
+
+function StatCard({ label, value, sub, color, suffix = '' }) {
+  const animated = useCountUp(typeof value === 'number' ? value : 0);
+  return (
+    <div className="stat-card">
+      <div className="stat-label">{label}</div>
+      <div className="stat-value" style={color ? { color } : {}}>
+        {typeof value === 'number' ? animated + suffix : value}
+      </div>
+      <div className="stat-sub">{sub}</div>
+    </div>
+  );
+}
+
+function CardSkeleton() {
+  return (
+    <div className="skeleton-card">
+      <div className="skeleton-img skel" />
+      <div className="skeleton-body">
+        <div className="skel skel-line" style={{ width: '80%' }} />
+        <div className="skel skel-line" style={{ width: '55%', marginTop: 6 }} />
+        <div className="skel skel-line" style={{ width: '40%', marginTop: 'auto' }} />
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
-  const [papers, setPapers]     = useState([]);
-  const [stats, setStats]       = useState({ total: 0, approved: 0, pending: 0 });
-  const [loading, setLoading]   = useState(true);
-  const [query, setQuery]       = useState('');
+  const [papers, setPapers]   = useState([]);
+  const [stats, setStats]     = useState({ total: 0, approved: 0, pending: 0 });
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery]     = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,6 +77,8 @@ export default function Home() {
     });
   }, []);
 
+  const rate = stats.total === 0 ? 0 : Math.round((stats.approved / stats.total) * 100);
+
   function handleSearch(e) {
     e.preventDefault();
     if (query.trim()) navigate(`/browse?q=${encodeURIComponent(query.trim())}`);
@@ -41,7 +87,6 @@ export default function Home() {
 
   return (
     <div className="page-content">
-      {/* Top bar */}
       <div className="topbar">
         <form className="search-wrapper" onSubmit={handleSearch} style={{ maxWidth: 360 }}>
           <span className="search-icon"><Search size={14} /></span>
@@ -60,34 +105,10 @@ export default function Home() {
 
       {/* Stats strip */}
       <div className="stats-row">
-        <div className="stat-card">
-          <div className="stat-label">Total Papers</div>
-          <div className="stat-value">{loading ? '—' : stats.total}</div>
-          <div className="stat-sub">in the vault</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Approved</div>
-          <div className="stat-value" style={{ color: 'var(--status-approved)' }}>
-            {loading ? '—' : stats.approved}
-          </div>
-          <div className="stat-sub">publicly visible</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Pending</div>
-          <div className="stat-value" style={{ color: 'var(--status-pending)' }}>
-            {loading ? '—' : stats.pending}
-          </div>
-          <div className="stat-sub">awaiting review</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Success Rate</div>
-          <div className="stat-value">
-            {loading || stats.total === 0
-              ? '—'
-              : `${Math.round((stats.approved / stats.total) * 100)}%`}
-          </div>
-          <div className="stat-sub">approval rate</div>
-        </div>
+        <StatCard label="Total Papers"  value={loading ? '—' : stats.total}    sub="in the vault"      />
+        <StatCard label="Approved"      value={loading ? '—' : stats.approved}  sub="publicly visible"  color="var(--status-approved)" />
+        <StatCard label="Pending"       value={loading ? '—' : stats.pending}   sub="awaiting review"   color="var(--status-pending)" />
+        <StatCard label="Success Rate"  value={loading ? '—' : rate}            sub="approval rate"     suffix="%" />
       </div>
 
       {/* Grid */}
@@ -101,7 +122,9 @@ export default function Home() {
         </div>
 
         {loading ? (
-          <div className="spinner-wrap"><div className="spinner" /></div>
+          <div className="papers-grid papers-grid-inner">
+            {Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)}
+          </div>
         ) : papers.length === 0 ? (
           <div className="empty-state">
             No papers yet.{' '}
