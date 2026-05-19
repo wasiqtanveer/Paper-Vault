@@ -77,9 +77,9 @@ select option {
   overflow-x: hidden;
   background: var(--bg-primary);
   min-width: 0;
-  /* slides in sync with the fixed sidebar — same 0.22s duration */
   margin-left: var(--sidebar-current-width, 240px);
   transition: margin-left 0.22s ease;
+  will-change: margin-left;
 }
 
 /* ── Mobile topbar placeholder ───────────────────── */

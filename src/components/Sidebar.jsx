@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -148,8 +148,9 @@ export default function Sidebar() {
 
   const sharedProps = { user, profile, theme, toggle, dropOpen, setDropOpen, dropRef, onSignOut: handleSignOut };
 
-  // Keep a CSS variable in sync so main-content can use margin-left without JS
-  useEffect(() => {
+  // useLayoutEffect so the CSS variable is set before the browser paints —
+  // prevents the one-frame flash where margin-left jumps on route changes
+  useLayoutEffect(() => {
     document.documentElement.style.setProperty('--sidebar-current-width', collapsed ? '56px' : '240px');
   }, [collapsed]);
 

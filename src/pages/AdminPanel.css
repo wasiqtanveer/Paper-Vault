@@ -56,6 +56,14 @@
 
 .admin-section-body { padding: 14px 18px; }
 
+/* Fixed height scrollable list for subjects/teachers */
+.admin-two-col .admin-section-body .table-wrap {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
 .admin-two-col {
   display: grid;
   grid-template-columns: 1fr 1fr;
