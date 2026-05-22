@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import Sidebar from './components/Sidebar';
 import ProtectedRoute from './components/ProtectedRoute';
 import Preloader from './components/Preloader';
+import WelcomeModal from './components/WelcomeModal';
 
 const Home         = lazy(() => import('./pages/Home'));
 const Browse       = lazy(() => import('./pages/Browse'));
@@ -70,6 +71,7 @@ function Shell() {
 
   return (
     <div className="app-shell">
+      <WelcomeModal />
       <Sidebar />
       <main className="main-content" id="main-scroll">
         <Suspense fallback={<PageFallback />}>
