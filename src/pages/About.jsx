@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Mail, Globe, ExternalLink, GitBranch, Heart, Code2, Github } from 'lucide-react';
+import { Mail, Globe, ExternalLink, GitBranch, Heart, Code2 } from 'lucide-react';
 import './About.css';
 
 const fadeUp = (i = 0) => ({
@@ -34,7 +34,7 @@ export default function About() {
                   <Globe size={14} /> Portfolio
                 </a>
                 <a href="https://github.com/wasiqtanveer" target="_blank" rel="noreferrer" className="about-link-btn">
-                  <Github size={14} /> GitHub
+                  <GitBranch size={14} /> GitHub
                 </a>
               </div>
             </div>

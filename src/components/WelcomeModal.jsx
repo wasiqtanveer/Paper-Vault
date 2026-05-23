@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, BookOpen, Upload, ShieldCheck, Github } from 'lucide-react';
+import { X, BookOpen, Upload, ShieldCheck, GitBranch } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './WelcomeModal.css';
 
@@ -79,7 +79,7 @@ export default function WelcomeModal() {
                 </div>
               </div>
               <div className="wm-feature">
-                <div className="wm-feature-icon"><Github size={16} /></div>
+                <div className="wm-feature-icon"><GitBranch size={16} /></div>
                 <div>
                   <div className="wm-feature-title">Make It Better</div>
                   <div className="wm-feature-desc">Found a bug? Have a feature idea? Reach out or contribute on GitHub — this is a student-built project and all feedback is welcome.</div>
