@@ -62,9 +62,27 @@ export default function AdminPanel() {
   }
 
   async function updateRole(userId, role) {
-    const { error } = await supabase.from('profiles').update({ role }).eq('id', userId);
+    const target = users.find(u => u.id === userId);
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ role })
+      .eq('id', userId)
+      .select();
     if (error) { addToast(error.message, 'error'); return; }
+    if (!data || data.length === 0) {
+      addToast('Update blocked — check RLS policy for profiles table.', 'error');
+      return;
+    }
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, role } : u));
+    // Log the role change so it shows up in activity history
+    await supabase.from('activity_log').insert({
+      action: 'role_change',
+      actor_id: currentProfile?.id,
+      actor_name: currentProfile?.full_name ?? 'Admin',
+      actor_role: currentProfile?.role ?? 'admin',
+      paper_id: null,
+      paper_title: `${target?.full_name ?? target?.email ?? 'User'} → ${role}`,
+    });
     addToast('Role updated.', 'success');
   }
 
@@ -130,11 +148,11 @@ export default function AdminPanel() {
   );
 
   function actionLabel(action) {
-    const map = { upload: 'Uploaded', approve: 'Approved', reject: 'Rejected', delete: 'Deleted' };
+    const map = { upload: 'Uploaded', approve: 'Approved', reject: 'Rejected', delete: 'Deleted', role_change: 'Role Changed' };
     return map[action] ?? action;
   }
   function actionColor(action) {
-    const map = { upload: 'var(--accent-blue)', approve: 'var(--status-approved)', reject: 'var(--status-rejected)', delete: 'var(--status-rejected)' };
+    const map = { upload: 'var(--accent-blue)', approve: 'var(--status-approved)', reject: 'var(--status-rejected)', delete: 'var(--status-rejected)', role_change: 'var(--accent-blue)' };
     return map[action] ?? 'var(--text-muted)';
   }
 
