@@ -198,6 +198,10 @@
 
 @media (max-width: 600px) {
   .pw-form-row { grid-template-columns: 1fr; }
+  .profile-header-card { flex-wrap: wrap; }
+  .profile-role-badge  { margin-left: 0; }
+  .profile-stats-row   { flex-wrap: wrap; }
+  .profile-stat        { min-width: calc(50% - 6px); }
 }
 
 /* Papers table */

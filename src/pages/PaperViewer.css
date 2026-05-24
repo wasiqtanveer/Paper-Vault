@@ -61,5 +61,9 @@
 
 @media (max-width: 860px) {
   .paper-viewer-layout { grid-template-columns: 1fr; }
-  .paper-meta-panel { position: static; }
+  .paper-meta-panel {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
 }
