@@ -1,43 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, BookOpen, Upload, ShieldCheck, GitBranch, ArrowRight, Sparkles } from 'lucide-react';
+import { X, BookOpen, Upload, ShieldCheck, GitBranch } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './WelcomeModal.css';
 
 const STORAGE_KEY = 'pv_welcome_seen';
-
-const features = [
-  {
-    icon: BookOpen,
-    title: 'Find Past Papers Fast',
-    desc: 'Search by subject, teacher, year, or semester. Every approved paper is just a click away — no more digging through WhatsApp groups.',
-  },
-  {
-    icon: Upload,
-    title: 'Share What You Have',
-    desc: 'Got a paper others would benefit from? Upload it in seconds. Each one is reviewed by mods to keep the vault clean and reliable.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Trustworthy by Design',
-    desc: 'Moderation, reports, and an activity log keep everything accountable. You see only what real students vouched for.',
-  },
-  {
-    icon: GitBranch,
-    title: 'Help Shape It',
-    desc: 'PaperVault is a student-built passion project. Hit any rough edge? Tell me — or send a PR. This grows with the people using it.',
-  },
-];
-
-const containerV = {
-  hidden: {},
-  show:   { transition: { staggerChildren: 0.07, delayChildren: 0.15 } },
-};
-const itemV = {
-  hidden: { opacity: 0, y: 14, scale: 0.97 },
-  show:   { opacity: 1, y: 0,  scale: 1, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
-};
 
 export default function WelcomeModal() {
   const { user } = useAuth();
@@ -47,10 +15,7 @@ export default function WelcomeModal() {
   useEffect(() => {
     if (!user) return;
     const seen = localStorage.getItem(STORAGE_KEY);
-    if (!seen) {
-      const t = setTimeout(() => setVisible(true), 350);
-      return () => clearTimeout(t);
-    }
+    if (!seen) setVisible(true);
   }, [user]);
 
   function dismiss() {
@@ -60,7 +25,7 @@ export default function WelcomeModal() {
 
   function goToAbout() {
     dismiss();
-    setTimeout(() => navigate('/about'), 220);
+    navigate('/about');
   }
 
   return (
@@ -72,68 +37,64 @@ export default function WelcomeModal() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: 0.2 }}
             onClick={dismiss}
           />
           <motion.div
             className="wm-modal"
-            initial={{ opacity: 0, y: 40, scale: 0.92 }}
-            animate={{ opacity: 1, y: 0,  scale: 1 }}
-            exit={{    opacity: 0, y: 20, scale: 0.96 }}
-            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1,    y: 0  }}
+            exit={{    opacity: 0, scale: 0.96, y: 10 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
           >
             <button className="wm-close" onClick={dismiss} aria-label="Close">
               <X size={16} />
             </button>
 
-            <motion.div
-              className="wm-header"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.1, ease: 'easeOut' }}
-            >
-              <div className="wm-badge">
-                <Sparkles size={11} /> Welcome
+            <div className="wm-header">
+              <div className="wm-logo">PaperVault</div>
+              <div className="wm-tagline">A student-built vault for past papers. Here's what you can do.</div>
+            </div>
+
+            <div className="wm-features">
+              <div className="wm-feature">
+                <div className="wm-feature-icon"><BookOpen size={16} /></div>
+                <div>
+                  <div className="wm-feature-title">Browse the Vault</div>
+                  <div className="wm-feature-desc">Filter past papers by subject, teacher, year, and semester. Everything you'd ask a senior for — searchable.</div>
+                </div>
               </div>
-              <h2 className="wm-logo">PaperVault</h2>
-              <p className="wm-tagline">
-                Built by a student, for students. Here's the quick tour — then you're free to explore.
-              </p>
-            </motion.div>
+              <div className="wm-feature">
+                <div className="wm-feature-icon"><Upload size={16} /></div>
+                <div>
+                  <div className="wm-feature-title">Upload What You Have</div>
+                  <div className="wm-feature-desc">Got a paper? Share it. Uploads are quick — just snap a photo, fill in the details, and submit for review.</div>
+                </div>
+              </div>
+              <div className="wm-feature">
+                <div className="wm-feature-icon"><ShieldCheck size={16} /></div>
+                <div>
+                  <div className="wm-feature-title">Moderated for Quality</div>
+                  <div className="wm-feature-desc">Every upload is checked by a moderator before going public. No junk, no duplicates — just useful papers.</div>
+                </div>
+              </div>
+              <div className="wm-feature">
+                <div className="wm-feature-icon"><GitBranch size={16} /></div>
+                <div>
+                  <div className="wm-feature-title">Help Make It Better</div>
+                  <div className="wm-feature-desc">Spot a bug or want a feature? PaperVault is open to contributions — tell me what's missing and I'll build it.</div>
+                </div>
+              </div>
+            </div>
 
-            <motion.div
-              className="wm-features"
-              variants={containerV}
-              initial="hidden"
-              animate="show"
-            >
-              {features.map((f, i) => {
-                const Icon = f.icon;
-                return (
-                  <motion.div className="wm-feature" key={i} variants={itemV}>
-                    <div className="wm-feature-icon"><Icon size={17} /></div>
-                    <div className="wm-feature-text">
-                      <div className="wm-feature-title">{f.title}</div>
-                      <div className="wm-feature-desc">{f.desc}</div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-
-            <motion.div
-              className="wm-footer"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.55, ease: 'easeOut' }}
-            >
-              <button className="wm-btn wm-btn-ghost" onClick={dismiss}>
-                Skip
+            <div className="wm-footer">
+              <button className="btn btn-ghost" onClick={dismiss}>
+                Get Started
               </button>
-              <button className="wm-btn wm-btn-primary" onClick={goToAbout}>
-                Meet the Developer <ArrowRight size={14} />
+              <button className="btn btn-primary" onClick={goToAbout}>
+                About the Developer →
               </button>
-            </motion.div>
+            </div>
           </motion.div>
         </>
       )}
