@@ -105,7 +105,7 @@ export default function Home() {
 
       {/* Stats strip */}
       <div className="stats-row">
-        <StatCard label="Total Papers"  value={loading ? '—' : stats.total}    sub="in the vault"      />
+        <StatCard label="Total Papers"  value={loading ? '—' : stats.approved + stats.pending} sub="in the vault"     />
         <StatCard label="Approved"      value={loading ? '—' : stats.approved}  sub="publicly visible"  color="var(--status-approved)" />
         <StatCard label="Pending"       value={loading ? '—' : stats.pending}   sub="awaiting review"   color="var(--status-pending)" />
         <StatCard label="Success Rate"  value={loading ? '—' : rate}            sub="approval rate"     suffix="%" />
