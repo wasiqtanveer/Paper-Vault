@@ -253,7 +253,12 @@ select option {
 }
 
 /* ── Page inner ──────────────────────────────────── */
-.page-inner { padding: 24px 28px; }
+.page-inner {
+  padding: 24px 28px;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+}
 
 .page-header {
   display: flex;
@@ -402,10 +407,11 @@ tbody tr:last-child td { border-bottom: none; }
   .main-content {
     margin-left: 0 !important;
     height: auto;
-    min-height: calc(100dvh - 52px); /* subtract mobile topbar height */
+    min-height: calc(100dvh - 52px);
     overflow-y: visible;
     overflow-x: hidden;
     flex: 1;
+    max-width: 100vw;
   }
 
   /* Hide the desktop topbar on pages that have one (PaperViewer etc.)

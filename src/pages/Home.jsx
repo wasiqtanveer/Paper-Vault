@@ -108,7 +108,7 @@ export default function Home() {
             <Link to="/upload" style={{ color: 'var(--accent-blue)' }}>Be the first to upload!</Link>
           </div>
         ) : (
-          <div className="papers-grid" style={{ padding: 0 }}>
+          <div className="papers-grid papers-grid-inner">
             {papers.map((p, i) => <PaperCard key={p.id} paper={p} index={i} />)}
           </div>
         )}
