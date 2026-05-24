@@ -19,11 +19,10 @@ export function AuthProvider({ children }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      const minDelay = new Promise(r => setTimeout(r, 1800));
       if (session?.user) {
-        Promise.all([fetchProfile(session.user.id), minDelay]).finally(() => setLoading(false));
+        fetchProfile(session.user.id).finally(() => setLoading(false));
       } else {
-        minDelay.then(() => setLoading(false));
+        setLoading(false);
       }
     });
 
@@ -45,7 +44,6 @@ export function AuthProvider({ children }) {
 
   async function signOut() {
     setSigningOut(true);
-    await new Promise(r => setTimeout(r, 2200)); // let preloader show
     await supabase.auth.signOut();
     setSigningOut(false);
   }

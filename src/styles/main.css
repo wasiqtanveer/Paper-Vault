@@ -422,7 +422,9 @@ tbody tr:last-child td { border-bottom: none; }
   /* Page header stacks */
   .page-header { flex-direction: column; align-items: flex-start; }
 
-  /* Buttons fill width on small screens */
-  .topbar-actions { gap: 6px; }
+  /* Topbar: stack search above actions on very small screens */
+  .topbar { flex-wrap: wrap; height: auto; min-height: 48px; padding: 8px 16px; gap: 8px; }
+  .search-wrapper { max-width: 100% !important; order: 2; flex: 1 1 100%; }
+  .topbar-actions { gap: 6px; order: 1; margin-left: 0; }
   .topbar-actions .btn { padding: 6px 10px; font-size: 12px; }
 }
