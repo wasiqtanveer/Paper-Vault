@@ -1,19 +1,16 @@
 .filters-bar {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   align-items: center;
   margin-bottom: 20px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px; /* prevent clipping box-shadows */
 }
+.filters-bar::-webkit-scrollbar { display: none; }
 
-.filters-bar .search-wrapper { flex: 1; min-width: 180px; max-width: 280px; }
-.filters-bar select          { width: auto; min-width: 130px; flex-shrink: 0; }
-
-/* Each filter dropdown: fixed natural width, never stretches */
-.filters-bar .cselect        { width: auto; flex-shrink: 0; }
-.filters-bar .cselect-trigger { min-width: 130px; width: auto; }
-
-@media (max-width: 600px) {
-  .filters-bar .cselect        { width: 100%; }
-  .filters-bar .search-wrapper { max-width: 100%; }
-}
+.filters-bar .search-wrapper  { flex: 1; min-width: 120px; max-width: 220px; flex-shrink: 0; }
+.filters-bar .cselect          { flex-shrink: 0; }
+.filters-bar .cselect-trigger  { min-width: 110px; white-space: nowrap; }
