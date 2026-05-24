@@ -1,0 +1,110 @@
+.wm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg);
+  z-index: 400;
+  backdrop-filter: blur(2px);
+}
+
+.wm-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 401;
+  width: min(480px, calc(100vw - 32px));
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-elevated);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.wm-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.wm-close:hover { color: var(--text-primary); background: var(--bg-card-hover); }
+
+.wm-header { padding-right: 24px; }
+
+.wm-logo {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.wm-tagline {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.wm-features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wm-feature {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.wm-feature-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.wm-feature-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.wm-feature-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.wm-footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 480px) {
+  .wm-modal  { padding: 20px; }
+  .wm-footer { flex-direction: column-reverse; }
+  .wm-footer .btn { width: 100%; justify-content: center; }
+}
