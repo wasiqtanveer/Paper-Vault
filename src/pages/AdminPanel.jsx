@@ -151,7 +151,7 @@ export default function AdminPanel() {
         {/* Stats */}
         <motion.div className="metrics-grid" {...fadeUp(0)}>
           {[
-            { label: 'Total Papers', value: stats.total, color: null },
+            { label: 'Total Papers', value: stats.approved + stats.pending, color: null },
             { label: 'Approved',     value: stats.approved, color: 'var(--status-approved)' },
             { label: 'Pending',      value: stats.pending,  color: 'var(--status-pending)'  },
             { label: 'Total Users',  value: stats.users,   color: null },
