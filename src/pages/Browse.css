@@ -11,6 +11,6 @@
 }
 .filters-bar::-webkit-scrollbar { display: none; }
 
-.filters-bar .search-wrapper  { flex: 1; min-width: 120px; max-width: 220px; flex-shrink: 0; }
-.filters-bar .cselect          { flex-shrink: 0; }
-.filters-bar .cselect-trigger  { min-width: 110px; white-space: nowrap; }
+.filters-bar .search-wrapper   { flex: 1; min-width: 120px; max-width: 220px; flex-shrink: 0; }
+.filters-bar .cselect          { width: auto; flex-shrink: 0; }
+.filters-bar .cselect-trigger  { width: auto; min-width: 110px; white-space: nowrap; }

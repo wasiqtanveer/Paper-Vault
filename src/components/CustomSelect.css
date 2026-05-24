@@ -1,6 +1,6 @@
 .cselect {
   position: relative;
-  width: 100%;
+  width: 100%; /* overridden to auto when inside .filters-bar */
 }
 
 .cselect-trigger {
