@@ -51,3 +51,31 @@
   .stat-card  { padding: 16px; }
   .stat-value { font-size: 24px; }
 }
+
+/* ── Skeleton card ───────────────────────────────── */
+.skeleton-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+}
+
+.skeleton-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.skeleton-body {
+  padding: 13px 15px 15px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0;
+}
+
+.skel-line {
+  height: 12px;
+  border-radius: 6px;
+}

@@ -288,6 +288,19 @@ select option {
   margin-bottom: 12px;
 }
 
+/* ── Skeleton shimmer ────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.skel {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-card-hover) 50%, var(--bg-elevated) 75%);
+  background-size: 1200px 100%;
+  animation: shimmer 1.4s infinite linear;
+  display: block;
+}
+
 /* ── Spinner ─────────────────────────────────────── */
 .spinner-wrap {
   display: flex;
