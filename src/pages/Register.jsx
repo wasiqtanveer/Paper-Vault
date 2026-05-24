@@ -20,6 +20,9 @@ export default function Register() {
     setError('');
     if (form.password !== form.confirm) { setError('Passwords do not match.'); return; }
     if (form.password.length < 6)      { setError('Password must be at least 6 characters.'); return; }
+    const emailDomain = form.email.split('@')[1]?.toLowerCase() ?? '';
+    const throwaway = ['mailinator.com','guerrillamail.com','tempmail.com','10minutemail.com','yopmail.com','trashmail.com','sharklasers.com','disposablemail.com'];
+    if (throwaway.includes(emailDomain)) { setError('Please use a real email address.'); return; }
     setLoading(true);
     try {
       const { error: signUpError } = await supabase.auth.signUp({
