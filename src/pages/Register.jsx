@@ -27,11 +27,20 @@ export default function Register() {
         password: form.password,
         options: { data: { full_name: form.fullName } },
       });
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        const msg = signUpError.message || '';
+        if (msg.toLowerCase().includes('sending') || msg.toLowerCase().includes('email') || msg === '{}' || msg === '') {
+          setError('We couldn\'t send a confirmation email right now. Please try again in a moment, or contact support.');
+        } else if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already been registered')) {
+          setError('An account with this email already exists. Try signing in instead.');
+        } else {
+          setError(msg || 'Registration failed. Please try again.');
+        }
+        return;
+      }
       setSent(true);
-      return;
     } catch (err) {
-      setError(err.message || 'Registration failed.');
+      setError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
