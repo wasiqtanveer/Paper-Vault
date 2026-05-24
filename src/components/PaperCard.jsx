@@ -12,10 +12,11 @@ export default function PaperCard({ paper, index = 0 }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, delay: index * 0.04, ease: 'easeOut' }}
-      whileHover={{ transition: { duration: 0.18 } }}
+      initial={{ opacity: 0, y: 18, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.42, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -2, transition: { duration: 0.2, ease: 'easeOut' } }}
+      whileTap={{ scale: 0.98 }}
     >
       <Link to={`/paper/${paper.id}`} className="paper-card">
         {paper.image_url ? (

@@ -27,9 +27,9 @@ function PageFallback() {
 const AUTH_ROUTES = ['/login', '/register'];
 
 const pageVariants = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.22, ease: 'easeOut' } },
-  exit:    { opacity: 0, y: -6, transition: { duration: 0.15, ease: 'easeIn' } },
+  initial: { opacity: 0, y: 14, scale: 0.985 },
+  animate: { opacity: 1, y: 0,  scale: 1,     transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } },
+  exit:    { opacity: 0, y: -8, scale: 0.99,  transition: { duration: 0.18, ease: 'easeIn' } },
 };
 
 function PageWrap({ children }) {
