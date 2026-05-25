@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Flag, Trash2, Check, X, ArrowLeft, Download } from 'lucide-react';
+import { Flag, Trash2, Check, X, ArrowLeft, Download, Pencil } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { deleteImage } from '../lib/storage';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import ImageViewer from '../components/ImageViewer';
 import StatusBadge from '../components/StatusBadge';
+import EditPaperModal from '../components/EditPaperModal';
 import './PaperViewer.css';
+
+const OWNER_EMAIL = 'mwasiqt@gmail.com';
 
 export default function PaperViewer() {
   const { id } = useParams();
@@ -23,6 +26,9 @@ export default function PaperViewer() {
   const [reportLoading, setReportLoading] = useState(false);
   const [reportError,   setReportError]   = useState('');
   const [downloading,   setDownloading]   = useState(false);
+  const [showEdit,      setShowEdit]      = useState(false);
+  const [subjects,      setSubjects]      = useState([]);
+  const [teachers,      setTeachers]      = useState([]);
 
   useEffect(() => {
     supabase
@@ -36,6 +42,18 @@ export default function PaperViewer() {
         setLoading(false);
       });
   }, [id]);
+
+  // Load subjects/teachers when modal is about to open
+  useEffect(() => {
+    if (!showEdit) return;
+    Promise.all([
+      supabase.from('subjects').select('id, name').order('name'),
+      supabase.from('teachers').select('id, name').order('name'),
+    ]).then(([{ data: s }, { data: t }]) => {
+      setSubjects(s ?? []);
+      setTeachers(t ?? []);
+    });
+  }, [showEdit]);
 
   async function handleDownload() {
     setDownloading(true);
@@ -115,6 +133,10 @@ export default function PaperViewer() {
 
   const isMod      = profile?.role === 'moderator' || profile?.role === 'admin';
   const isOwner    = user && paper.profiles?.id === user.id;
+  // The site owner (admin by email) can also edit any paper
+  const isSiteOwner = user?.email === OWNER_EMAIL;
+  const canEdit    = isOwner || isSiteOwner;
+
   const uploadedAt = new Date(paper.uploaded_at).toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
   });
@@ -125,6 +147,15 @@ export default function PaperViewer() {
         <button className="btn btn-ghost btn-sm" onClick={() => navigate(-1)} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
           <ArrowLeft size={14} /> Back
         </button>
+        {canEdit && (
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={() => setShowEdit(true)}
+            style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5 }}
+          >
+            <Pencil size={13} /> Edit Details
+          </button>
+        )}
       </div>
 
       <div className="page-inner">
@@ -220,6 +251,16 @@ export default function PaperViewer() {
           </div>
         </div>
       </div>
+
+      {showEdit && (
+        <EditPaperModal
+          paper={paper}
+          subjects={subjects}
+          teachers={teachers}
+          onSave={updated => setPaper(updated)}
+          onClose={() => setShowEdit(false)}
+        />
+      )}
     </div>
   );
 }

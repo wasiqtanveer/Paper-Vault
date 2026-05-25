@@ -124,6 +124,28 @@
 
 .mod-card-actions { display: flex; gap: 5px; }
 
+/* Edit (pencil) button on mod cards — visible only to site owner */
+.btn-mod-edit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+.btn-mod-edit:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-focus);
+  color: var(--text-primary);
+}
+
 /* Reports */
 .reports-table-wrap {
   display: flex;

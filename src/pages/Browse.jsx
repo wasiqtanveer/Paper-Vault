@@ -72,39 +72,46 @@ export default function Browse() {
 
       <div className="page-inner">
         <div className="filters-bar">
-          <div className="search-wrapper" style={{ maxWidth: 280 }}>
-            <span className="search-icon"><Search size={14} /></span>
-            <input
-              className="search-input"
-              value={filters.q}
-              onChange={set('q')}
-              placeholder="Search by title…"
+          {/* Row 1: search (full width) */}
+          <div className="filters-search-row">
+            <div className="search-wrapper">
+              <span className="search-icon"><Search size={14} /></span>
+              <input
+                className="search-input"
+                value={filters.q}
+                onChange={set('q')}
+                placeholder="Search by title…"
+              />
+            </div>
+          </div>
+
+          {/* Row 2: three dropdowns side by side */}
+          <div className="filters-dropdowns-row">
+            <CustomSelect
+              value={filters.subject}
+              onChange={v => setFilters(f => ({ ...f, subject: v }))}
+              placeholder="All Subjects"
+              options={[{ value: '', label: 'All Subjects' }, ...subjects.map(s => ({ value: s.id, label: s.name }))]}
+            />
+            <CustomSelect
+              value={filters.year}
+              onChange={v => setFilters(f => ({ ...f, year: v }))}
+              placeholder="All Years"
+              options={[{ value: '', label: 'All Years' }, ...years.map(y => ({ value: y, label: String(y) }))]}
+            />
+            <CustomSelect
+              value={filters.semester}
+              onChange={v => setFilters(f => ({ ...f, semester: v }))}
+              placeholder="All Semesters"
+              options={[
+                { value: '', label: 'All Semesters' },
+                { value: 'Spring', label: 'Spring' },
+                { value: 'Fall',   label: 'Fall'   },
+                { value: 'Mid',    label: 'Mid'    },
+                { value: 'Final',  label: 'Final'  },
+              ]}
             />
           </div>
-          <CustomSelect
-            value={filters.subject}
-            onChange={v => setFilters(f => ({ ...f, subject: v }))}
-            placeholder="All Subjects"
-            options={[{ value: '', label: 'All Subjects' }, ...subjects.map(s => ({ value: s.id, label: s.name }))]}
-          />
-          <CustomSelect
-            value={filters.year}
-            onChange={v => setFilters(f => ({ ...f, year: v }))}
-            placeholder="All Years"
-            options={[{ value: '', label: 'All Years' }, ...years.map(y => ({ value: y, label: String(y) }))]}
-          />
-          <CustomSelect
-            value={filters.semester}
-            onChange={v => setFilters(f => ({ ...f, semester: v }))}
-            placeholder="All Semesters"
-            options={[
-              { value: '', label: 'All Semesters' },
-              { value: 'Spring', label: 'Spring' },
-              { value: 'Fall',   label: 'Fall'   },
-              { value: 'Mid',    label: 'Mid'    },
-              { value: 'Final',  label: 'Final'  },
-            ]}
-          />
         </div>
 
         {loading && papers.length === 0 ? (

@@ -91,9 +91,37 @@
 .admin-two-col .admin-section td:first-child { width: 100%; }
 .admin-two-col .admin-section td:last-child  { width: 1%; white-space: nowrap; text-align: right; }
 
+/* Users table: fixed height with scroll */
+.users-table-wrap {
+  max-height: 340px;
+  overflow-y: auto;
+}
+
 /* Users table: role column CustomSelect gets a fixed width */
 .users-table td:nth-child(3) { width: 150px; }
 .users-table td:nth-child(3) .custom-select { width: 130px; }
+
+/* Sortable column header button */
+.sort-th-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0;
+  white-space: nowrap;
+  transition: color 0.15s;
+  user-select: none;
+}
+.sort-th-btn:hover,
+.sort-th-active { color: var(--text-primary); }
+.sort-th-icon { display: inline-flex; align-items: center; margin-left: 2px; }
 
 /* Activity table */
 .activity-table { table-layout: fixed; width: 100%; }

@@ -10,14 +10,15 @@
 /* ── Glassmorphic modal ──────────────────────────── */
 .wm-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   margin: auto;
-  height: fit-content;
   z-index: 401;
+
+  /* Clamp width and height so it never overflows the viewport */
   width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  height: fit-content;
+
   background: color-mix(in srgb, var(--bg-secondary) 70%, transparent);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -25,9 +26,11 @@
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-elevated);
   padding: 28px;
+
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow-y: auto;
 }
 
 .wm-close {
@@ -45,10 +48,11 @@
   color: var(--text-muted);
   cursor: pointer;
   transition: var(--transition);
+  flex-shrink: 0;
 }
 .wm-close:hover { color: var(--text-primary); background: var(--bg-card-hover); }
 
-.wm-header { padding-right: 24px; }
+.wm-header { padding-right: 24px; flex-shrink: 0; }
 
 .wm-logo {
   font-size: 20px;
@@ -67,12 +71,16 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .wm-feature {
   display: flex;
   gap: 12px;
   align-items: flex-start;
+  flex-shrink: 0;
 }
 
 .wm-feature-icon {
@@ -108,10 +116,56 @@
   justify-content: flex-end;
   padding-top: 4px;
   border-top: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
+/* ── Mobile tweaks ─────────────────────────────────── */
 @media (max-width: 480px) {
-  .wm-modal  { padding: 20px; }
-  .wm-footer { flex-direction: column-reverse; }
-  .wm-footer .btn { width: 100%; justify-content: center; }
+  .wm-modal {
+    padding: 20px 16px;
+    /* On short phones sit at the bottom like a sheet */
+    inset: auto 0 0 0;
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    margin: 0;
+  }
+
+  /* Drag handle hint */
+  .wm-modal::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    margin: 0 auto 8px;
+    flex-shrink: 0;
+  }
+
+  .wm-footer {
+    flex-direction: column-reverse;
+  }
+  .wm-footer .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Compress feature descriptions on very small screens */
+  .wm-feature-desc {
+    font-size: 11.5px;
+  }
+}
+
+/* Very short screens (landscape mobile) */
+@media (max-height: 600px) {
+  .wm-features {
+    gap: 10px;
+  }
+  .wm-feature-desc {
+    display: none; /* Hide descriptions, keep titles visible */
+  }
+  .wm-modal {
+    gap: 14px;
+  }
 }
