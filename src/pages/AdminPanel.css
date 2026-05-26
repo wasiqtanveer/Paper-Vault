@@ -238,3 +238,21 @@
 @media (max-width: 768px) {
   .metrics-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Hall of Fame admin form */
+.hof-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 4px;
+}
+
+.hof-admin-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hof-admin-row input {
+  min-width: 120px;
+}

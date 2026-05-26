@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home, LayoutGrid, Upload, ShieldCheck, Settings2,
   User, LogOut, ChevronUp, ChevronDown, Sun, Moon,
-  PanelLeftClose, PanelLeftOpen, Info, Menu, X
+  PanelLeftClose, PanelLeftOpen, Info, Menu, X, Trophy
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -56,7 +56,8 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
         {!collapsed && <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>}
       </button>
 
-      <NavItem to="/about" icon={Info} label="About Developer" />
+      <NavItem to="/about"        icon={Info}   label="About Developer" />
+      <NavItem to="/hall-of-fame" icon={Trophy} label="Hall of Fame" />
 
       {user ? (
         <div className="sidebar-bottom">

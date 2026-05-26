@@ -124,3 +124,71 @@
   background: var(--border);
 }
 .form-divider-label span { flex-shrink: 0; }
+
+/* ── Password input with show/hide toggle ─────────── */
+.pw-wrap {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+
+/* Reserve space for the eye button */
+.pw-wrap input {
+  padding-right: 42px;
+  width: 100%;
+  /* Animate only the text color — border and background stay rock-solid */
+  transition: color 0.18s ease;
+}
+
+/* Text (dots or characters) fades to invisible while type flips.
+   color:transparent leaves the border, background and layout 100% stable. */
+.pw-fading {
+  color: transparent !important;
+  caret-color: transparent !important;
+}
+
+/* Eye button — pinned to the right, centred vertically.
+   No Framer Motion on this element so translateY(-50%) is never overwritten. */
+.pw-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0;
+  line-height: 0;
+  /* Same transition as every other interactive element on the site */
+  transition: color 0.18s ease, background 0.18s ease, transform 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 2;
+}
+
+/* Press feedback — same scale as .btn:active used across the whole site */
+.pw-toggle:active {
+  transform: translateY(-50%) scale(0.9);
+}
+
+.pw-toggle:hover {
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.06);
+}
+[data-theme="light"] .pw-toggle:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+/* Blue when password is visible — same accent used for active nav links etc. */
+.pw-toggle-active       { color: var(--accent-blue); }
+.pw-toggle-active:hover { color: var(--accent-blue); }
+
+
+
+
+
