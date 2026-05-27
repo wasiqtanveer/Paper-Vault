@@ -7,6 +7,7 @@ import { deleteImage } from '../lib/storage';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import StatusBadge from '../components/StatusBadge';
+import { SkeletonRow } from '../components/Skeleton';
 import './Profile.css';
 
 const fadeUp = (i = 0) => ({
@@ -314,7 +315,18 @@ export default function Profile() {
           </div>
 
           {loading ? (
-            <div className="spinner-wrap"><div className="spinner" /></div>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Title</th><th>Subject</th><th>Year</th><th>Status</th><th>Uploaded</th><th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} cols={6} />)}
+                </tbody>
+              </table>
+            </div>
           ) : papers.length === 0 ? (
             <div className="empty-state">
               No papers yet. <Link to="/upload" style={{ color: 'var(--accent-blue)' }}>Upload one</Link>

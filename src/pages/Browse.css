@@ -1,3 +1,11 @@
+/* ── Topbar title ────────────────────────────────── */
+.browse-topbar-spacer { flex: 1; }
+.browse-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
 /* ── Filters bar ─────────────────────────────────── */
 .filters-bar {
   display: flex;

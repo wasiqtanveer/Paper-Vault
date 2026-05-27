@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /register
+Disallow: /upload
+Disallow: /profile
+Disallow: /mod
+Disallow: /admin

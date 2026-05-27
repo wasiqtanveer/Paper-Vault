@@ -8,6 +8,8 @@ import { useToast } from '../context/ToastContext';
 import ImageViewer from '../components/ImageViewer';
 import StatusBadge from '../components/StatusBadge';
 import EditPaperModal from '../components/EditPaperModal';
+import { SkeletonLine, SkeletonBlock } from '../components/Skeleton';
+import { usePageMeta } from '../lib/usePageMeta';
 import './PaperViewer.css';
 
 const OWNER_EMAIL = 'mwasiqt@gmail.com';
@@ -29,6 +31,8 @@ export default function PaperViewer() {
   const [showEdit,      setShowEdit]      = useState(false);
   const [subjects,      setSubjects]      = useState([]);
   const [teachers,      setTeachers]      = useState([]);
+
+  usePageMeta(paper?.title ?? 'Paper', paper?.title ? `View and download "${paper.title}" on PaperVault.` : undefined);
 
   useEffect(() => {
     supabase
@@ -124,7 +128,24 @@ export default function PaperViewer() {
     addToast('Report submitted.', 'success');
   }
 
-  if (loading) return <div className="spinner-wrap"><div className="spinner" /></div>;
+  if (loading) return (
+    <div className="page-content">
+      <div className="topbar"><span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Loading…</span></div>
+      <div className="page-inner">
+        <div className="paper-viewer-layout">
+          <SkeletonBlock height={420} style={{ aspectRatio: '3 / 4', height: 'auto' }} />
+          <div className="paper-meta-panel" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <SkeletonLine width="70%" height={20} />
+            <SkeletonLine width="30%" height={16} />
+            <SkeletonLine width="100%" />
+            <SkeletonLine width="90%" />
+            <SkeletonLine width="80%" />
+            <SkeletonBlock height={40} style={{ marginTop: 'auto' }} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
   if (error)   return (
     <div className="page-content">
       <div className="page-inner"><div className="empty-state">{error}</div></div>

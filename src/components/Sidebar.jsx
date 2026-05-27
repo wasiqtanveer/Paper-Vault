@@ -23,7 +23,14 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
 
   function NavItem({ to, end, icon: Icon, label }) {
     return (
-      <NavLink to={to} end={end} className={navCls} title={collapsed ? label : undefined} onClick={onNav}>
+      <NavLink
+        to={to}
+        end={end}
+        className={navCls}
+        title={collapsed ? label : undefined}
+        aria-label={collapsed ? label : undefined}
+        onClick={onNav}
+      >
         <Icon size={16} className="nav-link-icon" />
         {!collapsed && <span className="nav-link-label">{label}</span>}
       </NavLink>
@@ -51,6 +58,7 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
         className={'theme-toggle-sidebar' + (collapsed ? ' icon-only' : '')}
         onClick={toggle}
         title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
       >
         {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
         {!collapsed && <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>}
@@ -65,7 +73,13 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
             className={'sidebar-user' + (collapsed ? ' sidebar-user-collapsed' : '')}
             ref={dropRef}
             onClick={() => setDropOpen(v => !v)}
+            onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setDropOpen(v => !v); } }}
             title={collapsed ? (profile?.full_name ?? 'User') : undefined}
+            role="button"
+            tabIndex={0}
+            aria-haspopup="menu"
+            aria-expanded={dropOpen}
+            aria-label="Account menu"
           >
             <div className="sidebar-avatar">{initials}</div>
             {!collapsed && (
@@ -172,6 +186,8 @@ export default function Sidebar() {
             className={'sidebar-collapse-btn' + (collapsed ? ' sidebar-collapse-btn-only' : '')}
             onClick={() => { setCollapsed(v => !v); setDropOpen(false); }}
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-expanded={!collapsed}
           >
             {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
           </button>
@@ -184,7 +200,7 @@ export default function Sidebar() {
         <Link to="/" className="mobile-topbar-logo">
           <span>PaperVault</span>
         </Link>
-        <button className="mobile-hamburger" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+        <button className="mobile-hamburger" onClick={() => setMobileOpen(true)} aria-label="Open menu" aria-expanded={mobileOpen}>
           <Menu size={20} />
         </button>
       </div>

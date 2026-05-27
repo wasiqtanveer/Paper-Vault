@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, ChevronUp, ArrowUpDown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { safeQuery } from '../lib/query';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import CustomSelect from '../components/CustomSelect';
+import { SkeletonRow, SkeletonBlock } from '../components/Skeleton';
 import './AdminPanel.css';
 
 const ROLES = ['student', 'moderator', 'admin'];
 const OWNER_EMAIL = 'mwasiqt@gmail.com';
+const USERS_PAGE_SIZE = 25;
 
 const fadeUp = (i = 0) => ({
   initial: { opacity: 0, y: 12 },
@@ -45,6 +48,7 @@ export default function AdminPanel() {
   const [users,      setUsers]      = useState([]);
   const [userSearch, setUserSearch] = useState('');
   const [userSort,   setUserSort]   = useState({ col: 'created_at', dir: 'desc' });
+  const [userLimit,  setUserLimit]  = useState(USERS_PAGE_SIZE);
   const [subjects,    setSubjects]    = useState([]);
   const [newSubject,  setNewSubject]  = useState('');
   const [editSubject, setEditSubject] = useState(null); // { id, name }
@@ -62,29 +66,29 @@ export default function AdminPanel() {
   const [hofSaving, setHofSaving] = useState(false);
 
   useEffect(() => {
+    const onError = msg => addToast(msg, 'error');
     Promise.all([
-      supabase.from('profiles').select('*').order('created_at', { ascending: false }),
-      supabase.from('subjects').select('*').order('name'),
-      supabase.from('teachers').select('*').order('name'),
-      supabase.from('papers').select('id, status'),
-      supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(50),
-      supabase.from('hall_of_fame').select('*').order('created_at', { ascending: true }),
-    ]).then(([{ data: u }, { data: s }, { data: t }, { data: p }, { data: log }, { data: hof }]) => {
-      setUsers(u ?? []);
-      setSubjects(s ?? []);
-      setTeachers(t ?? []);
-      setActLog(log ?? []);
-      setHofList(hof ?? []);
-      const papers = p ?? [];
+      safeQuery(supabase.from('profiles').select('*').order('created_at', { ascending: false }), { fallback: [], onError, label: 'users' }),
+      safeQuery(supabase.from('subjects').select('*').order('name'), { fallback: [], onError, label: 'subjects' }),
+      safeQuery(supabase.from('teachers').select('*').order('name'), { fallback: [], onError, label: 'teachers' }),
+      safeQuery(supabase.from('papers').select('id, status'), { fallback: [], onError, label: 'paper stats' }),
+      safeQuery(supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(50), { fallback: [], onError, label: 'activity log' }),
+      safeQuery(supabase.from('hall_of_fame').select('*').order('created_at', { ascending: true }), { fallback: [], onError, label: 'hall of fame' }),
+    ]).then(([u, s, t, p, log, hof]) => {
+      setUsers(u);
+      setSubjects(s);
+      setTeachers(t);
+      setActLog(log);
+      setHofList(hof);
       setStats({
-        total:    papers.length,
-        approved: papers.filter(x => x.status === 'approved').length,
-        pending:  papers.filter(x => x.status === 'pending').length,
-        users:    (u ?? []).length,
+        total:    p.length,
+        approved: p.filter(x => x.status === 'approved').length,
+        pending:  p.filter(x => x.status === 'pending').length,
+        users:    u.length,
       });
       setLoading(false);
     });
-  }, []);
+  }, [addToast]);
 
   function canEditUser(u) {
     if (u.email === OWNER_EMAIL) return false;
@@ -175,6 +179,7 @@ export default function AdminPanel() {
 
   // ── Sort helpers ──────────────────────────────────────────────────
   function toggleSort(col) {
+    setUserLimit(USERS_PAGE_SIZE); // reset paging when re-sorting
     setUserSort(prev =>
       prev.col === col
         ? { col, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
@@ -196,6 +201,10 @@ export default function AdminPanel() {
       if (col === 'created_at') return dir * (new Date(a.created_at) - new Date(b.created_at));
       return 0;
     });
+
+  // Cap rendered rows so the table doesn't mount thousands of DOM nodes at once.
+  const visibleUsers = filteredUsers.slice(0, userLimit);
+  const hasMoreUsers = filteredUsers.length > userLimit;
 
   function actionLabel(action) {
     const map = { upload: 'Uploaded', approve: 'Approved', reject: 'Rejected', delete: 'Deleted', role_change: 'Role Changed' };
@@ -247,7 +256,28 @@ export default function AdminPanel() {
     addToast('Contributor removed.', 'success');
   }
 
-  if (loading) return <div className="spinner-wrap"><div className="spinner" /></div>;
+  if (loading) return (
+    <div className="page-content">
+      <div className="topbar"><span style={{ fontSize: 18, fontWeight: 700 }}>Admin Panel</span></div>
+      <div className="page-inner">
+        <div className="metrics-grid">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div className="metric-card" key={i}><SkeletonBlock height={48} /></div>
+          ))}
+        </div>
+        <div className="admin-section">
+          <div className="admin-section-header"><div className="section-title">Users</div></div>
+          <div className="table-wrap">
+            <table className="users-table">
+              <tbody>
+                {Array.from({ length: 8 }).map((_, i) => <SkeletonRow key={i} cols={4} />)}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="page-content">
@@ -276,7 +306,7 @@ export default function AdminPanel() {
         <motion.div className="admin-section" {...fadeUp(1)}>
           <div className="admin-section-header">
             <div className="section-title">Users</div>
-            <input value={userSearch} onChange={e => setUserSearch(e.target.value)} placeholder="Search users…" style={{ maxWidth: 200 }} />
+            <input value={userSearch} onChange={e => { setUserSearch(e.target.value); setUserLimit(USERS_PAGE_SIZE); }} placeholder="Search users…" style={{ maxWidth: 200 }} />
           </div>
           <div className="table-wrap users-table-wrap">
             <table className="users-table">
@@ -290,7 +320,7 @@ export default function AdminPanel() {
               </thead>
               <tbody>
                 <AnimatePresence initial={false}>
-                  {filteredUsers.map(u => (
+                  {visibleUsers.map(u => (
                     <motion.tr
                       key={u.id}
                       layout
@@ -322,6 +352,13 @@ export default function AdminPanel() {
                 </AnimatePresence>
               </tbody>
             </table>
+            {hasMoreUsers && (
+              <div className="load-more-wrap">
+                <button className="btn btn-ghost" onClick={() => setUserLimit(l => l + USERS_PAGE_SIZE)}>
+                  Show more ({filteredUsers.length - userLimit} more)
+                </button>
+              </div>
+            )}
           </div>
         </motion.div>
 

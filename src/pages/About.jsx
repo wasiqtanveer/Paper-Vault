@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Mail, Globe, ExternalLink, GitBranch, Heart, Code2 } from 'lucide-react';
+import { usePageMeta } from '../lib/usePageMeta';
 import './About.css';
 
 const fadeUp = (i = 0) => ({
@@ -8,6 +9,7 @@ const fadeUp = (i = 0) => ({
 });
 
 export default function About() {
+  usePageMeta('About', 'About PaperVault and the developer behind this community past-paper library.');
   return (
     <div className="page-content">
       <div className="topbar">
