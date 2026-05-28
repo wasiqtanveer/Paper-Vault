@@ -512,3 +512,32 @@ tbody tr:last-child td { border-bottom: none; }
   .topbar-actions { gap: 6px; order: 1; margin-left: 0; }
   .topbar-actions .btn { padding: 6px 10px; font-size: 12px; }
 }
+
+/* ── Global keyboard focus ring ───────────────────────
+   Visible on dark + light. Mouse clicks don't trigger :focus-visible,
+   so this only shows for keyboard/AT users. */
+:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+/* Inputs manage their own focus border below — don't double-ring them. */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible { outline: none; }
+
+/* ── Reduced motion ───────────────────────────────────
+   Respect the OS "reduce motion" setting. Cuts animations and
+   transitions to near-instant while keeping state changes visible. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Keep the skeleton readable (static) rather than mid-sweep frozen. */
+  .skel { animation: none !important; background: var(--bg-elevated) !important; }
+}

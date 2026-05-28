@@ -18,6 +18,12 @@
   --accent-blue:   #4f8ef7;
   --accent-blue-h: #6fa5ff;
 
+  /* Warm secondary accent — for featured / top-rated / Hall of Fame content */
+  --accent-amber:     #f0a030;
+  --accent-amber-h:   #f5b848;
+  --accent-amber-bg:  rgba(240,160,48,0.10);
+  --accent-amber-bdr: rgba(240,160,48,0.24);
+
   --status-pending:      #f5c518;
   --status-pending-bg:   rgba(245,197,24,0.10);
   --status-pending-bdr:  rgba(245,197,24,0.22);
@@ -61,6 +67,12 @@
 
   --accent-blue:   #3b7de0;
   --accent-blue-h: #2567c8;
+
+  /* Warm secondary accent — light-mode tuned (darker for 4.5:1 on white) */
+  --accent-amber:     #c47812;
+  --accent-amber-h:   #a8650c;
+  --accent-amber-bg:  rgba(196,120,18,0.08);
+  --accent-amber-bdr: rgba(196,120,18,0.22);
 
   --status-pending:      #d4a017;
   --status-pending-bg:   rgba(212,160,23,0.08);
@@ -108,5 +120,29 @@
   --sidebar-width: 240px;
   --sidebar-current-width: 240px;
 
-  --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* Spacing scale — 4px base. Use these instead of arbitrary px values. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Type scale — tuned slightly tight (15px base) for academic card density */
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-md:   17px;
+  --text-lg:   20px;
+  --text-xl:   24px;
+  --text-2xl:  30px;
+  --text-3xl:  38px;
+
+  --lh-tight: 1.3;
+  --lh-base:  1.55;
+  --lh-loose: 1.75;
+
+  --font: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
