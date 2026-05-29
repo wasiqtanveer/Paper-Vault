@@ -15,7 +15,7 @@
   z-index: 401;
 
   /* Clamp width and height so it never overflows the viewport */
-  width: min(480px, calc(100vw - 32px));
+  width: min(400px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
   height: fit-content;
   z-index: 501;

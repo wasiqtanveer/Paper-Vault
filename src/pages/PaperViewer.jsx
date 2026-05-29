@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Flag, Trash2, Check, X, ArrowLeft, Download, Pencil } from 'lucide-react';
+import { CONTENT_SWAP } from '../lib/motion';
 import { supabase } from '../lib/supabase';
 import { deleteImage } from '../lib/storage';
 import { useAuth } from '../context/AuthContext';
@@ -163,7 +165,10 @@ export default function PaperViewer() {
   });
 
   return (
-    <div className="page-content">
+    // Fades in over the outgoing skeleton instead of hard-cutting. The early
+    // returns above mean skeleton and content never share an AnimatePresence
+    // parent, so this is an enter-only fade rather than a true crossfade.
+    <motion.div className="page-content" initial={CONTENT_SWAP.initial} animate={CONTENT_SWAP.animate}>
       <div className="topbar">
         <button className="btn btn-ghost btn-sm" onClick={() => navigate(-1)} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
           <ArrowLeft size={14} /> Back
@@ -207,7 +212,9 @@ export default function PaperViewer() {
             )}
             <div className="meta-row">
               <span className="meta-label">Uploaded by</span>
-              <span className="meta-value">{paper.profiles?.full_name ?? 'Unknown'}</span>
+              {/* The embedded profile is only readable by staff, so non-staff
+                  fall through to the name stamped on the paper itself. */}
+              <span className="meta-value">{paper.profiles?.full_name ?? paper.uploader_name ?? 'Unknown'}</span>
             </div>
             <div className="meta-row">
               <span className="meta-label">Upload date</span>
@@ -282,6 +289,6 @@ export default function PaperViewer() {
           onClose={() => setShowEdit(false)}
         />
       )}
-    </div>
+    </motion.div>
   );
 }

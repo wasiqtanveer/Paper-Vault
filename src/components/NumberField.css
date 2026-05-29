@@ -1,0 +1,87 @@
+.numfield {
+  position: relative;
+  width: 100%;
+}
+
+/* Strip the browser's spinner in every engine that ships one. Firefox needs the
+   appearance reset; WebKit/Blink need the pseudo-elements removed outright. */
+.numfield-input {
+  -moz-appearance: textfield;
+  appearance: textfield;
+  /* Room for the steppers plus the 1px border, so long years never slide under
+     them. Matches the 30px right padding the themed <select> already uses. */
+  padding-right: 34px;
+}
+.numfield-input::-webkit-outer-spin-button,
+.numfield-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.numfield-steppers {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  bottom: 1px;
+  width: 26px;
+  display: flex;
+  flex-direction: column;
+  /* Sit inside the field's rounded corner rather than squaring it off. */
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  overflow: hidden;
+}
+
+.numfield-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.14s ease, background 0.14s ease;
+  /* The buttons are aria-hidden and untabbable, so they never take focus — but
+     a stray pointer drag shouldn't select the glyph either. */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.numfield-step:hover:not(:disabled) {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+
+/* Press reads on the icon, not the plate — the target is 13px tall, so moving
+   the background is the only change big enough to register at that size. */
+.numfield-step:active:not(:disabled) {
+  color: var(--text-primary);
+  background: var(--card-hover-bg, var(--bg-elevated));
+}
+
+/* At the clamp, the control says so instead of silently doing nothing. */
+.numfield-step:disabled {
+  color: var(--border);
+  cursor: default;
+}
+
+/* Hairline between the two halves, and one separating them from the value. */
+.numfield-step:first-child {
+  border-bottom: 1px solid var(--border-subtle, var(--border));
+}
+.numfield-steppers::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 1px;
+  background: var(--border-subtle, var(--border));
+}
+
+.numfield-disabled .numfield-steppers {
+  opacity: 0.5;
+  pointer-events: none;
+}

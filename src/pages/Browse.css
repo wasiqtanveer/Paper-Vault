@@ -6,6 +6,26 @@
   letter-spacing: -0.3px;
 }
 
+/* ── Results region ──────────────────────────────── */
+/* Reserves height so the brief gap between the outgoing and incoming result
+   sets doesn't collapse the page and yank the scroll position. */
+.results-region {
+  min-height: 320px;
+  transition: opacity 120ms ease-out;
+}
+
+/* Applied while a filter change is in flight. Deep enough to register as "these
+   results are stale", shallow enough not to read as a disabled control — a hard
+   fade to near-invisible makes a fast query look like a failure. */
+.results-region.is-refreshing {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .results-region { transition: none; }
+}
+
 /* ── Filters bar ─────────────────────────────────── */
 .filters-bar {
   display: flex;

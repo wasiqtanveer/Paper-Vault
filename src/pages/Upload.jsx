@@ -6,6 +6,7 @@ import { validateImageSize, compressImage, formatBytes } from '../lib/imageUtils
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import CustomSelect from '../components/CustomSelect';
+import NumberField from '../components/NumberField';
 import './Upload.css';
 
 const TERMS      = ['Spring', 'Summer', 'Fall'];
@@ -186,11 +187,11 @@ export default function Upload() {
             <div className="upload-two-col">
               <div className="form-group">
                 <label className="form-label">Year</label>
-                <input
-                  type="number"
+                <NumberField
                   value={form.year}
                   onChange={e => setForm(f => ({ ...f, year: e.target.value }))}
                   min={1990} max={2099} required
+                  aria-label="Year"
                 />
               </div>
               <div className="form-group">

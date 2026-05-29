@@ -113,7 +113,10 @@ select option {
   min-width: 0;
   margin-left: var(--sidebar-current-width, 240px);
   transition: margin-left 0.22s ease;
-  will-change: margin-left;
+  /* No will-change here on purpose. margin-left is a layout property, so the
+     compositor cannot fast-path it — the hint bought nothing and cost a
+     permanently promoted layer for the app's entire scrolling region, which is
+     felt on exactly the mid-range phones this is built for. */
   scrollbar-gutter: stable;
 }
 
