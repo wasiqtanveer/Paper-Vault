@@ -40,12 +40,6 @@
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.3px;
-  margin-bottom: 3px;
-}
-
-.about-tagline {
-  font-size: 13px;
-  color: var(--text-secondary);
   margin-bottom: 14px;
 }
 

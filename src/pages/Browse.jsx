@@ -147,9 +147,8 @@ export default function Browse() {
               options={[
                 { value: '', label: 'All Semesters' },
                 { value: 'Spring', label: 'Spring' },
+                { value: 'Summer', label: 'Summer' },
                 { value: 'Fall',   label: 'Fall'   },
-                { value: 'Mid',    label: 'Mid'    },
-                { value: 'Final',  label: 'Final'  },
               ]}
             />
           </div>
