@@ -98,7 +98,7 @@ export default function Upload() {
     if (!form.examType)   { setError('Please select an exam type.'); return; }
     setLoading(true);
     try {
-      const url = await uploadImage(compressed, user.id);
+      const { url, path } = await uploadImage(compressed, user.id);
       const { data: paper, error: dbErr } = await supabase.from('papers').insert({
         title:      form.title || buildTitle(form, subjects, teachers),
         subject_id: form.subjectId,
@@ -107,12 +107,13 @@ export default function Upload() {
         semester:   form.term   || null,
         exam_type:  form.examType || null,
         image_url:  url,
+        image_path: path,
         uploader_id: user.id,
         status: 'pending',
       }).select().single();
       if (dbErr) {
         // Don't leave the file behind when the row couldn't be created.
-        await deleteImage(url).catch(() => {});
+        await deleteImage(url, path).catch(() => {});
         throw dbErr;
       }
       invalidatePapers();
