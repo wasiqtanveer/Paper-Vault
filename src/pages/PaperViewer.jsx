@@ -10,6 +10,7 @@ import { useToast } from '../context/ToastContext';
 import ImageViewer from '../components/ImageViewer';
 import StatusBadge from '../components/StatusBadge';
 import EditPaperModal from '../components/EditPaperModal';
+import RejectReasonForm from '../components/RejectReasonForm';
 import { SkeletonLine, SkeletonBlock } from '../components/Skeleton';
 import { usePageMeta } from '../lib/usePageMeta';
 import './PaperViewer.css';
@@ -31,6 +32,8 @@ export default function PaperViewer() {
   const [reportError,   setReportError]   = useState('');
   const [downloading,   setDownloading]   = useState(false);
   const [showEdit,      setShowEdit]      = useState(false);
+  const [showReject,    setShowReject]    = useState(false);
+  const [rejectBusy,    setRejectBusy]    = useState(false);
   const [subjects,      setSubjects]      = useState([]);
   const [teachers,      setTeachers]      = useState([]);
 
@@ -84,20 +87,23 @@ export default function PaperViewer() {
   async function handleApprove() {
     const { error: err } = await supabase
       .from('papers')
-      .update({ status: 'approved', reviewed_at: new Date().toISOString(), reviewed_by: user.id })
+      .update({ status: 'approved', reviewed_at: new Date().toISOString(), reviewed_by: user.id, rejection_reason: null })
       .eq('id', id);
     if (err) { addToast(err.message, 'error'); return; }
-    setPaper(p => ({ ...p, status: 'approved' }));
+    setPaper(p => ({ ...p, status: 'approved', rejection_reason: null }));
     addToast('Paper approved.', 'success');
   }
 
-  async function handleReject() {
+  async function handleReject(reason) {
+    setRejectBusy(true);
     const { error: err } = await supabase
       .from('papers')
-      .update({ status: 'rejected', reviewed_at: new Date().toISOString(), reviewed_by: user.id })
+      .update({ status: 'rejected', reviewed_at: new Date().toISOString(), reviewed_by: user.id, rejection_reason: reason })
       .eq('id', id);
+    setRejectBusy(false);
     if (err) { addToast(err.message, 'error'); return; }
-    setPaper(p => ({ ...p, status: 'rejected' }));
+    setPaper(p => ({ ...p, status: 'rejected', rejection_reason: reason }));
+    setShowReject(false);
     addToast('Paper rejected.', 'info');
   }
 
@@ -192,6 +198,9 @@ export default function PaperViewer() {
             <div>
               <div className="paper-meta-title">{paper.title}</div>
               <StatusBadge status={paper.status} />
+              {paper.status === 'rejected' && paper.rejection_reason && (isOwner || isMod) && (
+                <div className="rejection-note"><strong>Rejected:</strong> {paper.rejection_reason}</div>
+              )}
             </div>
 
             <div className="divider" style={{ margin: '0' }} />
@@ -270,10 +279,13 @@ export default function PaperViewer() {
                   <Check size={13} /> Approve
                 </button>
               )}
-              {isMod && paper.status !== 'rejected' && (
-                <button className="btn-reject" onClick={handleReject} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+              {isMod && paper.status !== 'rejected' && !showReject && (
+                <button className="btn-reject" onClick={() => setShowReject(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
                   <X size={13} /> Reject
                 </button>
+              )}
+              {showReject && (
+                <RejectReasonForm busy={rejectBusy} onConfirm={handleReject} onCancel={() => setShowReject(false)} />
               )}
             </div>
           </div>

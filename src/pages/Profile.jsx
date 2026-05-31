@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import StatusBadge from '../components/StatusBadge';
 import { SkeletonRow } from '../components/Skeleton';
+import '../components/RejectReasonForm.css';
 import './Profile.css';
 
 const fadeUp = (i = 0) => ({
@@ -354,7 +355,12 @@ export default function Profile() {
                       </td>
                       <td style={{ color: 'var(--text-muted)' }}>{p.subjects?.name ?? '—'}</td>
                       <td style={{ color: 'var(--text-muted)' }}>{p.year}</td>
-                      <td><StatusBadge status={p.status} /></td>
+                      <td>
+                        <StatusBadge status={p.status} />
+                        {p.status === 'rejected' && p.rejection_reason && (
+                          <div className="rejection-note"><strong>Reason:</strong> {p.rejection_reason}</div>
+                        )}
+                      </td>
                       <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>
                         {new Date(p.uploaded_at).toLocaleDateString()}
                       </td>
