@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronUp, ArrowUpDown } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
@@ -15,11 +15,36 @@ const fadeUp = (i = 0) => ({
   animate: { opacity: 1, y: 0, transition: { duration: 0.22, delay: i * 0.05, ease: 'easeOut' } },
 });
 
+/** Sortable column header with animated icon */
+function SortTh({ col, label, sort, onSort, style }) {
+  const active = sort.col === col;
+  return (
+    <th style={style}>
+      <button
+        type="button"
+        className={'sort-th-btn' + (active ? ' sort-th-active' : '')}
+        onClick={() => onSort(col)}
+      >
+        {label}
+        <motion.span
+          className="sort-th-icon"
+          animate={active ? { rotate: sort.dir === 'asc' ? 0 : 180, opacity: 1 } : { rotate: 0, opacity: 0.4 }}
+          transition={{ duration: 0.2 }}
+          style={{ display: 'inline-flex', alignItems: 'center' }}
+        >
+          {active ? <ChevronUp size={11} /> : <ArrowUpDown size={11} />}
+        </motion.span>
+      </button>
+    </th>
+  );
+}
+
 export default function AdminPanel() {
   const { addToast } = useToast();
   const { profile: currentProfile } = useAuth();
   const [users,      setUsers]      = useState([]);
   const [userSearch, setUserSearch] = useState('');
+  const [userSort,   setUserSort]   = useState({ col: 'created_at', dir: 'desc' });
   const [subjects,    setSubjects]    = useState([]);
   const [newSubject,  setNewSubject]  = useState('');
   const [editSubject, setEditSubject] = useState(null); // { id, name }
@@ -74,7 +99,6 @@ export default function AdminPanel() {
       return;
     }
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, role } : u));
-    // Log the role change so it shows up in activity history
     await supabase.from('activity_log').insert({
       action: 'role_change',
       actor_id: currentProfile?.id,
@@ -142,10 +166,29 @@ export default function AdminPanel() {
     addToast('Teacher updated.', 'success');
   }
 
-  const filteredUsers = users.filter(u =>
-    u.full_name?.toLowerCase().includes(userSearch.toLowerCase()) ||
-    u.email?.toLowerCase().includes(userSearch.toLowerCase())
-  );
+  // ── Sort helpers ──────────────────────────────────────────────────
+  function toggleSort(col) {
+    setUserSort(prev =>
+      prev.col === col
+        ? { col, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
+        : { col, dir: 'asc' }
+    );
+  }
+
+  const filteredUsers = users
+    .filter(u =>
+      u.full_name?.toLowerCase().includes(userSearch.toLowerCase()) ||
+      u.email?.toLowerCase().includes(userSearch.toLowerCase())
+    )
+    .sort((a, b) => {
+      const dir = userSort.dir === 'asc' ? 1 : -1;
+      const col = userSort.col;
+      if (col === 'full_name') return dir * (a.full_name ?? '').localeCompare(b.full_name ?? '');
+      if (col === 'email')     return dir * (a.email ?? '').localeCompare(b.email ?? '');
+      if (col === 'role')      return dir * (a.role ?? '').localeCompare(b.role ?? '');
+      if (col === 'created_at') return dir * (new Date(a.created_at) - new Date(b.created_at));
+      return 0;
+    });
 
   function actionLabel(action) {
     const map = { upload: 'Uploaded', approve: 'Approved', reject: 'Rejected', delete: 'Deleted', role_change: 'Role Changed' };
@@ -187,39 +230,48 @@ export default function AdminPanel() {
             <div className="section-title">Users</div>
             <input value={userSearch} onChange={e => setUserSearch(e.target.value)} placeholder="Search users…" style={{ maxWidth: 200 }} />
           </div>
-          <div className="table-wrap">
+          <div className="table-wrap users-table-wrap">
             <table className="users-table">
               <thead>
                 <tr>
-                  <th style={{ width: '22%' }}>Name</th>
-                  <th style={{ width: '38%' }}>Email</th>
-                  <th style={{ width: '20%' }}>Role</th>
-                  <th style={{ width: '20%' }}>Joined</th>
+                  <SortTh col="full_name"  label="Name"   sort={userSort} onSort={toggleSort} style={{ width: '22%' }} />
+                  <SortTh col="email"      label="Email"  sort={userSort} onSort={toggleSort} style={{ width: '38%' }} />
+                  <SortTh col="role"       label="Role"   sort={userSort} onSort={toggleSort} style={{ width: '20%' }} />
+                  <SortTh col="created_at" label="Joined" sort={userSort} onSort={toggleSort} style={{ width: '20%' }} />
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map(u => (
-                  <tr key={u.id}>
-                    <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{u.full_name ?? '—'}</td>
-                    <td style={{ color: 'var(--text-muted)', fontSize: 12, wordBreak: 'break-all' }}>{u.email}</td>
-                    <td>
-                      {canEditUser(u) ? (
-                        <CustomSelect
-                          value={u.role}
-                          onChange={v => updateRole(u.id, v)}
-                          options={ROLES.filter(r => r !== 'admin').map(r => ({ value: r, label: r }))}
-                        />
-                      ) : (
-                        <span className={`role-pill role-pill-${u.email === OWNER_EMAIL ? 'owner' : u.role}`}>
-                          {u.email === OWNER_EMAIL ? 'owner' : u.role}
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ color: 'var(--text-muted)', fontSize: 12, whiteSpace: 'nowrap' }}>
-                      {new Date(u.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </td>
-                  </tr>
-                ))}
+                <AnimatePresence initial={false}>
+                  {filteredUsers.map(u => (
+                    <motion.tr
+                      key={u.id}
+                      layout
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                    >
+                      <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{u.full_name ?? '—'}</td>
+                      <td style={{ color: 'var(--text-muted)', fontSize: 12, wordBreak: 'break-all' }}>{u.email}</td>
+                      <td>
+                        {canEditUser(u) ? (
+                          <CustomSelect
+                            value={u.role}
+                            onChange={v => updateRole(u.id, v)}
+                            options={ROLES.filter(r => r !== 'admin').map(r => ({ value: r, label: r }))}
+                          />
+                        ) : (
+                          <span className={`role-pill role-pill-${u.email === OWNER_EMAIL ? 'owner' : u.role}`}>
+                            {u.email === OWNER_EMAIL ? 'owner' : u.role}
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ color: 'var(--text-muted)', fontSize: 12, whiteSpace: 'nowrap' }}>
+                        {new Date(u.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
               </tbody>
             </table>
           </div>
@@ -365,9 +417,8 @@ export default function AdminPanel() {
                 {actLog.length === 0 ? (
                   <tr><td colSpan={6} className="act-empty">No activity yet</td></tr>
                 ) : (() => {
-                  // Group by paper_id, preserving most-recent-first order
-                  const seen = new Map(); // paper_id → first (most recent) log entry
-                  const groups = new Map(); // paper_id → all entries for that paper
+                  const seen = new Map();
+                  const groups = new Map();
                   actLog.forEach(log => {
                     const key = log.paper_id ?? log.id;
                     if (!seen.has(key)) seen.set(key, log);

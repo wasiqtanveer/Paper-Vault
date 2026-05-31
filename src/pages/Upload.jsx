@@ -168,6 +168,7 @@ export default function Upload() {
                   onChange={setField('subjectId')}
                   placeholder="Select subject…"
                   options={subjects.map(s => ({ value: s.id, label: s.name }))}
+                  searchable
                 />
               </div>
               <div className="form-group">
@@ -177,6 +178,7 @@ export default function Upload() {
                   onChange={setField('teacherId')}
                   placeholder="Select teacher…"
                   options={[{ value: '', label: 'Unknown / N/A' }, ...teachers.map(t => ({ value: t.id, label: t.name }))]}
+                  searchable
                 />
               </div>
             </div>

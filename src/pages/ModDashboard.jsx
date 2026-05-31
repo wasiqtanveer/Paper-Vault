@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, X, ExternalLink, Flag } from 'lucide-react';
+import { Check, X, ExternalLink, Flag, Pencil } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import EditPaperModal from '../components/EditPaperModal';
 import './ModDashboard.css';
+
+const OWNER_EMAIL = 'mwasiqt@gmail.com';
 
 function ModCardSkeleton() {
   return (
@@ -30,6 +33,11 @@ export default function ModDashboard() {
   const [pending, setPending] = useState([]);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [subjects, setSubjects] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [editingPaper, setEditingPaper] = useState(null); // paper object being edited
+
+  const isSiteOwner = user?.email === OWNER_EMAIL;
 
   useEffect(() => {
     setLoading(true);
@@ -48,6 +56,18 @@ export default function ModDashboard() {
         .then(({ data }) => { setReports(data ?? []); setLoading(false); });
     }
   }, [tab]);
+
+  // Load subjects/teachers when edit modal is about to open
+  useEffect(() => {
+    if (!editingPaper) return;
+    Promise.all([
+      supabase.from('subjects').select('id, name').order('name'),
+      supabase.from('teachers').select('id, name').order('name'),
+    ]).then(([{ data: s }, { data: t }]) => {
+      setSubjects(s ?? []);
+      setTeachers(t ?? []);
+    });
+  }, [editingPaper]);
 
   async function resolveReport(reportId) {
     const { error } = await supabase
@@ -74,6 +94,10 @@ export default function ModDashboard() {
     });
     setPending(prev => prev.filter(p => p.id !== paperId));
     addToast(`Paper ${status}.`, status === 'approved' ? 'success' : 'info');
+  }
+
+  function handlePaperEdited(updatedPaper) {
+    setPending(prev => prev.map(p => p.id === updatedPaper.id ? { ...p, ...updatedPaper } : p));
   }
 
   const openReports   = reports.filter(r => !r.resolved);
@@ -122,6 +146,15 @@ export default function ModDashboard() {
                     <div className="mod-card-footer">
                       <span className="mod-card-date">{date}</span>
                       <div className="mod-card-actions">
+                        {isSiteOwner && (
+                          <button
+                            className="btn-mod-edit"
+                            title="Edit paper details"
+                            onClick={() => setEditingPaper(p)}
+                          >
+                            <Pencil size={12} />
+                          </button>
+                        )}
                         <button className="btn-approve" title="Approve" onClick={() => updateStatus(p.id, 'approved')}>
                           <Check size={13} />
                         </button>
@@ -210,6 +243,16 @@ export default function ModDashboard() {
           )
         )}
       </div>
+
+      {editingPaper && (
+        <EditPaperModal
+          paper={editingPaper}
+          subjects={subjects}
+          teachers={teachers}
+          onSave={handlePaperEdited}
+          onClose={() => setEditingPaper(null)}
+        />
+      )}
     </div>
   );
 }

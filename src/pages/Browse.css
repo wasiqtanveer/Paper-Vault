@@ -1,16 +1,57 @@
+/* ── Filters bar ─────────────────────────────────── */
 .filters-bar {
   display: flex;
-  flex-wrap: nowrap;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+/* Row 1: full-width search */
+.filters-search-row {
+  width: 100%;
+}
+.filters-search-row .search-wrapper {
+  max-width: 100%;
+}
+
+/* Row 2: dropdowns — auto-width on desktop, equal-width on mobile */
+.filters-dropdowns-row {
+  display: flex;
   gap: 8px;
   align-items: center;
-  margin-bottom: 20px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding-bottom: 2px; /* prevent clipping box-shadows */
+  flex-wrap: nowrap;
 }
-.filters-bar::-webkit-scrollbar { display: none; }
 
-.filters-bar .search-wrapper   { flex: 1; min-width: 120px; max-width: 220px; flex-shrink: 0; }
-.filters-bar .cselect          { width: auto; flex-shrink: 0; }
-.filters-bar .cselect-trigger  { width: auto; min-width: 110px; white-space: nowrap; }
+/* Desktop: dropdowns are content-sized (don't grow) */
+.filters-dropdowns-row .cselect {
+  width: auto;
+  flex-shrink: 0;
+}
+.filters-dropdowns-row .cselect-trigger {
+  min-width: 120px;
+  white-space: nowrap;
+}
+
+/* Mobile: dropdowns fill row equally */
+@media (max-width: 768px) {
+  .filters-dropdowns-row .cselect {
+    flex: 1 1 0;
+    min-width: 0;
+    flex-shrink: 1;
+  }
+  .filters-dropdowns-row .cselect-trigger {
+    min-width: 0;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* Truncate the label text so it fits narrow buttons */
+  .filters-dropdowns-row .cselect-placeholder,
+  .filters-dropdowns-row .cselect-value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+}
