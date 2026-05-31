@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import PasswordInput from '../components/PasswordInput';
 import './Login.css';
 import './Register.css';
 
@@ -155,11 +156,11 @@ export default function Register() {
               </div>
               <div className="form-group">
                 <label className="form-label">Password</label>
-                <input type="password" value={form.password} onChange={set('password')} placeholder="Min. 6 characters" required />
+                <PasswordInput value={form.password} onChange={set('password')} placeholder="Min. 6 characters" required />
               </div>
               <div className="form-group">
                 <label className="form-label">Confirm Password</label>
-                <input type="password" value={form.confirm} onChange={set('confirm')} placeholder="Repeat password" required />
+                <PasswordInput value={form.confirm} onChange={set('confirm')} placeholder="Repeat password" required />
               </div>
               <button type="submit" className="form-submit" disabled={loading}>
                 {loading ? 'Creating account…' : 'Create Account'}

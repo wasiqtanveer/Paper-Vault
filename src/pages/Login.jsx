@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import PasswordInput from '../components/PasswordInput';
 import './Login.css';
 
 function GoogleIcon() {
@@ -76,8 +77,7 @@ export default function Login() {
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>
-            <input
-              type="password"
+            <PasswordInput
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"

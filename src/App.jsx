@@ -19,6 +19,7 @@ const Profile      = lazy(() => import('./pages/Profile'));
 const ModDashboard = lazy(() => import('./pages/ModDashboard'));
 const AdminPanel   = lazy(() => import('./pages/AdminPanel'));
 const About        = lazy(() => import('./pages/About'));
+const HallOfFame   = lazy(() => import('./pages/HallOfFame'));
 
 function PageFallback() {
   return <div className="spinner-wrap"><div className="spinner" /></div>;
@@ -84,7 +85,8 @@ function Shell() {
               <Route path="/profile"   element={<ProtectedRoute><PageWrap><Profile /></PageWrap></ProtectedRoute>} />
               <Route path="/mod"       element={<ProtectedRoute roles={['moderator','admin']}><PageWrap><ModDashboard /></PageWrap></ProtectedRoute>} />
               <Route path="/admin"     element={<ProtectedRoute roles={['admin']}><PageWrap><AdminPanel /></PageWrap></ProtectedRoute>} />
-              <Route path="/about"     element={<PageWrap><About /></PageWrap>} />
+              <Route path="/about"         element={<PageWrap><About /></PageWrap>} />
+              <Route path="/hall-of-fame" element={<PageWrap><HallOfFame /></PageWrap>} />
             </Routes>
           </AnimatePresence>
         </Suspense>

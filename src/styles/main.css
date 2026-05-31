@@ -93,6 +93,7 @@ select option {
   margin-left: var(--sidebar-current-width, 240px);
   transition: margin-left 0.22s ease;
   will-change: margin-left;
+  scrollbar-gutter: stable;
 }
 
 /* ── Mobile topbar placeholder ───────────────────── */

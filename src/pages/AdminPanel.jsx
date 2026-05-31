@@ -56,6 +56,11 @@ export default function AdminPanel() {
   const [stats,      setStats]      = useState({ total: 0, approved: 0, pending: 0, users: 0 });
   const [loading,    setLoading]    = useState(true);
 
+  // Hall of Fame state
+  const [hofList,   setHofList]   = useState([]);
+  const [hofForm,   setHofForm]   = useState({ name: '', role: '', note: '', github: '', linkedin: '', website: '', email: '' });
+  const [hofSaving, setHofSaving] = useState(false);
+
   useEffect(() => {
     Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
@@ -63,11 +68,13 @@ export default function AdminPanel() {
       supabase.from('teachers').select('*').order('name'),
       supabase.from('papers').select('id, status'),
       supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(50),
-    ]).then(([{ data: u }, { data: s }, { data: t }, { data: p }, { data: log }]) => {
+      supabase.from('hall_of_fame').select('*').order('created_at', { ascending: true }),
+    ]).then(([{ data: u }, { data: s }, { data: t }, { data: p }, { data: log }, { data: hof }]) => {
       setUsers(u ?? []);
       setSubjects(s ?? []);
       setTeachers(t ?? []);
       setActLog(log ?? []);
+      setHofList(hof ?? []);
       const papers = p ?? [];
       setStats({
         total:    papers.length,
@@ -197,6 +204,47 @@ export default function AdminPanel() {
   function actionColor(action) {
     const map = { upload: 'var(--accent-blue)', approve: 'var(--status-approved)', reject: 'var(--status-rejected)', delete: 'var(--status-rejected)', role_change: 'var(--accent-blue)' };
     return map[action] ?? 'var(--text-muted)';
+  }
+
+  // ── Hall of Fame helpers ─────────────────────────────────────────────
+  function hofFormField(key, placeholder) {
+    return (
+      <input
+        value={hofForm[key]}
+        onChange={e => setHofForm(v => ({ ...v, [key]: e.target.value }))}
+        placeholder={placeholder}
+        style={{ flex: 1, minWidth: 120 }}
+      />
+    );
+  }
+
+  async function addToHof() {
+    const name = hofForm.name.trim();
+    if (!name) { addToast('Name is required.', 'error'); return; }
+    setHofSaving(true);
+    const payload = {
+      name,
+      role:     hofForm.role.trim()     || null,
+      note:     hofForm.note.trim()     || null,
+      github:   hofForm.github.trim()   || null,
+      linkedin: hofForm.linkedin.trim() || null,
+      website:  hofForm.website.trim()  || null,
+      email:    hofForm.email.trim()    || null,
+    };
+    const { data, error } = await supabase.from('hall_of_fame').insert(payload).select().single();
+    if (error) { addToast(error.message, 'error'); setHofSaving(false); return; }
+    setHofList(prev => [...prev, data]);
+    setHofForm({ name: '', role: '', note: '', github: '', linkedin: '', website: '', email: '' });
+    addToast('Contributor added to Hall of Fame!', 'success');
+    setHofSaving(false);
+  }
+
+  async function removeFromHof(id) {
+    if (!window.confirm('Remove this contributor from the Hall of Fame?')) return;
+    const { error } = await supabase.from('hall_of_fame').delete().eq('id', id);
+    if (error) { addToast(error.message, 'error'); return; }
+    setHofList(prev => prev.filter(c => c.id !== id));
+    addToast('Contributor removed.', 'success');
   }
 
   if (loading) return <div className="spinner-wrap"><div className="spinner" /></div>;
@@ -496,6 +544,97 @@ export default function AdminPanel() {
                 })()}
               </tbody>
             </table>
+          </div>
+        </motion.div>
+
+        {/* Hall of Fame */}
+        <motion.div className="admin-section" {...fadeUp(4)}>
+          <div className="admin-section-header">
+            <div className="section-title">Hall of Fame</div>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{hofList.length} contributor{hofList.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div className="admin-section-body">
+            {/* Add contributor form */}
+            <div className="hof-admin-form">
+              <div className="hof-admin-row">
+                <input
+                  value={hofForm.name}
+                  onChange={e => setHofForm(v => ({ ...v, name: e.target.value }))}
+                  placeholder="Full name (required)"
+                  style={{ flex: 2 }}
+                />
+                <input
+                  value={hofForm.role}
+                  onChange={e => setHofForm(v => ({ ...v, role: e.target.value }))}
+                  placeholder="Contribution role (e.g. Bug Reporter)"
+                  style={{ flex: 2 }}
+                />
+              </div>
+              <div className="hof-admin-row">
+                <input
+                  value={hofForm.note}
+                  onChange={e => setHofForm(v => ({ ...v, note: e.target.value }))}
+                  placeholder="Short note about their contribution (optional)"
+                  style={{ flex: 1 }}
+                />
+              </div>
+              <div className="hof-admin-row">
+                <input value={hofForm.github}   onChange={e => setHofForm(v => ({ ...v, github:   e.target.value }))} placeholder="GitHub URL"   style={{ flex: 1 }} />
+                <input value={hofForm.linkedin}  onChange={e => setHofForm(v => ({ ...v, linkedin: e.target.value }))} placeholder="LinkedIn URL" style={{ flex: 1 }} />
+                <input value={hofForm.website}   onChange={e => setHofForm(v => ({ ...v, website:  e.target.value }))} placeholder="Website URL"  style={{ flex: 1 }} />
+                <input value={hofForm.email}     onChange={e => setHofForm(v => ({ ...v, email:    e.target.value }))} placeholder="Email"        style={{ flex: 1 }} />
+              </div>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={addToHof}
+                disabled={hofSaving}
+                style={{ alignSelf: 'flex-start' }}
+              >
+                {hofSaving ? 'Adding…' : '+ Add to Hall of Fame'}
+              </button>
+            </div>
+
+            {/* Contributor list */}
+            {hofList.length === 0 ? (
+              <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, padding: '20px 0' }}>
+                No contributors yet. Add the first one above.
+              </div>
+            ) : (
+              <div className="table-wrap" style={{ marginTop: 14 }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Role / Note</th>
+                      <th>Socials</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {hofList.map(c => (
+                      <tr key={c.id}>
+                        <td style={{ fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>{c.name}</td>
+                        <td>
+                          {c.role && <div style={{ fontSize: 12, color: 'var(--status-pending)', fontWeight: 500 }}>{c.role}</div>}
+                          {c.note && <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 2 }}>{c.note}</div>}
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            {c.github   && <a href={c.github}   target="_blank" rel="noreferrer" style={{ fontSize: 11.5, color: 'var(--text-secondary)' }}>GitHub</a>}
+                            {c.linkedin && <a href={c.linkedin} target="_blank" rel="noreferrer" style={{ fontSize: 11.5, color: 'var(--text-secondary)' }}>LinkedIn</a>}
+                            {c.website  && <a href={c.website}  target="_blank" rel="noreferrer" style={{ fontSize: 11.5, color: 'var(--text-secondary)' }}>Website</a>}
+                            {c.email    && <a href={`mailto:${c.email}`}         style={{ fontSize: 11.5, color: 'var(--text-secondary)' }}>Email</a>}
+                          </div>
+                        </td>
+                        <td>
+                          <button className="btn btn-danger btn-sm" onClick={() => removeFromHof(c.id)}>Remove</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </motion.div>
 
