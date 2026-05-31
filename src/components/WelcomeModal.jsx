@@ -100,7 +100,7 @@ export default function WelcomeModal() {
                 Get Started
               </button>
               <button className="btn btn-primary" onClick={goToAbout}>
-                About the Developer →
+                About PaperVault →
               </button>
             </div>
           </motion.div>

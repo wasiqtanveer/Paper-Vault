@@ -6,43 +6,6 @@
   gap: 20px;
 }
 
-/* Hero card */
-.about-hero-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 28px;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.about-avatar {
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-primary);
-  font-size: 20px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  letter-spacing: -0.5px;
-}
-
-.about-hero-info { flex: 1; min-width: 0; }
-
-.about-name {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.3px;
-  margin-bottom: 14px;
-}
-
 .about-links {
   display: flex;
   flex-wrap: wrap;
@@ -88,6 +51,7 @@
 }
 
 .about-card-contribute {
+  grid-column: 1 / -1;
   border-color: var(--status-approved-bdr);
   background: var(--status-approved-bg);
 }
@@ -108,12 +72,6 @@
   border-color: var(--status-approved-bdr);
   color: var(--status-approved);
 }
-.about-card-icon.project {
-  background: var(--status-pending-bg);
-  border-color: var(--status-pending-bdr);
-  color: var(--status-pending);
-}
-
 .about-card-title {
   font-size: 15px;
   font-weight: 700;
@@ -170,14 +128,18 @@
   font-size: 12px;
   color: var(--text-muted);
   padding: 8px 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
+.about-footer .about-links { justify-content: center; }
 .about-footer strong {
   color: var(--text-secondary);
   font-weight: 700;
 }
 
 @media (max-width: 768px) {
-  .about-hero-card { flex-direction: column; text-align: center; }
   .about-links { justify-content: center; }
   .about-grid { grid-template-columns: 1fr; }
 }
