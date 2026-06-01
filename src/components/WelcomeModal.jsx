@@ -18,6 +18,14 @@ export default function WelcomeModal() {
     if (!seen) setVisible(true);
   }, [user]);
 
+  // Lock body scroll while modal is open (especially important on mobile)
+  useEffect(() => {
+    if (!visible) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [visible]);
+
   function dismiss() {
     localStorage.setItem(STORAGE_KEY, '1');
     setVisible(false);

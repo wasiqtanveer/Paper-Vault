@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   background: var(--overlay-bg);
-  z-index: 400;
+  z-index: 500;
   backdrop-filter: blur(8px) saturate(140%);
   -webkit-backdrop-filter: blur(8px) saturate(140%);
 }
@@ -18,6 +18,7 @@
   width: min(480px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
   height: fit-content;
+  z-index: 501;
 
   background: color-mix(in srgb, var(--bg-secondary) 70%, transparent);
   backdrop-filter: blur(24px) saturate(180%);
@@ -123,12 +124,14 @@
 @media (max-width: 480px) {
   .wm-modal {
     padding: 20px 16px;
-    /* On short phones sit at the bottom like a sheet */
+    /* Bottom-sheet style */
     inset: auto 0 0 0;
     width: 100%;
-    max-height: 92dvh;
+    max-height: 88dvh;
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     margin: 0;
+    /* Respect iOS safe area */
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
   }
 
   /* Drag handle hint */
@@ -151,10 +154,9 @@
     justify-content: center;
   }
 
-  /* Compress feature descriptions on very small screens */
-  .wm-feature-desc {
-    font-size: 11.5px;
-  }
+  .wm-feature-desc { font-size: 11.5px; }
+  .wm-logo         { font-size: 18px; }
+  .wm-tagline      { font-size: 12.5px; }
 }
 
 /* Very short screens (landscape mobile) */
