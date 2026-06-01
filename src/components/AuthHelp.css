@@ -1,0 +1,64 @@
+.auth-help {
+  margin-top: 14px;
+  text-align: center;
+}
+
+.auth-help-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.auth-help-trigger:hover,
+.auth-help-trigger.open { color: var(--text-primary); }
+
+.auth-help-chevron { transition: transform 0.2s ease; }
+.auth-help-chevron.rotated { transform: rotate(180deg); }
+
+.auth-help-card {
+  margin-top: 8px;
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.auth-help-card p { margin: 0 0 8px; }
+
+.auth-help-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* Same pill as the About page links; redefined here so the auth pages do not
+   need to load About.css. */
+.auth-help .about-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.auth-help .about-link-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+}
