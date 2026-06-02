@@ -6,6 +6,12 @@
   gap: 20px;
 }
 
+.about-brand {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 4px;
+}
+
 .about-links {
   display: flex;
   flex-wrap: wrap;

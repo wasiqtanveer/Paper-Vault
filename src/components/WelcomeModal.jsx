@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, BookOpen, Upload, ShieldCheck, GitBranch } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import ThemeLogo from './ThemeLogo';
 import './WelcomeModal.css';
 
 const STORAGE_KEY = 'pv_welcome_seen';
@@ -60,7 +61,7 @@ export default function WelcomeModal() {
             </button>
 
             <div className="wm-header">
-              <div className="wm-logo">PaperVault</div>
+              <div className="wm-logo"><ThemeLogo size={110} /></div>
               <div className="wm-tagline">A student-built vault for past papers. Here's what you can do.</div>
             </div>
 

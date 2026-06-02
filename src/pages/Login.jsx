@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PasswordInput from '../components/PasswordInput';
 import AuthHelp from '../components/AuthHelp';
+import ThemeLogo from '../components/ThemeLogo';
 import { looksLikePausedBackend } from '../lib/authErrors';
 import './Login.css';
 
@@ -59,7 +60,7 @@ export default function Login() {
 
   return (
     <div className="form-page">
-      <div className="form-page-brand">Paper<span>Vault</span></div>
+      <div className="form-page-brand"><ThemeLogo size={150} /></div>
       <div className="form-card">
         <div className="form-title">Welcome back</div>
         <div className="form-subtitle">Sign in to your PaperVault account</div>
