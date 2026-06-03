@@ -2,9 +2,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { safeQuery } from '../lib/query';
+import { cachedQuery } from '../lib/cache';
+import { usePageMeta } from '../lib/usePageMeta';
+import { useToast } from '../context/ToastContext';
 import './Browse.css';
 import PaperCard from '../components/PaperCard';
 import CustomSelect from '../components/CustomSelect';
+import { SkeletonCardGrid } from '../components/Skeleton';
 
 const PAGE_SIZE = 20;
 
@@ -20,13 +25,27 @@ export default function Browse() {
   const [offset,   setOffset]   = useState(0);
 
   const [filters, setFilters] = useState({ q: initialQ, subject: '', year: '', semester: '' });
+  const [debouncedQ, setDebouncedQ] = useState(initialQ);
+  const { addToast } = useToast();
+  usePageMeta('Browse Papers', 'Search and filter the full library of approved past exam papers by subject, year, and semester.');
+
+  // Debounce the title query so we don't fire a Supabase request on every keystroke.
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQ(filters.q), 300);
+    return () => clearTimeout(t);
+  }, [filters.q]);
 
   useEffect(() => {
-    supabase.from('subjects').select('id, name').order('name').then(({ data }) => setSubjects(data ?? []));
-    supabase.from('papers').select('year').eq('status', 'approved').then(({ data }) => {
-      if (data) setYears([...new Set(data.map(p => p.year))].sort((a, b) => b - a));
-    });
-  }, []);
+    const onError = msg => addToast(msg, 'error');
+    // Lookups are read-mostly — cache them so they don't refetch on every visit.
+    cachedQuery('browse:subjects', () =>
+      safeQuery(supabase.from('subjects').select('id, name').order('name'), { fallback: [], onError, label: 'subjects' }),
+    ).then(setSubjects);
+    cachedQuery('browse:years', () =>
+      safeQuery(supabase.from('papers').select('year').eq('status', 'approved'), { fallback: [], onError, label: 'years' })
+        .then(data => [...new Set(data.map(p => p.year))].sort((a, b) => b - a)),
+    ).then(setYears);
+  }, [addToast]);
 
   const fetchPapers = useCallback(async (currentFilters, currentOffset, append = false) => {
     setLoading(true);
@@ -42,31 +61,32 @@ export default function Browse() {
     if (currentFilters.year)     q = q.eq('year', Number(currentFilters.year));
     if (currentFilters.semester) q = q.eq('semester', currentFilters.semester);
 
-    const { data } = await q;
-    const results = data ?? [];
+    const results = await safeQuery(q, { fallback: [], onError: msg => addToast(msg, 'error'), label: 'papers' });
     setPapers(prev => append ? [...prev, ...results] : results);
     setHasMore(results.length === PAGE_SIZE);
     setLoading(false);
-  }, []);
+  }, [addToast]);
 
   useEffect(() => {
+    const effectiveFilters = { ...filters, q: debouncedQ };
     setOffset(0);
-    fetchPapers(filters, 0, false);
-  }, [filters, fetchPapers]);
+    fetchPapers(effectiveFilters, 0, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQ, filters.subject, filters.year, filters.semester, fetchPapers]);
 
   function set(key) { return e => setFilters(f => ({ ...f, [key]: e.target.value })); }
 
   function loadMore() {
     const newOffset = offset + PAGE_SIZE;
     setOffset(newOffset);
-    fetchPapers(filters, newOffset, true);
+    fetchPapers({ ...filters, q: debouncedQ }, newOffset, true);
   }
 
   return (
     <div className="page-content">
       <div className="topbar">
-        <div style={{ flex: 1 }}>
-          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.3px' }}>Browse Papers</span>
+        <div className="browse-topbar-spacer">
+          <span className="browse-title">Browse Papers</span>
         </div>
       </div>
 
@@ -115,7 +135,7 @@ export default function Browse() {
         </div>
 
         {loading && papers.length === 0 ? (
-          <div className="spinner-wrap"><div className="spinner" /></div>
+          <SkeletonCardGrid count={12} />
         ) : papers.length === 0 ? (
           <div className="empty-state">No papers found. Try adjusting filters.</div>
         ) : (

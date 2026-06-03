@@ -2,6 +2,27 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── Skip-to-content link (visible only on keyboard focus) ── */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 12px;
+  z-index: 9999;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  background: var(--accent-blue);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.18s ease;
+}
+.skip-link:focus {
+  top: 12px;
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
 /* ── Custom scrollbar — webkit ───────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -251,6 +272,29 @@ select option {
 
 .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: var(--radius-sm); }
 .btn-lg { padding: 10px 20px; font-size: 14px; font-weight: 600; }
+
+/* ── Exam-type toggle buttons (shared by Upload + EditPaperModal) ── */
+.exam-type-row { display: flex; gap: 8px; }
+.exam-type-btn {
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  /* padding / radius / background / flex are set per-context */
+}
+.exam-type-btn:hover {
+  border-color: var(--border-focus);
+  color: var(--text-primary);
+}
+.exam-type-btn.active {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+  font-weight: 600;
+}
 
 /* ── Theme toggle ────────────────────────────────── */
 .theme-toggle {

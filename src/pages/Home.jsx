@@ -2,8 +2,13 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { safeQuery } from '../lib/query';
+import { cachedQuery } from '../lib/cache';
+import { usePageMeta } from '../lib/usePageMeta';
+import { useToast } from '../context/ToastContext';
 import './Home.css';
 import PaperCard from '../components/PaperCard';
+import { SkeletonCardGrid } from '../components/Skeleton';
 
 function useCountUp(target, duration = 1200) {
   const [val, setVal] = useState(0);
@@ -36,46 +41,40 @@ function StatCard({ label, value, sub, color, suffix = '' }) {
   );
 }
 
-function CardSkeleton() {
-  return (
-    <div className="skeleton-card">
-      <div className="skeleton-img skel" />
-      <div className="skeleton-body">
-        <div className="skel skel-line" style={{ width: '80%' }} />
-        <div className="skel skel-line" style={{ width: '55%', marginTop: 6 }} />
-        <div className="skel skel-line" style={{ width: '40%', marginTop: 'auto' }} />
-      </div>
-    </div>
-  );
-}
-
 export default function Home() {
   const [papers, setPapers]   = useState([]);
   const [stats, setStats]     = useState({ total: 0, approved: 0, pending: 0 });
   const [loading, setLoading] = useState(true);
   const [query, setQuery]     = useState('');
   const navigate = useNavigate();
+  const { addToast } = useToast();
+  usePageMeta('Home', 'Browse, search, and download approved past exam papers, or upload your own to help other students.');
 
   useEffect(() => {
+    const onError = msg => addToast(msg, 'error');
     Promise.all([
-      supabase
-        .from('papers')
-        .select('*, subjects(name), profiles!papers_uploader_id_fkey(full_name)')
-        .eq('status', 'approved')
-        .order('uploaded_at', { ascending: false })
-        .limit(12),
-      supabase.from('papers').select('id, status'),
-    ]).then(([{ data: p }, { data: all }]) => {
-      setPapers(p ?? []);
-      const allPapers = all ?? [];
+      cachedQuery('home:recent', () => safeQuery(
+        supabase
+          .from('papers')
+          .select('*, subjects(name), profiles!papers_uploader_id_fkey(full_name)')
+          .eq('status', 'approved')
+          .order('uploaded_at', { ascending: false })
+          .limit(12),
+        { fallback: [], onError, label: 'recent papers' },
+      ), { ttl: 30_000 }),
+      cachedQuery('home:stats', () =>
+        safeQuery(supabase.from('papers').select('id, status'), { fallback: [], onError, label: 'stats' }),
+        { ttl: 30_000 }),
+    ]).then(([p, all]) => {
+      setPapers(p);
       setStats({
-        total:    allPapers.length,
-        approved: allPapers.filter(x => x.status === 'approved').length,
-        pending:  allPapers.filter(x => x.status === 'pending').length,
+        total:    all.length,
+        approved: all.filter(x => x.status === 'approved').length,
+        pending:  all.filter(x => x.status === 'pending').length,
       });
       setLoading(false);
     });
-  }, []);
+  }, [addToast]);
 
   const rate = stats.total === 0 ? 0 : Math.round((stats.approved / stats.total) * 100);
 
@@ -122,9 +121,7 @@ export default function Home() {
         </div>
 
         {loading ? (
-          <div className="papers-grid papers-grid-inner">
-            {Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)}
-          </div>
+          <SkeletonCardGrid count={8} />
         ) : papers.length === 0 ? (
           <div className="empty-state">
             No papers yet.{' '}

@@ -1,3 +1,31 @@
+/* ── Floating music toggle ── */
+.hof-music-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: var(--shadow-elevated);
+  transition: var(--transition);
+}
+.hof-music-fab:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+}
+.hof-music-fab:active { transform: scale(0.97); }
+
 /* ── Banner card heading ── */
 .hof-banner {
   background: var(--bg-secondary);

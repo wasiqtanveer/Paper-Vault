@@ -1,0 +1,40 @@
+/* Shared skeleton primitives — uses the global .skel shimmer (main.css). */
+
+.skel-line {
+  height: 12px;
+  border-radius: 6px;
+}
+
+/* Card skeleton (matches PaperCard layout) */
+.skeleton-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+}
+.skeleton-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+.skeleton-body {
+  padding: 13px 15px 15px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0;
+}
+
+/* Generic stacked blocks */
+.skeleton-stat {
+  height: 78px;
+  border-radius: var(--radius-lg);
+}
+.skeleton-row-cell {
+  height: 14px;
+  border-radius: 6px;
+}
+.skeleton-block {
+  border-radius: var(--radius-md);
+}

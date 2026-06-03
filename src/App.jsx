@@ -72,6 +72,7 @@ function Shell() {
 
   return (
     <div className="app-shell">
+      <a href="#main-scroll" className="skip-link">Skip to content</a>
       <WelcomeModal />
       <Sidebar />
       <main className="main-content" id="main-scroll">

@@ -81,28 +81,12 @@
   border-top: 1px solid var(--border-subtle);
 }
 
-/* Reuse exam-type-btn from Upload.css */
-.exam-type-row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+/* Base .exam-type-btn lives in main.css; only layout deltas here. */
+.exam-type-row { flex-wrap: wrap; }
 .exam-type-btn {
   padding: 6px 14px;
   border-radius: var(--radius-sm);
-  font-size: 13px;
-  font-weight: 500;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
   background: var(--bg-elevated);
-  cursor: pointer;
-  transition: var(--transition);
-}
-.exam-type-btn:hover { border-color: var(--border-focus); color: var(--text-primary); }
-.exam-type-btn.active {
-  background: var(--text-primary);
-  color: var(--bg-primary);
-  border-color: var(--text-primary);
 }
 
 [data-theme="light"] .epm-panel {
