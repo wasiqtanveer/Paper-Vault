@@ -505,6 +505,10 @@ tbody tr:last-child td { border-bottom: none; }
 
   /* Tables scroll horizontally */
   .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  /* Without a floor the browser squeezes every column to fit the screen (one
+     word per line, columns cut off) instead of letting the wrapper scroll. */
+  .table-wrap table:has(th:nth-child(4)) { min-width: 620px; }
+  .table-wrap table:has(th:nth-child(4)) td:first-child { min-width: 170px; }
 
   /* Page header stacks */
   .page-header { flex-direction: column; align-items: flex-start; }
