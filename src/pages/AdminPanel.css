@@ -256,3 +256,13 @@
 .hof-admin-row input {
   min-width: 120px;
 }
+
+/* Count beside a section title, e.g. "Teachers 31" */
+.admin-count {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.admin-section-header .btn { gap: 5px; }

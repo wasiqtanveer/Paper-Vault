@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, ChevronUp, ArrowUpDown } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronUp, ArrowUpDown, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { safeQuery } from '../lib/query';
+import { safeQuery, countRows } from '../lib/query';
+import { invalidate } from '../lib/cache';
+import { logActivity } from '../lib/activity';
+import { joinTeacherName, splitTeacherName, cleanName } from '../lib/teacherName';
+import TeacherNameField from '../components/TeacherNameField';
+import { confirmDialog } from '../components/ConfirmDialog';
+import AdminFormModal from '../components/AdminFormModal';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import CustomSelect from '../components/CustomSelect';
@@ -54,7 +60,12 @@ export default function AdminPanel() {
   const [editSubject, setEditSubject] = useState(null); // { id, name }
   const [teachers,    setTeachers]    = useState([]);
   const [newTeacher,  setNewTeacher]  = useState('');
-  const [editTeacher, setEditTeacher] = useState(null); // { id, name }
+  const [newTitle,    setNewTitle]    = useState('');
+  const [newDept,     setNewDept]     = useState('');
+  const [editTeacher, setEditTeacher] = useState(null); // { id, title, name }
+  const [requests,    setRequests]    = useState([]); // pending subject/teacher requests
+  const [adding,      setAdding]      = useState(null); // 'subject' | 'teacher' | 'hof' | null
+  const [saving,      setSaving]      = useState(false);
   const [actLog,     setActLog]     = useState([]);
   const [expandedPaper, setExpandedPaper] = useState(null); // paper_id whose row is expanded
   const [stats,      setStats]      = useState({ total: 0, approved: 0, pending: 0, users: 0 });
@@ -63,7 +74,6 @@ export default function AdminPanel() {
   // Hall of Fame state
   const [hofList,   setHofList]   = useState([]);
   const [hofForm,   setHofForm]   = useState({ name: '', role: '', note: '', github: '', linkedin: '', website: '', email: '' });
-  const [hofSaving, setHofSaving] = useState(false);
 
   useEffect(() => {
     const onError = msg => addToast(msg, 'error');
@@ -71,19 +81,24 @@ export default function AdminPanel() {
       safeQuery(supabase.from('profiles').select('*').order('created_at', { ascending: false }), { fallback: [], onError, label: 'users' }),
       safeQuery(supabase.from('subjects').select('*').order('name'), { fallback: [], onError, label: 'subjects' }),
       safeQuery(supabase.from('teachers').select('*').order('name'), { fallback: [], onError, label: 'teachers' }),
-      safeQuery(supabase.from('papers').select('id, status'), { fallback: [], onError, label: 'paper stats' }),
+      Promise.all(['approved', 'pending'].map(st =>
+        countRows(supabase.from('papers').select('id', { count: 'exact', head: true }).eq('status', st)),
+      )).then(([approved, pending]) => ({ approved, pending })).catch(() => { onError('Failed to load paper stats.'); return { approved: 0, pending: 0 }; }),
       safeQuery(supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(50), { fallback: [], onError, label: 'activity log' }),
       safeQuery(supabase.from('hall_of_fame').select('*').order('created_at', { ascending: true }), { fallback: [], onError, label: 'hall of fame' }),
-    ]).then(([u, s, t, p, log, hof]) => {
+      // Silent on failure: the table only exists once supabase_catalog_requests.sql has been run.
+      safeQuery(supabase.from('catalog_requests').select('*').eq('status', 'pending').order('created_at', { ascending: true }), { fallback: [], onError: msg => console.warn(msg), label: 'requests' }),
+    ]).then(([u, s, t, p, log, hof, reqs]) => {
+      setRequests(reqs);
       setUsers(u);
       setSubjects(s);
       setTeachers(t);
       setActLog(log);
       setHofList(hof);
       setStats({
-        total:    p.length,
-        approved: p.filter(x => x.status === 'approved').length,
-        pending:  p.filter(x => x.status === 'pending').length,
+        total:    p.approved + p.pending,
+        approved: p.approved,
+        pending:  p.pending,
         users:    u.length,
       });
       setLoading(false);
@@ -110,33 +125,39 @@ export default function AdminPanel() {
       return;
     }
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, role } : u));
-    await supabase.from('activity_log').insert({
+    await logActivity({
       action: 'role_change',
-      actor_id: currentProfile?.id,
-      actor_name: currentProfile?.full_name ?? 'Admin',
-      actor_role: currentProfile?.role ?? 'admin',
-      paper_id: null,
-      paper_title: `${target?.full_name ?? target?.email ?? 'User'} → ${role}`,
+      user: { id: currentProfile?.id },
+      profile: currentProfile,
+      fallbackRole: 'admin',
+      paperTitle: `${target?.full_name ?? target?.email ?? 'User'} → ${role}`,
     });
     addToast('Role updated.', 'success');
   }
 
   async function addSubject() {
-    const name = newSubject.trim();
-    if (!name) return;
+    const name = cleanName(newSubject);
+    if (!name) { addToast('Enter a subject name.', 'error'); return false; }
+    if (subjects.some(s => s.name.toLowerCase() === name.toLowerCase())) { addToast('That subject already exists.', 'error'); return false; }
     const { data, error } = await supabase.from('subjects').insert({ name }).select().single();
-    if (error) { addToast(error.message, 'error'); return; }
+    if (error) { addToast(error.message, 'error'); return false; }
+    invalidateLookups();
     setSubjects(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)));
     setNewSubject('');
     addToast('Subject added.', 'success');
+    record('subject_add', name);
+    return true;
   }
 
   async function deleteSubject(id) {
-    if (!window.confirm('Delete this subject?')) return;
+    const name = subjects.find(s => s.id === id)?.name ?? 'this subject';
+    if (!(await confirmDialog({ title: 'Delete subject?', body: `"${name}" will be removed from every dropdown.`, confirmLabel: 'Delete subject' }))) return;
     const { error } = await supabase.from('subjects').delete().eq('id', id);
     if (error) { addToast(error.message, 'error'); return; }
+    invalidateLookups();
     setSubjects(prev => prev.filter(s => s.id !== id));
     addToast('Subject deleted.', 'success');
+    record('subject_delete', name);
   }
 
   async function saveSubject() {
@@ -144,37 +165,86 @@ export default function AdminPanel() {
     if (!name) return;
     const { error } = await supabase.from('subjects').update({ name }).eq('id', editSubject.id);
     if (error) { addToast(error.message, 'error'); return; }
+    invalidateLookups();
     setSubjects(prev => prev.map(s => s.id === editSubject.id ? { ...s, name } : s).sort((a, b) => a.name.localeCompare(b.name)));
     setEditSubject(null);
     addToast('Subject updated.', 'success');
   }
 
   async function addTeacher() {
-    const name = newTeacher.trim();
-    if (!name) return;
-    const { data, error } = await supabase.from('teachers').insert({ name }).select().single();
-    if (error) { addToast(error.message, 'error'); return; }
+    if (!newTitle) { addToast('Choose a title (Mr., Ms., Mrs. or Dr.).', 'error'); return false; }
+    const name = joinTeacherName(newTitle, newTeacher);
+    if (!name) { addToast("Enter the teacher's name.", 'error'); return false; }
+    const department = cleanName(newDept);
+    if (department.length < 2) { addToast("Choose the teacher's department.", 'error'); return false; }
+    if (teachers.some(t => t.name.toLowerCase() === name.toLowerCase())) { addToast('That teacher already exists.', 'error'); return false; }
+    const { data, error } = await supabase.from('teachers').insert({ name, department }).select().single();
+    if (error) { addToast(error.message, 'error'); return false; }
+    invalidateLookups();
     setTeachers(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)));
     setNewTeacher('');
+    setNewTitle('');
+    setNewDept('');
     addToast('Teacher added.', 'success');
+    record('teacher_add', `${name} · ${department}`);
+    return true;
   }
 
   async function deleteTeacher(id) {
-    if (!window.confirm('Delete this teacher?')) return;
+    const name = teachers.find(t => t.id === id)?.name ?? 'this teacher';
+    if (!(await confirmDialog({ title: 'Delete teacher?', body: `"${name}" will be removed from every dropdown.`, confirmLabel: 'Delete teacher' }))) return;
     const { error } = await supabase.from('teachers').delete().eq('id', id);
     if (error) { addToast(error.message, 'error'); return; }
+    invalidateLookups();
     setTeachers(prev => prev.filter(t => t.id !== id));
     addToast('Teacher deleted.', 'success');
+    record('teacher_delete', name);
   }
 
   async function saveTeacher() {
-    const name = editTeacher.name.trim();
+    if (!editTeacher.title) { addToast('Choose a title (Mr., Ms., Mrs. or Dr.).', 'error'); return; }
+    const name = joinTeacherName(editTeacher.title, editTeacher.name);
     if (!name) return;
-    const { error } = await supabase.from('teachers').update({ name }).eq('id', editTeacher.id);
+    const department = cleanName(editTeacher.department ?? '') || null;
+    const { error } = await supabase.from('teachers').update({ name, department }).eq('id', editTeacher.id);
     if (error) { addToast(error.message, 'error'); return; }
-    setTeachers(prev => prev.map(t => t.id === editTeacher.id ? { ...t, name } : t).sort((a, b) => a.name.localeCompare(b.name)));
+    invalidateLookups();
+    setTeachers(prev => prev.map(t => t.id === editTeacher.id ? { ...t, name, department } : t).sort((a, b) => a.name.localeCompare(b.name)));
     setEditTeacher(null);
     addToast('Teacher updated.', 'success');
+  }
+
+  // Subjects/teachers feed cached dropdowns on Browse, the viewer and the edit modal.
+  function invalidateLookups() {
+    ['browse:subjects', 'lookup:subjects', 'lookup:teachers'].forEach(k => invalidate(k));
+  }
+
+  const requesterName = id => {
+    const u = users.find(x => x.id === id);
+    return u?.full_name ?? u?.email ?? 'Unknown';
+  };
+
+  async function reviewRequest(r, approve) {
+    if (approve) {
+      const table = r.kind === 'subject' ? 'subjects' : 'teachers';
+      const list  = r.kind === 'subject' ? subjects : teachers;
+      // The name may already exist (added by hand since the request): skip the insert, still close the request.
+      if (!list.some(x => x.name.toLowerCase() === r.name.toLowerCase())) {
+        const row = r.kind === 'teacher' ? { name: r.name, department: r.department ?? null } : { name: r.name };
+        const { data, error } = await supabase.from(table).insert(row).select().single();
+        if (error) { addToast(error.message, 'error'); return; }
+        const setList = r.kind === 'subject' ? setSubjects : setTeachers;
+        setList(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)));
+        invalidateLookups();
+      }
+    }
+    const { error } = await supabase.from('catalog_requests')
+      .update({ status: approve ? 'approved' : 'rejected', reviewed_by: currentProfile?.id, reviewed_at: new Date().toISOString() })
+      .eq('id', r.id);
+    if (error) { addToast(error.message, 'error'); return; }
+    setRequests(prev => prev.filter(x => x.id !== r.id));
+    addToast(approve ? `Added "${r.name}".` : 'Request declined.', approve ? 'success' : 'info');
+    record(approve ? 'request_approve' : 'request_decline', `${r.kind === 'subject' ? 'Subject' : 'Teacher'}: ${r.name}`);
   }
 
   // ── Sort helpers ──────────────────────────────────────────────────
@@ -206,54 +276,93 @@ export default function AdminPanel() {
   const visibleUsers = filteredUsers.slice(0, userLimit);
   const hasMoreUsers = filteredUsers.length > userLimit;
 
-  function actionLabel(action) {
-    const map = { upload: 'Uploaded', approve: 'Approved', reject: 'Rejected', delete: 'Deleted', role_change: 'Role Changed' };
-    return map[action] ?? action;
-  }
-  function actionColor(action) {
-    const map = { upload: 'var(--accent-blue)', approve: 'var(--status-approved)', reject: 'var(--status-rejected)', delete: 'var(--status-rejected)', role_change: 'var(--accent-blue)' };
-    return map[action] ?? 'var(--text-muted)';
+  /**
+   * Log an admin action and show it in the Activity Log right away. The log is
+   * loaded once with the page, so without the local prepend the admin's own
+   * actions would only appear after a reload, which reads as "broken".
+   */
+  function record(action, details) {
+    logActivity({ action, user: { id: currentProfile?.id }, profile: currentProfile, fallbackRole: 'admin', paperTitle: details });
+    setActLog(prev => [{
+      id: `local-${Date.now()}-${Math.random()}`,
+      action,
+      actor_name: currentProfile?.full_name ?? 'You',
+      actor_role: currentProfile?.role ?? 'admin',
+      paper_id: null,
+      paper_title: details,
+      created_at: new Date().toISOString(),
+    }, ...prev].slice(0, 50));
   }
 
+  const ACTIONS = {
+    upload:          ['Uploaded',         'var(--accent-blue)'],
+    approve:         ['Approved',         'var(--status-approved)'],
+    approved:        ['Approved',         'var(--status-approved)'],
+    reject:          ['Rejected',         'var(--status-rejected)'],
+    rejected:        ['Rejected',         'var(--status-rejected)'],
+    restore:         ['Back to pending',  'var(--status-pending)'],
+    delete:          ['Deleted',          'var(--status-rejected)'],
+    role_change:     ['Role changed',     'var(--accent-blue)'],
+    subject_add:     ['Subject added',    'var(--status-approved)'],
+    subject_delete:  ['Subject removed',  'var(--status-rejected)'],
+    teacher_add:     ['Teacher added',    'var(--status-approved)'],
+    teacher_delete:  ['Teacher removed',  'var(--status-rejected)'],
+    request_approve: ['Request approved', 'var(--status-approved)'],
+    request_decline: ['Request declined', 'var(--status-rejected)'],
+    hof_add:         ['Hall of Fame +',   'var(--accent-amber)'],
+    hof_remove:      ['Hall of Fame −',   'var(--status-rejected)'],
+  };
+  const actionLabel = action => ACTIONS[action]?.[0] ?? action;
+  const actionColor = action => ACTIONS[action]?.[1] ?? 'var(--text-muted)';
+
   // ── Hall of Fame helpers ─────────────────────────────────────────────
-  function hofFormField(key, placeholder) {
-    return (
-      <input
-        value={hofForm[key]}
-        onChange={e => setHofForm(v => ({ ...v, [key]: e.target.value }))}
-        placeholder={placeholder}
-        style={{ flex: 1, minWidth: 120 }}
-      />
-    );
-  }
+  // A bare "github.com/x" would render as a relative link on the Hall of Fame page.
+  const normalizeUrl = v => {
+    const t = v.trim();
+    if (!t) return null;
+    return /^https?:\/\//i.test(t) ? t : `https://${t}`;
+  };
 
   async function addToHof() {
     const name = hofForm.name.trim();
-    if (!name) { addToast('Name is required.', 'error'); return; }
-    setHofSaving(true);
+    if (!name) { addToast('Name is required.', 'error'); return false; }
+    const email = hofForm.email.trim();
+    if (email && !/^\S+@\S+\.\S+$/.test(email)) { addToast('That email address looks invalid.', 'error'); return false; }
     const payload = {
       name,
       role:     hofForm.role.trim()     || null,
       note:     hofForm.note.trim()     || null,
-      github:   hofForm.github.trim()   || null,
-      linkedin: hofForm.linkedin.trim() || null,
-      website:  hofForm.website.trim()  || null,
-      email:    hofForm.email.trim()    || null,
+      github:   normalizeUrl(hofForm.github),
+      linkedin: normalizeUrl(hofForm.linkedin),
+      website:  normalizeUrl(hofForm.website),
+      email:    email || null,
     };
     const { data, error } = await supabase.from('hall_of_fame').insert(payload).select().single();
-    if (error) { addToast(error.message, 'error'); setHofSaving(false); return; }
+    if (error) { addToast(error.message, 'error'); return false; }
     setHofList(prev => [...prev, data]);
     setHofForm({ name: '', role: '', note: '', github: '', linkedin: '', website: '', email: '' });
-    addToast('Contributor added to Hall of Fame!', 'success');
-    setHofSaving(false);
+    addToast('Contributor added to Hall of Fame.', 'success');
+    record('hof_add', name);
+    return true;
+  }
+
+  // Runs an add* function from a pop-up and closes it only when it succeeded,
+  // so a validation error keeps what was typed.
+  async function runAdd(fn) {
+    setSaving(true);
+    const ok = await fn();
+    setSaving(false);
+    if (ok) setAdding(null);
   }
 
   async function removeFromHof(id) {
-    if (!window.confirm('Remove this contributor from the Hall of Fame?')) return;
+    const name = hofList.find(c => c.id === id)?.name ?? 'this contributor';
+    if (!(await confirmDialog({ title: 'Remove from Hall of Fame?', body: `"${name}" will no longer be listed.`, confirmLabel: 'Remove' }))) return;
     const { error } = await supabase.from('hall_of_fame').delete().eq('id', id);
     if (error) { addToast(error.message, 'error'); return; }
     setHofList(prev => prev.filter(c => c.id !== id));
     addToast('Contributor removed.', 'success');
+    record('hof_remove', name);
   }
 
   if (loading) return (
@@ -362,20 +471,56 @@ export default function AdminPanel() {
           </div>
         </motion.div>
 
+        {/* Requests from students for missing subjects / teachers */}
+        <motion.div className="admin-section" {...fadeUp(2)}>
+          <div className="admin-section-header">
+            <div className="section-title">Subject &amp; Teacher Requests</div>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{requests.length} pending</span>
+          </div>
+          {requests.length === 0 ? (
+            <div className="act-empty" style={{ padding: '22px 20px' }}>No pending requests.</div>
+          ) : (
+            <div className="table-wrap">
+              <table>
+                <thead><tr><th>Type</th><th>Name</th><th>Requested by</th><th>When</th><th></th></tr></thead>
+                <tbody>
+                  {requests.map(r => (
+                    <tr key={r.id}>
+                      <td><span className="act-badge" style={{ color: 'var(--accent-blue)', background: 'var(--accent-blue)18', border: '1px solid var(--accent-blue)33' }}>{r.kind === 'subject' ? 'Subject' : 'Teacher'}</span></td>
+                      <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
+                        {r.name}
+                        {r.department && <div style={{ fontSize: 11.5, color: 'var(--text-muted)', fontWeight: 400, marginTop: 2 }}>{r.department}</div>}
+                      </td>
+                      <td style={{ color: 'var(--text-muted)', fontSize: 12.5 }}>{requesterName(r.requested_by)}</td>
+                      <td style={{ color: 'var(--text-muted)', fontSize: 12, whiteSpace: 'nowrap' }}>
+                        {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </td>
+                      <td>
+                        <div className="admin-row-actions">
+                          <button className="btn btn-primary btn-sm" onClick={() => reviewRequest(r, true)}>Approve</button>
+                          <button className="btn btn-ghost btn-sm" onClick={() => reviewRequest(r, false)}>Decline</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </motion.div>
+
         {/* Subjects + Teachers side by side */}
         <motion.div className="admin-two-col" {...fadeUp(2)}>
 
           {/* Subjects */}
           <div className="admin-section">
             <div className="admin-section-header">
-              <div className="section-title">Subjects</div>
+              <div className="section-title">Subjects <span className="admin-count">{subjects.length}</span></div>
+              <button className="btn btn-primary btn-sm" onClick={() => setAdding('subject')}>
+                <Plus size={13} aria-hidden="true" /> Add subject
+              </button>
             </div>
             <div className="admin-section-body">
-              <div className="add-subject-row">
-                <input value={newSubject} onChange={e => setNewSubject(e.target.value)}
-                  placeholder="New subject…" onKeyDown={e => e.key === 'Enter' && addSubject()} />
-                <button className="btn btn-primary btn-sm" onClick={addSubject}>Add</button>
-              </div>
               <div className="table-wrap">
                 <table>
                   <thead><tr><th>Name</th><th></th></tr></thead>
@@ -421,14 +566,12 @@ export default function AdminPanel() {
           {/* Teachers */}
           <div className="admin-section">
             <div className="admin-section-header">
-              <div className="section-title">Teachers</div>
+              <div className="section-title">Teachers <span className="admin-count">{teachers.length}</span></div>
+              <button className="btn btn-primary btn-sm" onClick={() => setAdding('teacher')}>
+                <Plus size={13} aria-hidden="true" /> Add teacher
+              </button>
             </div>
             <div className="admin-section-body">
-              <div className="add-subject-row">
-                <input value={newTeacher} onChange={e => setNewTeacher(e.target.value)}
-                  placeholder="New teacher…" onKeyDown={e => e.key === 'Enter' && addTeacher()} />
-                <button className="btn btn-primary btn-sm" onClick={addTeacher}>Add</button>
-              </div>
               <div className="table-wrap">
                 <table>
                   <thead><tr><th>Name</th><th></th></tr></thead>
@@ -437,15 +580,22 @@ export default function AdminPanel() {
                       <tr key={t.id}>
                         <td>
                           {editTeacher?.id === t.id ? (
-                            <input
-                              value={editTeacher.name}
-                              onChange={e => setEditTeacher(v => ({ ...v, name: e.target.value }))}
+                            <TeacherNameField
+                              title={editTeacher.title} name={editTeacher.name}
+                              onTitleChange={v => setEditTeacher(e => ({ ...e, title: v }))}
+                              onNameChange={v => setEditTeacher(e => ({ ...e, name: v }))}
+                              department={editTeacher.department} onDepartmentChange={v => setEditTeacher(e => ({ ...e, department: v }))}
+                             
                               onKeyDown={e => { if (e.key === 'Enter') saveTeacher(); if (e.key === 'Escape') setEditTeacher(null); }}
-                              autoFocus
-                              style={{ padding: '4px 8px', fontSize: 13 }}
+                              autoFocus compact
                             />
                           ) : (
-                            <span style={{ color: 'var(--text-primary)' }}>{t.name}</span>
+                            <>
+                              <span style={{ color: 'var(--text-primary)' }}>{t.name}</span>
+                              {t.department
+                                ? <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 2 }}>{t.department}</div>
+                                : <div style={{ fontSize: 11.5, color: 'var(--status-pending)', marginTop: 2 }}>No department</div>}
+                            </>
                           )}
                         </td>
                         <td>
@@ -457,7 +607,7 @@ export default function AdminPanel() {
                               </>
                             ) : (
                               <>
-                                <button className="btn btn-ghost btn-sm" onClick={() => setEditTeacher({ id: t.id, name: t.name })}>Edit</button>
+                                <button className="btn btn-ghost btn-sm" onClick={() => { const { title, rest } = splitTeacherName(t.name); setEditTeacher({ id: t.id, title, name: rest, department: t.department ?? '' }); }}>Edit</button>
                                 <button className="btn btn-danger btn-sm" onClick={() => deleteTeacher(t.id)}>Delete</button>
                               </>
                             )}
@@ -476,7 +626,7 @@ export default function AdminPanel() {
         <motion.div className="admin-section" {...fadeUp(3)}>
           <div className="admin-section-header">
             <div className="section-title">Activity Log</div>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Last 50 actions · click a row to expand</span>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Last 50 actions · click a row with an arrow to see its history</span>
           </div>
           <div className="table-wrap">
             <table className="activity-table">
@@ -494,13 +644,13 @@ export default function AdminPanel() {
                   <th>Action</th>
                   <th>By</th>
                   <th>Role</th>
-                  <th>Paper</th>
+                  <th>Details</th>
                   <th>When</th>
                 </tr>
               </thead>
               <tbody>
                 {actLog.length === 0 ? (
-                  <tr><td colSpan={6} className="act-empty">No activity yet</td></tr>
+                  <tr><td colSpan={6} className="act-empty">No activity yet. Uploads, reviews and admin changes will appear here.</td></tr>
                 ) : (() => {
                   const seen = new Map();
                   const groups = new Map();
@@ -587,57 +737,19 @@ export default function AdminPanel() {
         {/* Hall of Fame */}
         <motion.div className="admin-section" {...fadeUp(4)}>
           <div className="admin-section-header">
-            <div className="section-title">Hall of Fame</div>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{hofList.length} contributor{hofList.length !== 1 ? 's' : ''}</span>
+            <div className="section-title">Hall of Fame <span className="admin-count">{hofList.length}</span></div>
+            <button className="btn btn-primary btn-sm" onClick={() => setAdding('hof')}>
+              <Plus size={13} aria-hidden="true" /> Add contributor
+            </button>
           </div>
           <div className="admin-section-body">
-            {/* Add contributor form */}
-            <div className="hof-admin-form">
-              <div className="hof-admin-row">
-                <input
-                  value={hofForm.name}
-                  onChange={e => setHofForm(v => ({ ...v, name: e.target.value }))}
-                  placeholder="Full name (required)"
-                  style={{ flex: 2 }}
-                />
-                <input
-                  value={hofForm.role}
-                  onChange={e => setHofForm(v => ({ ...v, role: e.target.value }))}
-                  placeholder="Contribution role (e.g. Bug Reporter)"
-                  style={{ flex: 2 }}
-                />
-              </div>
-              <div className="hof-admin-row">
-                <input
-                  value={hofForm.note}
-                  onChange={e => setHofForm(v => ({ ...v, note: e.target.value }))}
-                  placeholder="Short note about their contribution (optional)"
-                  style={{ flex: 1 }}
-                />
-              </div>
-              <div className="hof-admin-row">
-                <input value={hofForm.github}   onChange={e => setHofForm(v => ({ ...v, github:   e.target.value }))} placeholder="GitHub URL"   style={{ flex: 1 }} />
-                <input value={hofForm.linkedin}  onChange={e => setHofForm(v => ({ ...v, linkedin: e.target.value }))} placeholder="LinkedIn URL" style={{ flex: 1 }} />
-                <input value={hofForm.website}   onChange={e => setHofForm(v => ({ ...v, website:  e.target.value }))} placeholder="Website URL"  style={{ flex: 1 }} />
-                <input value={hofForm.email}     onChange={e => setHofForm(v => ({ ...v, email:    e.target.value }))} placeholder="Email"        style={{ flex: 1 }} />
-              </div>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={addToHof}
-                disabled={hofSaving}
-                style={{ alignSelf: 'flex-start' }}
-              >
-                {hofSaving ? 'Adding…' : '+ Add to Hall of Fame'}
-              </button>
-            </div>
-
             {/* Contributor list */}
             {hofList.length === 0 ? (
               <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, padding: '20px 0' }}>
-                No contributors yet. Add the first one above.
+                No contributors yet. Use Add contributor to list the first one.
               </div>
             ) : (
-              <div className="table-wrap" style={{ marginTop: 14 }}>
+              <div className="table-wrap">
                 <table>
                   <thead>
                     <tr>
@@ -676,6 +788,62 @@ export default function AdminPanel() {
         </motion.div>
 
       </div>
+
+      <AnimatePresence>
+        {adding === 'subject' && (
+          <AdminFormModal key="add-subject" title="Add subject" submitLabel="Add subject" busy={saving}
+            onClose={() => setAdding(null)} onSubmit={() => runAdd(addSubject)}>
+            <div className="form-group" style={{ marginBottom: 4 }}>
+              <label className="form-label" htmlFor="new-subject">Subject name</label>
+              <input id="new-subject" value={newSubject} onChange={e => setNewSubject(e.target.value)}
+                placeholder="e.g. Theory of Automata" maxLength={80} autoFocus />
+            </div>
+          </AdminFormModal>
+        )}
+        {adding === 'teacher' && (
+          <AdminFormModal key="add-teacher" title="Add teacher" submitLabel="Add teacher" busy={saving}
+            onClose={() => setAdding(null)} onSubmit={() => runAdd(addTeacher)}>
+            <div className="form-group" style={{ marginBottom: 4 }}>
+              <label className="form-label">Teacher</label>
+              <TeacherNameField
+                title={newTitle} name={newTeacher}
+                onTitleChange={setNewTitle} onNameChange={setNewTeacher}
+                department={newDept} onDepartmentChange={setNewDept}
+                autoFocus
+              />
+            </div>
+          </AdminFormModal>
+        )}
+        {adding === 'hof' && (
+          <AdminFormModal key="add-hof" title="Add to Hall of Fame" submitLabel="Add contributor" busy={saving} width={520}
+            onClose={() => setAdding(null)} onSubmit={() => runAdd(addToHof)}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="hof-name">Full name <span className="req" aria-hidden="true">*</span></label>
+              <input id="hof-name" value={hofForm.name} onChange={e => setHofForm(v => ({ ...v, name: e.target.value }))}
+                placeholder="e.g. Rafi Ullah" autoFocus />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="hof-role">Contribution</label>
+              <input id="hof-role" value={hofForm.role} onChange={e => setHofForm(v => ({ ...v, role: e.target.value }))}
+                placeholder="e.g. Bug Reporter" />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="hof-note">Note</label>
+              <input id="hof-note" value={hofForm.note} onChange={e => setHofForm(v => ({ ...v, note: e.target.value }))}
+                placeholder="What they did, in one line" />
+            </div>
+            <div className="form-group" style={{ marginBottom: 4 }}>
+              <label className="form-label">Links <span style={{ textTransform: 'none', letterSpacing: 0, color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span></label>
+              <div className="epm-two-col">
+                <input value={hofForm.github} onChange={e => setHofForm(v => ({ ...v, github: e.target.value }))} placeholder="GitHub" aria-label="GitHub" />
+                <input value={hofForm.linkedin} onChange={e => setHofForm(v => ({ ...v, linkedin: e.target.value }))} placeholder="LinkedIn" aria-label="LinkedIn" />
+                <input value={hofForm.website} onChange={e => setHofForm(v => ({ ...v, website: e.target.value }))} placeholder="Website" aria-label="Website" />
+                <input value={hofForm.email} onChange={e => setHofForm(v => ({ ...v, email: e.target.value }))} placeholder="Email" aria-label="Email" />
+              </div>
+            </div>
+          </AdminFormModal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

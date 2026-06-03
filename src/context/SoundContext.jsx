@@ -74,11 +74,11 @@ const KEY_THROTTLE_MS = 28;
 function readStored() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    // Default on: the feature is invisible until it makes noise, and browsers
-    // already withhold every sound until the visitor's first real gesture.
-    return raw === null ? true : raw === '1';
+    // Default off: students open this in libraries and lecture halls, where an
+    // unexpected sound is worse than a missed one. Opt-in from the sidebar.
+    return raw === '1';
   } catch {
-    return true;
+    return false;
   }
 }
 

@@ -1,0 +1,8 @@
+.tnf { display: flex; flex-direction: column; gap: 8px; width: 100%; min-width: 0; }
+.tnf-row { display: flex; gap: 8px; align-items: stretch; width: 100%; }
+.tnf-title { flex: 0 0 92px; }
+.tnf-name  { flex: 1; min-width: 0; }
+.tnf-compact { gap: 6px; }
+.tnf-compact .tnf-title { flex-basis: 84px; }
+.tnf-compact .tnf-name,
+.tnf-compact .tnf-dept { padding: 4px 8px; font-size: 13px; }

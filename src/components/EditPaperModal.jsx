@@ -9,6 +9,8 @@
  *  onSave       – (updatedPaper) => void
  *  onClose      – () => void
  */
+import { invalidatePapers } from '../lib/cache';
+import { teacherLabel } from '../lib/teacherName';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -62,6 +64,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
       .single();
     setSaving(false);
     if (error) { addToast(error.message, 'error'); return; }
+    invalidatePapers();
     addToast('Paper updated.', 'success');
     onSave(data);
     onClose();
@@ -108,7 +111,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
                   value={form.teacherId}
                   onChange={setField('teacherId')}
                   placeholder="Unknown / N/A"
-                  options={[{ value: '', label: 'Unknown / N/A' }, ...teachers.map(t => ({ value: t.id, label: t.name }))]}
+                  options={[{ value: '', label: 'Unknown / N/A' }, ...teachers.map(t => ({ value: t.id, label: teacherLabel(t) }))]}
                   searchable
                 />
               </div>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext(null);
@@ -10,30 +10,45 @@ export function AuthProvider({ children }) {
   const [loading,    setLoading]    = useState(true);
   const [signingOut, setSigningOut] = useState(false);
 
-  async function fetchProfile(userId) {
-    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
-    setProfile(data);
+  // Profile fetches are de-duplicated per user: getSession() and the first
+  // onAuthStateChange event both ask for the same row on load.
+  const profileReq = useRef({ id: null, promise: null });
+
+  function fetchProfile(userId) {
+    if (profileReq.current.id === userId && profileReq.current.promise) return profileReq.current.promise;
+    const promise = supabase.from('profiles').select('*').eq('id', userId).single()
+      .then(({ data }) => { setProfile(data ?? null); })
+      .catch(() => {})
+      .finally(() => { if (profileReq.current.promise === promise) profileReq.current = { id: null, promise: null }; });
+    profileReq.current = { id: userId, promise };
+    return promise;
   }
 
   useEffect(() => {
+    let done = false;
+    const finish = () => { if (!done) { done = true; setLoading(false); } };
+
+    // Never let a stalled auth/profile request pin the app on the preloader.
+    // Past this point the app renders; the profile fills in whenever it lands.
+    const safety = setTimeout(finish, 6000);
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id).finally(() => setLoading(false));
-      } else {
-        setLoading(false);
-      }
-    });
+      if (session?.user) fetchProfile(session.user.id).finally(finish);
+      else finish();
+    }).catch(finish);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id);
+      // Deferred: calling back into supabase synchronously inside this callback
+      // can deadlock against the auth lock the client is holding.
+      if (session?.user) setTimeout(() => fetchProfile(session.user.id), 0);
       else setProfile(null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => { clearTimeout(safety); subscription.unsubscribe(); };
   }, []);
 
   async function signIn(email, password) {

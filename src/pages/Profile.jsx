@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { invalidatePapers } from '../lib/cache';
+import { confirmDialog } from '../components/ConfirmDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FileText, CheckCircle, Clock, ShieldCheck, Settings2, Users, KeyRound, ChevronDown, Pencil } from 'lucide-react';
@@ -55,7 +57,9 @@ export default function Profile() {
       queries.push(supabase.from('profiles').select('id', { count: 'exact', head: true }));
     }
 
+    let alive = true;
     Promise.all(queries).then(([papersRes, modRes, adminRes]) => {
+      if (!alive) return;
       setPapers(papersRes.data ?? []);
       if (modRes) {
         const reviewed = modRes.data ?? [];
@@ -66,9 +70,11 @@ export default function Profile() {
         });
       }
       if (adminRes) setUserCount(adminRes.count ?? 0);
-      setLoading(false);
-    });
-  }, [user, isMod, isAdmin]);
+    })
+    .catch(() => { if (alive) addToast('Failed to load your profile data.', 'error'); })
+    .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [user, isMod, isAdmin, addToast]);
 
   async function handleChangePassword(e) {
     e.preventDefault();
@@ -104,10 +110,16 @@ export default function Profile() {
   }
 
   async function handleDelete(paper) {
-    if (!window.confirm('Delete this paper?')) return;
-    try { await deleteImage(paper.image_url); } catch (_) {}
+    const ok = await confirmDialog({
+      title: 'Delete this paper?',
+      body: `"${paper.title}" will be removed permanently.`,
+      confirmLabel: 'Delete paper',
+    });
+    if (!ok) return;
     const { error } = await supabase.from('papers').delete().eq('id', paper.id);
     if (error) { addToast(error.message, 'error'); return; }
+    deleteImage(paper.image_url).catch(() => {});
+    invalidatePapers();
     setPapers(prev => prev.filter(p => p.id !== paper.id));
     addToast('Paper deleted.', 'success');
   }

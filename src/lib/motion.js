@@ -25,6 +25,6 @@ export const EASE_OUT = [0.22, 1, 0.36, 1];
  */
 export const CONTENT_SWAP = {
   initial: { opacity: 0 },
-  animate: { opacity: 1, transition: { duration: 0.24, ease: EASE_OUT } },
-  exit:    { opacity: 0, transition: { duration: 0.1,  ease: 'easeIn' } },
+  animate: { opacity: 1, transition: { duration: 0.18, ease: EASE_OUT } },
+  exit:    { opacity: 0, transition: { duration: 0.08, ease: 'easeIn' } },
 };

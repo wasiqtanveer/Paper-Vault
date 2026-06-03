@@ -14,6 +14,14 @@ const PREVIEW_DELAY_MS = 380;
 function PaperCard({ paper, index = 0 }) {
   const timerRef = useRef(null);
   const [origin, setOrigin] = useState(null);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const imgRef = useRef(null);
+
+  // A cached image can finish before React attaches onLoad; catch that case so
+  // it doesn't stay invisible waiting for an event that already fired.
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) setImgLoaded(true);
+  }, []);
 
   // Fine pointers only. On touch, `pointerenter` fires on tap and the preview
   // would flash over the page you are already navigating to.
@@ -40,6 +48,7 @@ function PaperCard({ paper, index = 0 }) {
   }
 
   const subject  = paper.subjects?.name ?? paper.subject_name ?? '—';
+  const teacher  = paper.teachers?.name ?? null;
   const uploader = paper.profiles?.full_name ?? paper.uploader_name ?? 'Unknown';
   const date     = paper.uploaded_at
     ? new Date(paper.uploaded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -71,7 +80,20 @@ function PaperCard({ paper, index = 0 }) {
 
       <Link to={`/paper/${paper.id}`} className="paper-card">
         {paper.image_url ? (
-          <img src={paper.image_url} alt={paper.title} className="paper-card-image" loading="lazy" width="400" height="300" />
+          <img
+            ref={imgRef}
+            src={paper.image_url}
+            alt={paper.title}
+            className={'paper-card-image' + (imgLoaded ? ' is-loaded' : '')}
+            // The first row is above the fold: load it eagerly and at high
+            // priority. Everything below stays lazy.
+            loading={index < 4 ? 'eager' : 'lazy'}
+            fetchPriority={index < 4 ? 'high' : 'auto'}
+            decoding="async"
+            width="400" height="300"
+            onLoad={() => setImgLoaded(true)}
+            onError={() => setImgLoaded(true)}
+          />
         ) : (
           <div className="paper-card-image-placeholder">
             <FileText size={32} strokeWidth={1.2} />
@@ -81,9 +103,13 @@ function PaperCard({ paper, index = 0 }) {
           <div className="paper-card-title">{paper.title}</div>
           <div className="paper-card-meta">
             {subject}{paper.year ? ` · ${paper.year}` : ''}{paper.semester ? ` · ${paper.semester}` : ''}
+            {teacher && <span className="paper-card-teacher">{teacher}</span>}
           </div>
           <div className="paper-card-footer">
-            <span className="paper-card-date"><Calendar size={11} style={{ marginRight: 4, verticalAlign: 'middle' }} />{date}</span>
+            <span className="paper-card-chips">
+              <span className="paper-card-date"><Calendar size={11} style={{ marginRight: 4, verticalAlign: 'middle' }} />{date}</span>
+              {paper.exam_type && <span className="paper-card-date">{paper.exam_type}</span>}
+            </span>
             <span className="paper-card-uploader">{uploader}</span>
           </div>
         </div>

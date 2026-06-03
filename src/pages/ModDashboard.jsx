@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { invalidatePapers } from '../lib/cache';
+import { logActivity } from '../lib/activity';
 import { Link } from 'react-router-dom';
 import { Check, X, ExternalLink, Flag, Pencil } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -43,29 +45,36 @@ export default function ModDashboard() {
   const isSiteOwner = user?.email === OWNER_EMAIL;
 
   useEffect(() => {
+    let alive = true; // a fast tab switch must not let the slower response win
     setLoading(true);
-    if (tab === 'pending') {
-      supabase
-        .from('papers')
-        .select('*, subjects(name), profiles!papers_uploader_id_fkey(full_name)')
-        .eq('status', 'pending')
-        .order('uploaded_at', { ascending: false })
-        .then(({ data }) => { setPending(data ?? []); setLoading(false); });
-    } else {
-      supabase
-        .from('reports')
-        .select('*, papers(id, title, status), profiles!reports_reporter_id_fkey(full_name)')
-        .order('created_at', { ascending: false })
-        .then(({ data }) => { setReports(data ?? []); setLoading(false); });
-    }
-  }, [tab]);
+    const query = tab === 'pending'
+      ? supabase
+          .from('papers')
+          .select('*, subjects(name), profiles!papers_uploader_id_fkey(full_name)')
+          .eq('status', 'pending')
+          .order('uploaded_at', { ascending: false })
+      : supabase
+          .from('reports')
+          .select('*, papers(id, title, status), profiles!reports_reporter_id_fkey(full_name)')
+          .order('created_at', { ascending: false });
+    const set = tab === 'pending' ? setPending : setReports;
+    Promise.resolve(query)
+      .then(({ data, error }) => {
+        if (!alive) return;
+        if (error) addToast(`Failed to load ${tab === 'pending' ? 'pending papers' : 'reports'}: ${error.message}`, 'error');
+        else set(data ?? []);
+      })
+      .catch(() => { if (alive) addToast('Failed to load. Check your connection and try again.', 'error'); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [tab, addToast]);
 
   // Load subjects/teachers when edit modal is about to open
   useEffect(() => {
     if (!editingPaper) return;
     Promise.all([
       supabase.from('subjects').select('id, name').order('name'),
-      supabase.from('teachers').select('id, name').order('name'),
+      supabase.from('teachers').select('id, name, department').order('name'),
     ]).then(([{ data: s }, { data: t }]) => {
       setSubjects(s ?? []);
       setTeachers(t ?? []);
@@ -92,15 +101,32 @@ export default function ModDashboard() {
       })
       .eq('id', paperId);
     if (error) { addToast(error.message, 'error'); return false; }
-    await supabase.from('activity_log').insert({
-      action: status, actor_id: user.id,
-      actor_name: profile?.full_name ?? user.email,
-      actor_role: profile?.role ?? 'moderator',
-      paper_id: paperId, paper_title: paper?.title,
+    invalidatePapers();
+    // The admin log keys on 'approve' / 'reject'; the paper status values are 'approved' / 'rejected'.
+    await logActivity({
+      action: status === 'approved' ? 'approve' : 'reject',
+      user, profile, fallbackRole: 'moderator', paperId, paperTitle: paper?.title,
     });
     setPending(prev => prev.filter(p => p.id !== paperId));
-    addToast(`Paper ${status}.`, status === 'approved' ? 'success' : 'info');
+    addToast(`Paper ${status}.`, status === 'approved' ? 'success' : 'info', {
+      action: { label: 'Undo', onClick: () => undoStatus(paper) },
+    });
     return true;
+  }
+
+  // Puts a just-reviewed paper back in the queue exactly as it was.
+  async function undoStatus(paper) {
+    if (!paper) return;
+    const { error } = await supabase
+      .from('papers')
+      .update({ status: 'pending', reviewed_at: null, reviewed_by: null, rejection_reason: null })
+      .eq('id', paper.id);
+    if (error) { addToast(`Couldn't undo: ${error.message}`, 'error'); return; }
+    invalidatePapers();
+    logActivity({ action: 'restore', user, profile, fallbackRole: 'moderator', paperId: paper.id, paperTitle: paper.title });
+    setPending(prev => [paper, ...prev.filter(p => p.id !== paper.id)]
+      .sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)));
+    addToast('Moved back to pending.', 'info');
   }
 
   async function confirmReject(paperId, reason) {
@@ -169,10 +195,10 @@ export default function ModDashboard() {
                             <Pencil size={12} />
                           </button>
                         )}
-                        <button className="btn-approve" title="Approve" onClick={() => updateStatus(p.id, 'approved')}>
+                        <button className="btn-approve" title="Approve" aria-label={`Approve ${p.title}`} onClick={() => updateStatus(p.id, 'approved')}>
                           <Check size={13} />
                         </button>
-                        <button className="btn-reject" title="Reject" onClick={() => setRejectingId(id => id === p.id ? null : p.id)}>
+                        <button className="btn-reject" title="Reject" aria-label={`Reject ${p.title}`} aria-expanded={rejectingId === p.id} onClick={() => setRejectingId(id => id === p.id ? null : p.id)}>
                           <X size={13} />
                         </button>
                       </div>
@@ -246,7 +272,7 @@ export default function ModDashboard() {
                       </thead>
                       <tbody>
                         {closedReports.map(r => (
-                          <tr key={r.id} style={{ opacity: 0.5 }}>
+                          <tr key={r.id} className="report-resolved">
                             <td style={{ color: 'var(--text-muted)' }}>{r.papers?.title ?? '—'}</td>
                             <td className="report-reason">{r.reason}</td>
                             <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>{r.profiles?.full_name ?? '—'}</td>

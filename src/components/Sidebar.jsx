@@ -254,7 +254,7 @@ export default function Sidebar() {
                 <Link to="/" className="sidebar-logo" onClick={() => setMobileOpen(false)}>
                   <ThemeLogo variant="mark" size={28} /> PaperVault
                 </Link>
-                <button className="sidebar-collapse-btn" onClick={() => setMobileOpen(false)} title="Close menu">
+                <button className="sidebar-collapse-btn" onClick={() => setMobileOpen(false)} title="Close menu" aria-label="Close menu">
                   <X size={16} />
                 </button>
               </div>

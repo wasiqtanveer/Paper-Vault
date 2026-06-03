@@ -83,3 +83,9 @@
     max-width: 100%;
   }
 }
+
+.filters-clear { flex-shrink: 0; }
+@media (max-width: 768px) {
+  .filters-dropdowns-row { flex-wrap: wrap; }
+  .filters-dropdowns-row .cselect { flex: 1 1 calc(50% - 4px); }
+}

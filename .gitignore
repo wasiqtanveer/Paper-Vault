@@ -26,3 +26,6 @@ bulk-import-data
 *.njsproj
 *.sln
 *.sw?
+
+# Supabase CLI local state
+supabase/.temp/

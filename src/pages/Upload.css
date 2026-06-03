@@ -28,6 +28,7 @@
 }
 
 .upload-zone {
+  display: block; /* it's a <label> now: inline would split the dashed border per line */
   border: 1.5px dashed var(--border);
   border-radius: var(--radius-lg);
   padding: 36px 20px;
@@ -43,7 +44,7 @@
 }
 .upload-zone.drag-over { border-style: solid; }
 
-.upload-zone-icon { font-size: 28px; color: var(--text-muted); margin-bottom: 8px; }
+.upload-zone-icon { display: block; margin: 0 auto 8px; color: var(--text-muted); }
 .upload-zone-text { font-size: 13.5px; color: var(--text-secondary); }
 .upload-zone-sub  { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
@@ -88,4 +89,54 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto 16px;
+}
+
+/* "Not listed? + Request a subject" under a dropdown.
+   A quiet hint line with one compact action, so it reads as help attached to
+   the field above rather than a second blue label competing with the next row. */
+.field-request {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 6px;
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.field-request-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 6px;
+  margin-left: -2px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-blue);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+.field-request-btn:hover {
+  color: var(--accent-blue-h);
+  background: color-mix(in srgb, var(--accent-blue) 10%, transparent);
+  border-color: color-mix(in srgb, var(--accent-blue) 24%, transparent);
+}
+.field-request-btn:active { transform: translateY(1px); }
+
+/* Give the hint room to breathe before the next row of fields. */
+.upload-two-col > .form-group { margin-bottom: 22px; }
+
+.req { color: var(--status-rejected); margin-left: 2px; }
+.upload-zone:focus-within {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+.upload-success-icon { color: var(--status-approved); margin: 0 auto 10px; display: block; }
+
+/* Phones: two searchable selects side by side were ~160px each. */
+@media (max-width: 600px) {
+  .upload-two-col { grid-template-columns: 1fr; }
 }
