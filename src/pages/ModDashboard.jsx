@@ -1,3 +1,4 @@
+import { CONTACT } from '../lib/contact';
 import { useEffect, useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
 import { logActivity } from '../lib/activity';
@@ -10,7 +11,7 @@ import EditPaperModal from '../components/EditPaperModal';
 import RejectReasonForm from '../components/RejectReasonForm';
 import './ModDashboard.css';
 
-const OWNER_EMAIL = 'mwasiqt@gmail.com';
+const OWNER_EMAIL = CONTACT.email;
 
 function ModCardSkeleton() {
   return (
