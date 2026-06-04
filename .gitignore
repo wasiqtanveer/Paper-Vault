@@ -29,3 +29,6 @@ bulk-import-data
 
 # Supabase CLI local state
 supabase/.temp/
+
+# PDFs dropped in for bulk import (local only)
+paper-inbox/
