@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
-import { CONTENT_SWAP } from '../lib/motion';
+import { CONTENT_SWAP, EASE_OUT } from '../lib/motion';
 import { supabase } from '../lib/supabase';
 import { safeQuery } from '../lib/query';
 import { cachedSafeQuery, peek } from '../lib/cache';
@@ -195,9 +195,10 @@ export default function Browse() {
         {/* Dimmed the instant a filter changes, so the click registers visually
             long before the query comes back. */}
         <div className={`results-region${refreshing && papers.length > 0 ? ' is-refreshing' : ''}`}>
-          <AnimatePresence mode="wait" initial={false}>
+          <div className="swap-stack">
+          <AnimatePresence initial={false}>
             {loading && papers.length === 0 ? (
-              <motion.div key="skeleton" {...CONTENT_SWAP}>
+              <motion.div key="skeleton" {...CONTENT_SWAP} exit={{ opacity: 0, transition: { duration: 0.24, ease: EASE_OUT } }}>
                 <SkeletonCardGrid count={12} />
               </motion.div>
             ) : papers.length === 0 ? (
@@ -221,6 +222,7 @@ export default function Browse() {
               </motion.div>
             )}
           </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>

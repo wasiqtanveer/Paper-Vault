@@ -8,6 +8,10 @@ export function AuthProvider({ children }) {
   const [user,       setUser]       = useState(null);
   const [profile,    setProfile]    = useState(null);
   const [loading,    setLoading]    = useState(true);
+  // Separate from `loading`: the session (read from local storage) is instant,
+  // the profile row is a network round-trip. Only role checks wait for it.
+  const [profileReady, setProfileReady] = useState(false);
+  const lastUserId = useRef(null);
   const [signingOut, setSigningOut] = useState(false);
 
   // Profile fetches are de-duplicated per user: getSession() and the first
@@ -35,8 +39,10 @@ export function AuthProvider({ children }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) fetchProfile(session.user.id).finally(finish);
-      else finish();
+      lastUserId.current = session?.user?.id ?? null;
+      if (session?.user) fetchProfile(session.user.id).finally(() => setProfileReady(true));
+      else setProfileReady(true);
+      finish();
     }).catch(finish);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -45,7 +51,14 @@ export function AuthProvider({ children }) {
       // Deferred: calling back into supabase synchronously inside this callback
       // can deadlock against the auth lock the client is holding.
       if (session?.user) setTimeout(() => fetchProfile(session.user.id), 0);
-      else setProfile(null);
+      else { setProfile(null); setProfileReady(true); }
+      // A different account signed in: its role isn't known until its profile loads.
+      const id = session?.user?.id ?? null;
+      if (id && id !== lastUserId.current) {
+        setProfileReady(false);
+        setTimeout(() => fetchProfile(id).finally(() => setProfileReady(true)), 0);
+      }
+      lastUserId.current = id;
     });
 
     return () => { clearTimeout(safety); subscription.unsubscribe(); };
@@ -76,7 +89,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, user, profile, loading, signingOut, signIn, signInWithGoogle, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ session, user, profile, profileReady, loading, signingOut, signIn, signInWithGoogle, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

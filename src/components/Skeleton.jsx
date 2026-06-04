@@ -49,3 +49,44 @@ export function SkeletonRow({ cols = 4 }) {
     </tr>
   );
 }
+
+/**
+ * Generic page placeholder: a topbar strip, a heading, and a card grid. Used
+ * while a route's code or the auth session resolves, in place of a spinner, so
+ * the first thing on screen already has the page's shape.
+ */
+export function PageSkeleton({ cards = 8 }) {
+  return (
+    <div className="page-content" aria-busy="true" aria-label="Loading">
+      <div className="topbar">
+        <SkeletonLine width={220} height={30} style={{ borderRadius: 'var(--radius-md)' }} />
+      </div>
+      <div className="page-inner">
+        <div className="page-header">
+          <div style={{ width: '100%' }}>
+            <SkeletonLine width={180} height={18} />
+            <SkeletonLine width={260} style={{ marginTop: 8 }} />
+          </div>
+        </div>
+        <SkeletonCardGrid count={cards} />
+      </div>
+    </div>
+  );
+}
+
+/** Sidebar + page placeholder, shown for the instant before the session is read. */
+export function ShellSkeleton() {
+  return (
+    <div className="app-shell">
+      <aside className="sidebar sidebar-desktop shell-skel-sidebar" aria-hidden="true">
+        <div className="shell-skel-logo"><SkeletonLine width={120} height={20} /></div>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <SkeletonLine key={i} width={`${70 - (i % 3) * 12}%`} height={14} style={{ margin: '14px 16px 0' }} />
+        ))}
+      </aside>
+      <main className="main-content">
+        <PageSkeleton />
+      </main>
+    </div>
+  );
+}

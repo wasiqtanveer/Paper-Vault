@@ -23,10 +23,18 @@ function renderAt(ui) {
 beforeEach(() => mockAuth.mockReset());
 
 describe('ProtectedRoute', () => {
-  it('shows a spinner while auth is loading', () => {
+  it('shows a page skeleton while auth is loading', () => {
     mockAuth.mockReturnValue({ user: null, profile: null, loading: true });
     const { container } = renderAt(<ProtectedRoute><div>Secret</div></ProtectedRoute>);
-    expect(container.querySelector('.spinner')).toBeInTheDocument();
+    expect(container.querySelector('.skel')).toBeInTheDocument();
+    expect(container.querySelector('.spinner')).not.toBeInTheDocument();
+  });
+
+  it('shows a skeleton, not a 403, while the role is still loading', () => {
+    mockAuth.mockReturnValue({ user: { id: '1' }, profile: null, loading: false, profileReady: false });
+    const { container } = renderAt(<ProtectedRoute roles={['admin']}><div>Secret</div></ProtectedRoute>);
+    expect(container.querySelector('.skel')).toBeInTheDocument();
+    expect(screen.queryByText('403')).not.toBeInTheDocument();
   });
 
   it('redirects to /login when there is no user', () => {
