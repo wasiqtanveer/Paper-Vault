@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { CONTENT_SWAP, EASE_OUT } from '../lib/motion';
 import { supabase } from '../lib/supabase';
-import { safeQuery } from '../lib/query';
+import { safeQuery, escapeLike } from '../lib/query';
 import { cachedSafeQuery, peek } from '../lib/cache';
 import { usePageMeta } from '../lib/usePageMeta';
 import { useToast } from '../context/ToastContext';
@@ -76,7 +76,7 @@ export default function Browse() {
       .order('uploaded_at', { ascending: false })
       .range(currentOffset, currentOffset + PAGE_SIZE - 1);
 
-    if (currentFilters.q)        q = q.ilike('title', `%${currentFilters.q}%`);
+    if (currentFilters.q)        q = q.ilike('title', `%${escapeLike(currentFilters.q)}%`);
     if (currentFilters.subject)  q = q.eq('subject_id', currentFilters.subject);
     if (currentFilters.year)     q = q.eq('year', Number(currentFilters.year));
     if (currentFilters.semester) q = q.eq('semester', currentFilters.semester);
