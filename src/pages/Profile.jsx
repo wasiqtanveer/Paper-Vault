@@ -116,8 +116,10 @@ export default function Profile() {
       confirmLabel: 'Delete paper',
     });
     if (!ok) return;
-    const { error } = await supabase.from('papers').delete().eq('id', paper.id);
+    const { data: removed, error } = await supabase.from('papers').delete().eq('id', paper.id).select('id');
     if (error) { addToast(error.message, 'error'); return; }
+    // RLS filters a forbidden delete to zero rows without raising an error.
+    if (!removed?.length) { addToast('Could not delete this paper. You may not have permission.', 'error'); return; }
     deleteImage(paper.image_url).catch(() => {});
     invalidatePapers();
     setPapers(prev => prev.filter(p => p.id !== paper.id));
