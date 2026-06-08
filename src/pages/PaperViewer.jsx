@@ -136,13 +136,18 @@ export default function PaperViewer() {
   async function handleReport(e) {
     e.preventDefault();
     setReportError('');
-    if (!reportReason.trim()) { setReportError('Please enter a reason.'); return; }
+    const reason = reportReason.trim();
+    if (reason.length < 3) { setReportError('Please enter a reason.'); return; }
+    if (reason.length > 500) { setReportError('Please keep the reason under 500 characters.'); return; }
     setReportLoading(true);
     const { error: err } = await supabase.from('reports').insert({
-      paper_id: id, reporter_id: user.id, reason: reportReason,
+      paper_id: id, reporter_id: user.id, reason,
     });
     setReportLoading(false);
-    if (err) { setReportError(err.message); return; }
+    if (err) {
+      setReportError(err.code === '23505' ? 'You already have an open report on this paper.' : err.message);
+      return;
+    }
     setShowReport(false); setReportReason('');
     addToast('Report submitted.', 'success');
   }
@@ -277,6 +282,7 @@ export default function PaperViewer() {
                     value={reportReason}
                     onChange={e => setReportReason(e.target.value)}
                     placeholder="Describe the issue…"
+                    maxLength={500}
                   />
                   {reportError && <div className="form-error">{reportError}</div>}
                   <div className="report-form-actions">
