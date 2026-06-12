@@ -45,7 +45,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 55% 120% at 100% 50%, var(--status-pending-bg) 0%, transparent 70%);
+  background: radial-gradient(ellipse 55% 120% at 100% 50%, var(--accent-amber-bg) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -53,9 +53,9 @@
   width: 42px;
   height: 42px;
   border-radius: var(--radius-md);
-  background: var(--status-pending-bg);
-  border: 1px solid var(--status-pending-bdr);
-  color: var(--status-pending);
+  background: var(--accent-amber-bg);
+  border: 1px solid var(--accent-amber-bdr);
+  color: var(--accent-amber);
   display: flex;
   align-items: center;
   justify-content: center;
