@@ -105,6 +105,7 @@ export default function Profile() {
     const { error } = await supabase.from('profiles').update({ full_name: nameValue.trim() }).eq('id', user.id);
     setNameLoading(false);
     if (error) { setNameError(error.message); return; }
+    await refreshProfile();
     setNameSuccess(true);
     addToast('Name updated.', 'success');
     setTimeout(() => { setNameOpen(false); setNameSuccess(false); }, 1500);
