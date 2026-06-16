@@ -11,6 +11,7 @@
  */
 import { invalidatePapers } from '../lib/cache';
 import { teacherLabel } from '../lib/teacherName';
+import { buildTitle } from '../lib/paperTitle';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -35,6 +36,15 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
     title:     paper.title       ?? '',
   });
 
+  // If the stored title still matches its fields it was auto-generated, so keep
+  // it in sync as the fields change; a hand-written title is left alone.
+  const [titleManual, setTitleManual] = useState(() =>
+    paper.title !== buildTitle({
+      subjectId: paper.subject_id ?? '', teacherId: paper.teacher_id ?? '',
+      year: paper.year, term: paper.semester ?? '', examType: paper.exam_type ?? '',
+    }, subjects, teachers));
+  const shownTitle = titleManual ? form.title : buildTitle(form, subjects, teachers) || form.title;
+
   // Close on Escape
   useEffect(() => {
     function onKey(e) { if (e.key === 'Escape') onClose(); }
@@ -49,7 +59,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
     if (!form.subjectId) { addToast('Please select a subject.', 'error'); return; }
     setSaving(true);
     const payload = {
-      title:      form.title.trim() || paper.title,
+      title:      shownTitle.trim() || paper.title,
       subject_id: form.subjectId,
       teacher_id: form.teacherId || null,
       year:       Number(form.year),
@@ -159,8 +169,8 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
             <div className="form-group">
               <label className="form-label">Title</label>
               <input
-                value={form.title}
-                onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                value={shownTitle}
+                onChange={e => { setTitleManual(true); setForm(f => ({ ...f, title: e.target.value })); }}
                 placeholder="Paper title…"
               />
             </div>
