@@ -34,6 +34,7 @@ export default function PaperViewer() {
   const [reportError,   setReportError]   = useState('');
   const [downloading,   setDownloading]   = useState(false);
   const [showEdit,      setShowEdit]      = useState(false);
+  const [editLoading,   setEditLoading]   = useState(false);
   const [showReject,    setShowReject]    = useState(false);
   const [rejectBusy,    setRejectBusy]    = useState(false);
   const [subjects,      setSubjects]      = useState([]);
@@ -60,12 +61,17 @@ export default function PaperViewer() {
     return () => { alive = false; };
   }, [id]);
 
-  // Load subjects/teachers when modal is about to open
-  useEffect(() => {
-    if (!showEdit) return;
-    cachedSafeQuery('lookup:subjects', () => supabase.from('subjects').select('id, name').order('name'), { fallback: [], ttl: 300_000 }).then(setSubjects);
-    cachedSafeQuery('lookup:teachers', () => supabase.from('teachers').select('id, name, department').order('name'), { fallback: [], ttl: 300_000 }).then(setTeachers);
-  }, [showEdit]);
+  // Load subjects/teachers *before* the modal opens so its dropdowns are never empty.
+  async function openEdit() {
+    setEditLoading(true);
+    const [s, t] = await Promise.all([
+      cachedSafeQuery('lookup:subjects', () => supabase.from('subjects').select('id, name').order('name'), { fallback: [], ttl: 300_000 }),
+      cachedSafeQuery('lookup:teachers', () => supabase.from('teachers').select('id, name, department').order('name'), { fallback: [], ttl: 300_000 }),
+    ]);
+    setSubjects(s); setTeachers(t);
+    setEditLoading(false);
+    setShowEdit(true);
+  }
 
   async function handleDownload() {
     setDownloading(true);
@@ -219,7 +225,8 @@ export default function PaperViewer() {
         {canEdit && (
           <button
             className="btn btn-ghost btn-sm"
-            onClick={() => setShowEdit(true)}
+            onClick={openEdit}
+            disabled={editLoading}
             style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5 }}
           >
             <Pencil size={13} /> Edit Details
