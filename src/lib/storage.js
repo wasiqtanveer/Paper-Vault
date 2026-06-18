@@ -1,7 +1,10 @@
 import { supabase } from './supabase';
 
+const EXT_BY_MIME = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+
 export async function uploadImage(file, userId) {
-  const ext      = file.name.split('.').pop() || 'jpg';
+  // Derive the extension from the validated MIME type, never the client's filename.
+  const ext      = EXT_BY_MIME[file.type] || 'jpg';
   const path     = `papers/${userId}/${Date.now()}.${ext}`;
 
   const { error } = await supabase.storage.from('papers').upload(path, file, {
