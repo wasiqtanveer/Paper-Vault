@@ -3,7 +3,7 @@ import { invalidatePapers } from '../lib/cache';
 import { motion } from 'framer-motion';
 import { FileImage, CheckCircle2, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { uploadImage } from '../lib/storage';
+import { uploadImage, deleteImage } from '../lib/storage';
 import { validateImageSize, compressImage, formatBytes } from '../lib/imageUtils';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -110,7 +110,11 @@ export default function Upload() {
         uploader_id: user.id,
         status: 'pending',
       }).select().single();
-      if (dbErr) throw dbErr;
+      if (dbErr) {
+        // Don't leave the file behind when the row couldn't be created.
+        await deleteImage(url).catch(() => {});
+        throw dbErr;
+      }
       invalidatePapers();
 
       // Log activity
