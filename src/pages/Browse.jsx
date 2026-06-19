@@ -59,9 +59,9 @@ export default function Browse() {
     // Lookups are read-mostly — cached, but a failed request is never stored.
     cachedSafeQuery('browse:subjects', () => supabase.from('subjects').select('id, name').order('name'),
       { fallback: [], onError, label: 'subjects', ttl: 300_000 }).then(setSubjects);
-    cachedSafeQuery('browse:years', () => supabase.from('papers').select('year').eq('status', 'approved'),
+    cachedSafeQuery('browse:years', () => supabase.rpc('paper_years'),
       { fallback: [], onError, label: 'years', ttl: 300_000 })
-      .then(data => setYears([...new Set(data.map(p => p.year))].sort((a, b) => b - a)));
+      .then(data => setYears(data.map(r => r.year)));
   }, [addToast]);
 
   const fetchPapers = useCallback(async (currentFilters, currentOffset, append = false) => {
