@@ -14,16 +14,19 @@ export async function uploadImage(file, userId) {
   if (error) throw error;
 
   const { data } = supabase.storage.from('papers').getPublicUrl(path);
-  return data.publicUrl;
+  return { url: data.publicUrl, path };
 }
 
-export async function deleteImage(imageUrl) {
-  if (!imageUrl) return;
-  // Extract path after /papers/ in the storage URL
-  const marker = '/object/public/papers/';
-  const idx    = imageUrl.indexOf(marker);
-  if (idx === -1) return;
-  const path   = imageUrl.slice(idx + marker.length);
+/** Remove a paper's image. Prefers the stored `image_path`; falls back to parsing the URL for old rows. */
+export async function deleteImage(imageUrl, imagePath) {
+  let path = imagePath;
+  if (!path) {
+    if (!imageUrl) return;
+    const marker = '/object/public/papers/';
+    const idx    = imageUrl.indexOf(marker);
+    if (idx === -1) return;
+    path = imageUrl.slice(idx + marker.length);
+  }
   const { error } = await supabase.storage.from('papers').remove([path]);
   if (error) console.warn('[storage] could not delete image:', path, error.message);
 }

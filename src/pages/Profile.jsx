@@ -120,7 +120,7 @@ export default function Profile() {
     if (error) { addToast(error.message, 'error'); return; }
     // RLS filters a forbidden delete to zero rows without raising an error.
     if (!removed?.length) { addToast('Could not delete this paper. You may not have permission.', 'error'); return; }
-    deleteImage(paper.image_url).catch(err => console.warn('[storage] image cleanup failed:', err));
+    deleteImage(paper.image_url, paper.image_path).catch(err => console.warn('[storage] image cleanup failed:', err));
     invalidatePapers();
     setPapers(prev => prev.filter(p => p.id !== paper.id));
     addToast('Paper deleted.', 'success');
