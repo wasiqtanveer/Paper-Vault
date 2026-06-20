@@ -24,5 +24,6 @@ export async function deleteImage(imageUrl) {
   const idx    = imageUrl.indexOf(marker);
   if (idx === -1) return;
   const path   = imageUrl.slice(idx + marker.length);
-  await supabase.storage.from('papers').remove([path]);
+  const { error } = await supabase.storage.from('papers').remove([path]);
+  if (error) console.warn('[storage] could not delete image:', path, error.message);
 }

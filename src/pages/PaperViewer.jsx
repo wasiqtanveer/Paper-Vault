@@ -128,7 +128,7 @@ export default function PaperViewer() {
     if (err) { addToast(err.message, 'error'); return; }
     // RLS filters a forbidden delete to zero rows without raising an error.
     if (!removed?.length) { addToast('Could not delete this paper. You may not have permission.', 'error'); return; }
-    deleteImage(paper.image_url).catch(() => {});
+    deleteImage(paper.image_url).catch(err => console.warn('[storage] image cleanup failed:', err));
     invalidatePapers();
     await logActivity({ action: 'delete', user, profile, fallbackRole: 'student', paperId: id, paperTitle: paper?.title });
     addToast('Paper deleted.', 'success');
