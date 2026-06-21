@@ -36,6 +36,8 @@ export default function Browse() {
   // Guards against out-of-order responses: rapid filter changes fire overlapping
   // requests, and without this a slow earlier one can overwrite a fast later one.
   const requestId = useRef(0);
+  // Latest subject list for the fetch callback, which must not re-create on every load.
+  const subjectsRef = useRef(peek('browse:subjects') ?? []);
 
   const [filters, setFilters] = useState({
     q:        initialQ,
@@ -58,7 +60,7 @@ export default function Browse() {
     const onError = msg => addToast(msg, 'error');
     // Lookups are read-mostly — cached, but a failed request is never stored.
     cachedSafeQuery('browse:subjects', () => supabase.from('subjects').select('id, name').order('name'),
-      { fallback: [], onError, label: 'subjects', ttl: 300_000 }).then(setSubjects);
+      { fallback: [], onError, label: 'subjects', ttl: 300_000 }).then(s => { subjectsRef.current = s; setSubjects(s); });
     cachedSafeQuery('browse:years', () => supabase.rpc('paper_years'),
       { fallback: [], onError, label: 'years', ttl: 300_000 })
       .then(data => setYears(data.map(r => r.year)));
@@ -76,7 +78,15 @@ export default function Browse() {
       .order('uploaded_at', { ascending: false })
       .range(currentOffset, currentOffset + PAGE_SIZE - 1);
 
-    if (currentFilters.q)        q = q.ilike('title', `%${escapeLike(currentFilters.q)}%`);
+    if (currentFilters.q) {
+      // Titles usually contain the subject, but match the subject name too so
+      // "calculus" finds papers whose title was edited. Quoted so commas and
+      // parentheses in the query can't break the `or` filter syntax.
+      const needle = currentFilters.q.toLowerCase();
+      const subjectIds = subjectsRef.current.filter(s => s.name.toLowerCase().includes(needle)).map(s => s.id);
+      const pattern = `"%${escapeLike(currentFilters.q).replace(/[\\"]/g, '\\$&')}%"`;
+      q = q.or([`title.ilike.${pattern}`, subjectIds.length ? `subject_id.in.(${subjectIds.join(',')})` : null].filter(Boolean).join(','));
+    }
     if (currentFilters.subject)  q = q.eq('subject_id', currentFilters.subject);
     if (currentFilters.year)     q = q.eq('year', Number(currentFilters.year));
     if (currentFilters.semester) q = q.eq('semester', currentFilters.semester);
