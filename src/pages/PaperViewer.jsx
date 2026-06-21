@@ -19,8 +19,6 @@ import { SkeletonLine, SkeletonBlock } from '../components/Skeleton';
 import { usePageMeta } from '../lib/usePageMeta';
 import './PaperViewer.css';
 
-const OWNER_EMAIL = 'mwasiqt@gmail.com';
-
 export default function PaperViewer() {
   const { id } = useParams();
   const { user, profile } = useAuth();
@@ -175,9 +173,8 @@ export default function PaperViewer() {
 
   const isMod      = profile?.role === 'moderator' || profile?.role === 'admin';
   const isOwner    = user && paper.profiles?.id === user.id;
-  // The site owner (admin by email) can also edit any paper
-  const isSiteOwner = user?.email === OWNER_EMAIL;
-  const canEdit    = isOwner || isSiteOwner;
+  // Staff can edit any paper (RLS allows it); gate on role, not an email address.
+  const canEdit    = isOwner || isMod;
 
   const uploadedAt = new Date(paper.uploaded_at).toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
