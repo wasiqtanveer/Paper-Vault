@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { safeQuery, countRows } from '../lib/query';
 import { invalidate } from '../lib/cache';
 import { logActivity } from '../lib/activity';
+import { CONTACT } from '../lib/contact';
 import { joinTeacherName, splitTeacherName, cleanName } from '../lib/teacherName';
 import TeacherNameField from '../components/TeacherNameField';
 import { confirmDialog } from '../components/ConfirmDialog';
@@ -16,7 +17,7 @@ import { SkeletonRow, SkeletonBlock } from '../components/Skeleton';
 import './AdminPanel.css';
 
 const ROLES = ['student', 'moderator', 'admin'];
-const OWNER_EMAIL = 'mwasiqt@gmail.com';
+const OWNER_EMAIL = CONTACT.email;
 const USERS_PAGE_SIZE = 25;
 
 const fadeUp = (i = 0) => ({
