@@ -89,3 +89,9 @@
   .filters-dropdowns-row { flex-wrap: wrap; }
   .filters-dropdowns-row .cselect { flex: 1 1 calc(50% - 4px); }
 }
+
+.results-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
