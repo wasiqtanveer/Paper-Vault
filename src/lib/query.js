@@ -45,3 +45,8 @@ export async function countRows(builder) {
   if (error) throw new Error(error.message);
   return count ?? 0;
 }
+
+/** Escape `%`, `_` and `\` so user input is matched literally inside an `ilike` pattern. */
+export function escapeLike(value) {
+  return String(value).replace(/[\%_]/g, '\$&');
+}
