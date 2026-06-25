@@ -100,6 +100,8 @@ export default function Upload() {
     if (!compressed)      { setError('Please select an image file.'); return; }
     if (!form.subjectId)  { setError('Please select a subject.'); return; }
     if (!form.examType)   { setError('Please select an exam type.'); return; }
+    const year = Number(form.year);
+    if (!Number.isInteger(year) || year < 1990 || year > 2099) { setError('Please enter a year between 1990 and 2099.'); return; }
     setLoading(true);
     try {
       const { url, path } = await uploadImage(compressed, user.id);
