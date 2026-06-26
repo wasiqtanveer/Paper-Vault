@@ -22,6 +22,9 @@ export async function compressImage(file) {
     maxSizeMB: 1,
     maxWidthOrHeight: 1920,
     useWebWorker: true,
+    // Always emit JPEG so the stored MIME type and extension match the bytes
+    // (a PNG in, JPEG out would otherwise keep a .png name).
+    fileType: 'image/jpeg',
   });
 }
 
