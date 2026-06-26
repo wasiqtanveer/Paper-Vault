@@ -96,6 +96,7 @@ export default function PaperViewer() {
       .update({ status: 'approved', reviewed_at: new Date().toISOString(), reviewed_by: user.id, rejection_reason: null })
       .eq('id', id);
     if (err) { addToast(err.message, 'error'); return; }
+    invalidatePapers();
     setPaper(p => ({ ...p, status: 'approved', rejection_reason: null }));
     addToast('Paper approved.', 'success');
   }
@@ -108,6 +109,7 @@ export default function PaperViewer() {
       .eq('id', id);
     setRejectBusy(false);
     if (err) { addToast(err.message, 'error'); return; }
+    invalidatePapers();
     setPaper(p => ({ ...p, status: 'rejected', rejection_reason: reason }));
     setShowReject(false);
     addToast('Paper rejected.', 'info');
