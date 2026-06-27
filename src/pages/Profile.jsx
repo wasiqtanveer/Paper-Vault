@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { FileText, CheckCircle, Clock, ShieldCheck, Settings2, Users, KeyRound, ChevronDown, Pencil } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { deleteImage } from '../lib/storage';
+import { logActivity } from '../lib/activity';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import StatusBadge from '../components/StatusBadge';
@@ -19,7 +20,7 @@ const fadeUp = (i = 0) => ({
 });
 
 export default function Profile() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const { addToast } = useToast();
   const [papers,    setPapers]    = useState([]);
   const [modStats,  setModStats]  = useState(null);
@@ -122,6 +123,7 @@ export default function Profile() {
     if (!removed?.length) { addToast('Could not delete this paper. You may not have permission.', 'error'); return; }
     deleteImage(paper.image_url, paper.image_path).catch(err => console.warn('[storage] image cleanup failed:', err));
     invalidatePapers();
+    logActivity({ action: 'delete', user, profile, fallbackRole: 'student', paperId: paper.id, paperTitle: paper.title });
     setPapers(prev => prev.filter(p => p.id !== paper.id));
     addToast('Paper deleted.', 'success');
   }
