@@ -97,6 +97,7 @@ export default function PaperViewer() {
       .eq('id', id);
     if (err) { addToast(err.message, 'error'); return; }
     invalidatePapers();
+    logActivity({ action: 'approve', user, profile, fallbackRole: 'moderator', paperId: id, paperTitle: paper.title });
     setPaper(p => ({ ...p, status: 'approved', rejection_reason: null }));
     addToast('Paper approved.', 'success');
   }
@@ -110,6 +111,7 @@ export default function PaperViewer() {
     setRejectBusy(false);
     if (err) { addToast(err.message, 'error'); return; }
     invalidatePapers();
+    logActivity({ action: 'reject', user, profile, fallbackRole: 'moderator', paperId: id, paperTitle: paper.title });
     setPaper(p => ({ ...p, status: 'rejected', rejection_reason: reason }));
     setShowReject(false);
     addToast('Paper rejected.', 'info');
