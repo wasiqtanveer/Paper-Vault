@@ -90,7 +90,24 @@ export default function PaperViewer() {
     setDownloading(false);
   }
 
+  // Puts the paper back exactly as it was before a review action.
+  async function undoReview(prev) {
+    const { error: err } = await supabase
+      .from('papers')
+      .update({
+        status: prev.status, reviewed_at: prev.reviewed_at ?? null,
+        reviewed_by: prev.reviewed_by ?? null, rejection_reason: prev.rejection_reason ?? null,
+      })
+      .eq('id', id);
+    if (err) { addToast(`Couldn't undo: ${err.message}`, 'error'); return; }
+    invalidatePapers();
+    logActivity({ action: 'restore', user, profile, fallbackRole: 'moderator', paperId: id, paperTitle: prev.title });
+    setPaper(p => ({ ...p, ...prev }));
+    addToast('Review undone.', 'info');
+  }
+
   async function handleApprove() {
+    const before = paper;
     const { error: err } = await supabase
       .from('papers')
       .update({ status: 'approved', reviewed_at: new Date().toISOString(), reviewed_by: user.id, rejection_reason: null })
@@ -99,11 +116,12 @@ export default function PaperViewer() {
     invalidatePapers();
     logActivity({ action: 'approve', user, profile, fallbackRole: 'moderator', paperId: id, paperTitle: paper.title });
     setPaper(p => ({ ...p, status: 'approved', rejection_reason: null }));
-    addToast('Paper approved.', 'success');
+    addToast('Paper approved.', 'success', { action: { label: 'Undo', onClick: () => undoReview(before) } });
   }
 
   async function handleReject(reason) {
     setRejectBusy(true);
+    const before = paper;
     const { error: err } = await supabase
       .from('papers')
       .update({ status: 'rejected', reviewed_at: new Date().toISOString(), reviewed_by: user.id, rejection_reason: reason })
@@ -114,7 +132,7 @@ export default function PaperViewer() {
     logActivity({ action: 'reject', user, profile, fallbackRole: 'moderator', paperId: id, paperTitle: paper.title });
     setPaper(p => ({ ...p, status: 'rejected', rejection_reason: reason }));
     setShowReject(false);
-    addToast('Paper rejected.', 'info');
+    addToast('Paper rejected.', 'info', { action: { label: 'Undo', onClick: () => undoReview(before) } });
   }
 
   async function handleDelete() {
