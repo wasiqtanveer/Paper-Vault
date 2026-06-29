@@ -184,7 +184,7 @@ export default function Profile() {
                   {nameError   && <div className="form-error">{nameError}</div>}
                   <div className="form-group" style={{ marginBottom: 12 }}>
                     <label className="form-label">Display Name</label>
-                    <input value={nameValue} onChange={e => setNameValue(e.target.value)} placeholder="Your full name" />
+                    <input value={nameValue} onChange={e => setNameValue(e.target.value)} placeholder="Your full name" maxLength={60} />
                   </div>
                   <button type="submit" className="btn btn-primary btn-sm" disabled={nameLoading}>
                     {nameLoading ? 'Saving…' : 'Save Name'}

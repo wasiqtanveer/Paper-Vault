@@ -156,7 +156,7 @@ export default function Register() {
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label className="form-label">Full Name</label>
-                <input value={form.fullName} onChange={set('fullName')} placeholder="Your full name" required />
+                <input value={form.fullName} onChange={set('fullName')} placeholder="Your full name" maxLength={60} required />
               </div>
               <div className="form-group">
                 <label className="form-label">Email</label>
