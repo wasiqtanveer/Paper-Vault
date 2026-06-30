@@ -13,17 +13,11 @@ import RequestModal from '../components/RequestModal';
 import { Link } from 'react-router-dom';
 import { logActivity } from '../lib/activity';
 import { teacherLabel } from '../lib/teacherName';
+import { buildTitle } from '../lib/paperTitle';
 import './Upload.css';
 
 const TERMS      = ['Spring', 'Summer', 'Fall'];
 const EXAM_TYPES = ['Mid', 'Final'];
-
-function buildTitle(form, subjects, teachers) {
-  const sub  = subjects.find(s => s.id === form.subjectId)?.name  || '';
-  const tch  = teachers.find(t => t.id === form.teacherId)?.name  || '';
-  const parts = [sub, tch, form.year, form.term, form.examType].filter(Boolean);
-  return parts.join(' — ');
-}
 
 export default function Upload() {
   const { user, profile } = useAuth();
