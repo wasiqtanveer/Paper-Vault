@@ -82,16 +82,28 @@ export default function Browse() {
     if (currentFilters.semester) q = q.eq('semester', currentFilters.semester);
     if (currentFilters.type)     q = q.eq('exam_type', currentFilters.type);
 
-    const results = await safeQuery(q, { fallback: [], onError: msg => addToast(msg, 'error'), label: 'papers' });
+    let results;
+    try {
+      results = await safeQuery(q, { fallback: [], label: 'papers', throwOnError: true });
+    } catch (err) {
+      if (id !== requestId.current) return false;
+      addToast(err.message || 'Failed to load papers.', 'error');
+      setLoading(false);
+      setRefreshing(false);
+      // Keep the list and the Load More button so the user can retry; only a
+      // successful empty page means the end of the results.
+      return false;
+    }
 
     // A newer request has since been fired — discard this stale response whole.
-    if (id !== requestId.current) return;
+    if (id !== requestId.current) return false;
 
     setPapers(prev => append ? [...prev, ...results] : results);
     setHasMore(results.length === PAGE_SIZE);
     setLoading(false);
     setRefreshing(false);
     if (!append) setResultsToken(t => t + 1);
+    return true;
   }, [addToast]);
 
   useEffect(() => {
@@ -118,8 +130,7 @@ export default function Browse() {
 
   function loadMore() {
     const newOffset = offset + PAGE_SIZE;
-    setOffset(newOffset);
-    fetchPapers({ ...filters, q: debouncedQ }, newOffset, true);
+    fetchPapers({ ...filters, q: debouncedQ }, newOffset, true).then(ok => { if (ok) setOffset(newOffset); });
   }
 
   return (
