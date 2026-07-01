@@ -12,13 +12,9 @@ const STORAGE_KEY = 'pv_welcome_seen';
 export default function WelcomeModal() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (!user) return;
-    const seen = readStorage(STORAGE_KEY);
-    if (!seen) setVisible(true);
-  }, [user]);
+  // Read storage once, lazily, instead of syncing it into state from an effect.
+  const [dismissed, setDismissed] = useState(() => !!readStorage(STORAGE_KEY));
+  const visible = !!user && !dismissed;
 
   // Lock body scroll while modal is open (especially important on mobile)
   useEffect(() => {
@@ -30,7 +26,7 @@ export default function WelcomeModal() {
 
   function dismiss() {
     writeStorage(STORAGE_KEY, '1');
-    setVisible(false);
+    setDismissed(true);
   }
 
   function goToAbout() {
