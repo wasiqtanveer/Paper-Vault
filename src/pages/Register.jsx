@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
 import PasswordInput from '../components/PasswordInput';
 import AuthHelp from '../components/AuthHelp';
 import ThemeLogo from '../components/ThemeLogo';
@@ -26,9 +25,7 @@ function GoogleIcon() {
 }
 
 export default function Register() {
-  const navigate = useNavigate();
   const { signInWithGoogle } = useAuth();
-  const { addToast } = useToast();
   const [gLoading, setGLoading] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [form,     setForm]      = useState({ fullName: '', email: '', password: '', confirm: '' });
