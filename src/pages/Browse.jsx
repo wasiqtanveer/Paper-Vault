@@ -114,13 +114,13 @@ export default function Browse() {
   }, [debouncedQ, filters.subject, filters.year, filters.semester, filters.type, fetchPapers]);
 
   useEffect(() => {
-    const next = {};
-    if (debouncedQ)       next.q        = debouncedQ;
-    if (filters.subject)  next.subject  = filters.subject;
-    if (filters.year)     next.year     = String(filters.year);
-    if (filters.semester) next.semester = filters.semester;
-    if (filters.type)     next.type     = filters.type;
-    setSearchParams(next, { replace: true });
+    // Update only the keys Browse owns; any other query params survive.
+    const owned = { q: debouncedQ, subject: filters.subject, year: filters.year ? String(filters.year) : '', semester: filters.semester, type: filters.type };
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      for (const [k, v] of Object.entries(owned)) { if (v) next.set(k, v); else next.delete(k); }
+      return next;
+    }, { replace: true });
   }, [debouncedQ, filters.subject, filters.year, filters.semester, filters.type, setSearchParams]);
 
   const hasFilters = !!(filters.q || filters.subject || filters.year || filters.semester || filters.type);
