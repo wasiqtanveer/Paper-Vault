@@ -16,7 +16,7 @@ function useCountUp(target, duration = 700) {
   const [val, setVal] = useState(0);
   const raf = useRef(null);
   useEffect(() => {
-    if (target === 0) { setVal(0); return; }
+    if (target === 0) return;
     const start = performance.now();
     function tick(now) {
       const p = Math.min((now - start) / duration, 1);
@@ -27,7 +27,8 @@ function useCountUp(target, duration = 700) {
     raf.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf.current);
   }, [target, duration]);
-  return val;
+  // A zero target renders 0 directly rather than resetting state from the effect.
+  return target === 0 ? 0 : val;
 }
 
 function StatCard({ label, value, sub, color, suffix = '' }) {
