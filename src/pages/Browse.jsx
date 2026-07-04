@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { CONTENT_SWAP, EASE_OUT } from '../lib/motion';
 import { supabase } from '../lib/supabase';
-import { safeQuery, escapeLike } from '../lib/query';
+import { escapeLike } from '../lib/query';
 import { cachedSafeQuery, peek } from '../lib/cache';
 import { usePageMeta } from '../lib/usePageMeta';
 import { useToast } from '../context/ToastContext';
@@ -12,6 +12,13 @@ import './Browse.css';
 import PaperCard from '../components/PaperCard';
 import CustomSelect from '../components/CustomSelect';
 import { SkeletonCardGrid } from '../components/Skeleton';
+
+const SORTS = {
+  newest: { label: 'Newest first', column: 'uploaded_at', ascending: false },
+  oldest: { label: 'Oldest first', column: 'uploaded_at', ascending: true },
+  year:   { label: 'Year (high to low)', column: 'year', ascending: false },
+  title:  { label: 'Title (A–Z)', column: 'title', ascending: true },
+};
 
 const PAGE_SIZE = 20;
 
@@ -25,6 +32,7 @@ export default function Browse() {
   const [years,    setYears]    = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [hasMore,  setHasMore]  = useState(false);
+  const [total,    setTotal]    = useState(null);
   const [offset,   setOffset]   = useState(0);
 
   // `refreshing` drives the immediate dim on the existing results the moment a
@@ -45,6 +53,7 @@ export default function Browse() {
     year:     searchParams.get('year')     || '',
     semester: searchParams.get('semester') || '',
     type:     searchParams.get('type')     || '',
+    sort:     searchParams.get('sort')     || 'newest',
   });
   const [debouncedQ, setDebouncedQ] = useState(initialQ);
   const { addToast } = useToast();
@@ -73,9 +82,9 @@ export default function Browse() {
 
     let q = supabase
       .from('papers')
-      .select('*, subjects(name), teachers(name), profiles!papers_uploader_id_fkey(full_name)')
+      .select('*, subjects(name), teachers(name), profiles!papers_uploader_id_fkey(full_name)', { count: 'exact' })
       .eq('status', 'approved')
-      .order('uploaded_at', { ascending: false })
+      .order(SORTS[currentFilters.sort]?.column ?? 'uploaded_at', { ascending: SORTS[currentFilters.sort]?.ascending ?? false })
       .range(currentOffset, currentOffset + PAGE_SIZE - 1);
 
     if (currentFilters.q) {
@@ -94,7 +103,10 @@ export default function Browse() {
 
     let results;
     try {
-      results = await safeQuery(q, { fallback: [], label: 'papers', throwOnError: true });
+      const { data, count, error } = await q;
+      if (error) throw new Error(`Failed to load papers: ${error.message}`);
+      results = data ?? [];
+      if (!append) setTotal(count ?? results.length);
     } catch (err) {
       if (id !== requestId.current) return false;
       addToast(err.message || 'Failed to load papers.', 'error');
@@ -121,20 +133,20 @@ export default function Browse() {
     setOffset(0);
     fetchPapers(effectiveFilters, 0, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQ, filters.subject, filters.year, filters.semester, filters.type, fetchPapers]);
+  }, [debouncedQ, filters.subject, filters.year, filters.semester, filters.type, filters.sort, fetchPapers]);
 
   useEffect(() => {
     // Update only the keys Browse owns; any other query params survive.
-    const owned = { q: debouncedQ, subject: filters.subject, year: filters.year ? String(filters.year) : '', semester: filters.semester, type: filters.type };
+    const owned = { q: debouncedQ, subject: filters.subject, year: filters.year ? String(filters.year) : '', semester: filters.semester, type: filters.type, sort: filters.sort === 'newest' ? '' : filters.sort };
     setSearchParams(prev => {
       const next = new URLSearchParams(prev);
       for (const [k, v] of Object.entries(owned)) { if (v) next.set(k, v); else next.delete(k); }
       return next;
     }, { replace: true });
-  }, [debouncedQ, filters.subject, filters.year, filters.semester, filters.type, setSearchParams]);
+  }, [debouncedQ, filters.subject, filters.year, filters.semester, filters.type, filters.sort, setSearchParams]);
 
   const hasFilters = !!(filters.q || filters.subject || filters.year || filters.semester || filters.type);
-  function clearFilters() { setFilters({ q: '', subject: '', year: '', semester: '', type: '' }); }
+  function clearFilters() { setFilters(f => ({ q: '', subject: '', year: '', semester: '', type: '', sort: f.sort })); }
 
   function set(key) { return e => setFilters(f => ({ ...f, [key]: e.target.value })); }
 
@@ -207,6 +219,13 @@ export default function Browse() {
                 { value: 'Final', label: 'Final only'  },
               ]}
             />
+            <CustomSelect
+              value={filters.sort}
+              onChange={v => setFilters(f => ({ ...f, sort: v || 'newest' }))}
+              placeholder="Newest first"
+              ariaLabel="Sort papers"
+              options={Object.entries(SORTS).map(([value, s]) => ({ value, label: s.label }))}
+            />
             {hasFilters && (
               <button type="button" className="btn btn-ghost btn-sm filters-clear" onClick={clearFilters}>Clear</button>
             )}
@@ -215,6 +234,10 @@ export default function Browse() {
 
         {/* Dimmed the instant a filter changes, so the click registers visually
             long before the query comes back. */}
+        {total !== null && !(loading && papers.length === 0) && (
+          <div className="results-count" aria-live="polite">{total} {total === 1 ? 'paper' : 'papers'}</div>
+        )}
+
         <div className={`results-region${refreshing && papers.length > 0 ? ' is-refreshing' : ''}`}>
           <div className="swap-stack">
           <AnimatePresence initial={false}>
