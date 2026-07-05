@@ -33,7 +33,6 @@ export default function Browse() {
   const [loading,  setLoading]  = useState(true);
   const [hasMore,  setHasMore]  = useState(false);
   const [total,    setTotal]    = useState(null);
-  const [offset,   setOffset]   = useState(0);
 
   // `refreshing` drives the immediate dim on the existing results the moment a
   // filter changes — without it the page looks frozen until the request lands.
@@ -130,8 +129,9 @@ export default function Browse() {
 
   useEffect(() => {
     const effectiveFilters = { ...filters, q: debouncedQ };
-    setOffset(0);
-    fetchPapers(effectiveFilters, 0, false);
+    // fetchPapers sets loading state first; deferring it a microtask keeps the effect
+    // itself free of synchronous setState while still dimming on the same frame.
+    queueMicrotask(() => fetchPapers(effectiveFilters, 0, false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedQ, filters.subject, filters.year, filters.semester, filters.type, filters.sort, fetchPapers]);
 
@@ -151,8 +151,8 @@ export default function Browse() {
   function set(key) { return e => setFilters(f => ({ ...f, [key]: e.target.value })); }
 
   function loadMore() {
-    const newOffset = offset + PAGE_SIZE;
-    fetchPapers({ ...filters, q: debouncedQ }, newOffset, true).then(ok => { if (ok) setOffset(newOffset); });
+    // The next page starts after the rows already shown; no separate offset to reset on filter change.
+    fetchPapers({ ...filters, q: debouncedQ }, papers.length, true);
   }
 
   return (
