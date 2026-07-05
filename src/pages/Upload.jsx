@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { FileImage, CheckCircle2, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { uploadImage, deleteImage } from '../lib/storage';
-import { validateImageSize, compressImage, formatBytes } from '../lib/imageUtils';
+import { validateImage, compressImage, formatBytes } from '../lib/imageUtils';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import CustomSelect from '../components/CustomSelect';
@@ -65,7 +65,7 @@ export default function Upload() {
   async function processFile(f) {
     if (!f) return;
     setFileError(''); setCompressed(null); setPreview(''); setFile(f);
-    try { validateImageSize(f); } catch (err) { setFileError(err.message); return; }
+    try { validateImage(f); } catch (err) { setFileError(err.message); return; }
     setCompressing(true);
     try {
       const comp = await compressImage(f);
@@ -80,8 +80,8 @@ export default function Upload() {
 
   function handleDrop(e) {
     e.preventDefault(); setDragOver(false);
-    const f = e.dataTransfer.files[0];
-    if (f && f.type.startsWith('image/')) processFile(f);
+    // Same validation as the file picker, so both paths accept the same files.
+    processFile(e.dataTransfer.files[0]);
   }
 
   async function handleSubmit(e) {
@@ -271,7 +271,7 @@ export default function Upload() {
                 <FileImage size={28} strokeWidth={1.4} className="upload-zone-icon" aria-hidden="true" />
                 <div className="upload-zone-text">{file ? file.name : 'Choose or drag an image here'}</div>
                 <div className="upload-zone-sub">JPEG, PNG, WEBP · Max 5MB</div>
-                <input id="paper-file" ref={fileInputRef} type="file" accept="image/*" className="sr-only"
+                <input id="paper-file" ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only"
                   onChange={e => processFile(e.target.files[0])} />
               </label>
               {fileError && <div className="form-error">{fileError}</div>}

@@ -1,11 +1,20 @@
 import imageCompression from 'browser-image-compression';
 
 const MAX_RAW_SIZE_MB = 5;
+export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export function validateImageSize(file) {
   if (file.size > MAX_RAW_SIZE_MB * 1024 * 1024) {
     throw new Error(`Image must be under ${MAX_RAW_SIZE_MB}MB`);
   }
+}
+
+/** Reject anything that isn't a JPEG, PNG or WEBP, then apply the size limit. */
+export function validateImage(file) {
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    throw new Error('Please choose a JPEG, PNG or WEBP image.');
+  }
+  validateImageSize(file);
 }
 
 export async function compressImage(file) {
