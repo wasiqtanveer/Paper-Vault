@@ -54,11 +54,9 @@ export default function Upload() {
     });
   }, []);
 
-  // Auto-fill title when fields change (unless user manually edited it)
-  useEffect(() => {
-    if (titleManual) return;
-    setForm(f => ({ ...f, title: buildTitle(f, subjects, teachers) }));
-  }, [form.subjectId, form.teacherId, form.year, form.term, form.examType, subjects, teachers, titleManual]);
+  // The title follows the fields until the user edits it. Derived during render
+  // rather than synced into state from an effect.
+  const title = titleManual ? form.title : buildTitle(form, subjects, teachers);
 
   function setField(key) {
     return v => setForm(f => ({ ...f, [key]: v }));
@@ -130,7 +128,7 @@ export default function Upload() {
       }
       const { url, path } = await uploadImage(compressed, user.id, setProgress);
       const { data: paper, error: dbErr } = await supabase.from('papers').insert({
-        title:      form.title || buildTitle(form, subjects, teachers),
+        title:      title || buildTitle(form, subjects, teachers),
         subject_id: form.subjectId,
         teacher_id: form.teacherId || null,
         year:       Number(form.year),
@@ -288,7 +286,7 @@ export default function Upload() {
                 )}
               </label>
               <input
-                value={form.title}
+                value={title}
                 onChange={e => { setTitleManual(true); setForm(f => ({ ...f, title: e.target.value })); }}
                 placeholder="Auto-generated from fields above"
               />
