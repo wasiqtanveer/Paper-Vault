@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
 import { logActivity } from '../lib/activity';
-import { confirmDialog } from '../components/ConfirmDialog';
+import { confirmDialog } from '../lib/confirmDialog';
 import { cachedSafeQuery } from '../lib/cache';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';

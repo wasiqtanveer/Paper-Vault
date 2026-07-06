@@ -8,7 +8,7 @@ import { logActivity } from '../lib/activity';
 import { CONTACT } from '../lib/contact';
 import { joinTeacherName, splitTeacherName, cleanName } from '../lib/teacherName';
 import TeacherNameField from '../components/TeacherNameField';
-import { confirmDialog } from '../components/ConfirmDialog';
+import { confirmDialog } from '../lib/confirmDialog';
 import AdminFormModal from '../components/AdminFormModal';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
