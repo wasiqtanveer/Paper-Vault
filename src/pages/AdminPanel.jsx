@@ -11,7 +11,7 @@ import TeacherNameField from '../components/TeacherNameField';
 import { confirmDialog } from '../lib/confirmDialog';
 import AdminFormModal from '../components/AdminFormModal';
 import { useToast } from '../context/ToastContext';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import CustomSelect from '../components/CustomSelect';
 import { SkeletonRow, SkeletonBlock } from '../components/Skeleton';
 import './AdminPanel.css';

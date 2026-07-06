@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase';
 import { deleteImage } from '../lib/storage';
 import { logActivity } from '../lib/activity';
 import { MIN_PASSWORD_LENGTH } from '../lib/authRules';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { useToast } from '../context/ToastContext';
 import StatusBadge from '../components/StatusBadge';
 import { SkeletonRow } from '../components/Skeleton';

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import PasswordInput from '../components/PasswordInput';
 import AuthHelp from '../components/AuthHelp';
 import ThemeLogo from '../components/ThemeLogo';

@@ -1,0 +1,11 @@
+Generated with the built-in image_gen tool.
+
+Use case: logo-brand
+Asset type: primary logo for PaperVault, a student exam-paper archive web app.
+Primary request: Design one polished, distinctive logo combining a folded paper symbol and a subtle V-shaped vault opening in a single simple geometric mark, with the exact wordmark "PaperVault" below it. The symbol should feel like two neatly interlocking folded sheets protecting a central negative-space V, with a confident compact silhouette and very few shapes. Sophisticated, friendly academic software identity; precise optical balance and memorable at small sizes.
+Style/medium: flat vector-style brand design, crisp solid shapes, clean edges, professional typography. No 3D.
+Composition: one centered stacked logo, generous but not excessive transparent margins; symbol above wordmark, wordmark on one line in a bold modern geometric sans serif with careful kerning. Mark roughly 2x the height of the text; overall balanced compact lockup.
+Color palette: project blue #4f8ef7 and deeper blue #2567c8 for the folded-paper mark; charcoal #111111 for the wordmark.
+Text (verbatim): "PaperVault"
+Background: genuinely transparent alpha background.
+Constraints: output only the finished single logo, no presentation board, no mockup, no slogan, no palette swatches, no surrounding annotations, no watermark, no shadows, no gradients, no tiny page lines, no literal padlock, no graduation cap.

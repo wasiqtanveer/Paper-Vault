@@ -8,7 +8,7 @@ import {
   PanelLeftClose, PanelLeftOpen, Info, Menu, X, Trophy,
   Volume2, VolumeX
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { useTheme } from '../context/ThemeContext';
 import { useSound } from '../context/SoundContext';
 import ThemeLogo from './ThemeLogo';

@@ -5,7 +5,7 @@ import ProtectedRoute from './ProtectedRoute';
 
 // Mock the auth context so we can drive ProtectedRoute's branches directly.
 const mockAuth = vi.fn();
-vi.mock('../context/AuthContext', () => ({
+vi.mock('../context/useAuth', () => ({
   useAuth: () => mockAuth(),
 }));
 
