@@ -62,15 +62,25 @@ export default function Upload() {
     return v => setForm(f => ({ ...f, [key]: v }));
   }
 
+  // Object URLs hold the image in memory until revoked; release the old one
+  // whenever the preview changes and when the page unmounts.
+  const previewRef = useRef('');
+  function replacePreview(url) {
+    if (previewRef.current) URL.revokeObjectURL(previewRef.current);
+    previewRef.current = url;
+    setPreview(url);
+  }
+  useEffect(() => () => { if (previewRef.current) URL.revokeObjectURL(previewRef.current); }, []);
+
   async function processFile(f) {
     if (!f) return;
-    setFileError(''); setCompressed(null); setPreview(''); setFile(f);
+    setFileError(''); setCompressed(null); replacePreview(''); setFile(f);
     try { validateImage(f); } catch (err) { setFileError(err.message); return; }
     setCompressing(true);
     try {
       const comp = await compressImage(f);
       setCompressed(comp);
-      setPreview(URL.createObjectURL(comp));
+      replacePreview(URL.createObjectURL(comp));
     } catch (err) {
       setFileError('Compression failed: ' + err.message);
     } finally {
@@ -118,7 +128,7 @@ export default function Upload() {
       setSuccess(true);
       setForm({ subjectId: '', teacherId: '', year: new Date().getFullYear(), term: '', examType: '', title: '' });
       setTitleManual(false);
-      setFile(null); setCompressed(null); setPreview('');
+      setFile(null); setCompressed(null); replacePreview('');
     } catch (err) {
       setError(err.message || 'Upload failed.');
     } finally {
