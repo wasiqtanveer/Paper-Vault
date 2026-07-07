@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 import { useTheme } from '../context/useTheme';
-import { useSound } from '../context/SoundContext';
+import { useSound } from '../context/useSound';
 import ThemeLogo from './ThemeLogo';
 import './Sidebar.css';
 
