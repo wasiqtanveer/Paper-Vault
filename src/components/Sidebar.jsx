@@ -9,7 +9,7 @@ import {
   Volume2, VolumeX
 } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../context/useTheme';
 import { useSound } from '../context/SoundContext';
 import ThemeLogo from './ThemeLogo';
 import './Sidebar.css';
