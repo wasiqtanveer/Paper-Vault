@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/useAuth';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import { joinTeacherName, cleanName } from '../lib/teacherName';
 import TeacherNameField from './TeacherNameField';
 import './EditPaperModal.css';

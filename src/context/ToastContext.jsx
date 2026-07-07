@@ -1,9 +1,8 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { ToastContext } from './toast-context';
 import { AnimatePresence } from 'framer-motion';
 import Toast from '../components/Toast';
 import { useSound } from './SoundContext';
-
-const ToastContext = createContext(null);
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
@@ -38,8 +37,4 @@ export function ToastProvider({ children }) {
       </div>
     </ToastContext.Provider>
   );
-}
-
-export function useToast() {
-  return useContext(ToastContext);
 }

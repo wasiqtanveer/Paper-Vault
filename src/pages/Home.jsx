@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import { countRows } from '../lib/query';
 import { cachedQuery, cachedSafeQuery, peek } from '../lib/cache';
 import { usePageMeta } from '../lib/usePageMeta';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import './Home.css';
 import PaperCard from '../components/PaperCard';
 import { SkeletonCardGrid } from '../components/Skeleton';

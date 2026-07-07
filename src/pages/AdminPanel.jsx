@@ -10,7 +10,7 @@ import { joinTeacherName, splitTeacherName, cleanName } from '../lib/teacherName
 import TeacherNameField from '../components/TeacherNameField';
 import { confirmDialog } from '../lib/confirmDialog';
 import AdminFormModal from '../components/AdminFormModal';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import { useAuth } from '../context/useAuth';
 import CustomSelect from '../components/CustomSelect';
 import { SkeletonRow, SkeletonBlock } from '../components/Skeleton';

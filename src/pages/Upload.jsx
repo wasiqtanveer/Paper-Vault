@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 import { uploadImage, deleteImage } from '../lib/storage';
 import { validateImage, compressImage, combineImages, formatBytes, MAX_PAGES } from '../lib/imageUtils';
 import { useAuth } from '../context/useAuth';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import CustomSelect from '../components/CustomSelect';
 import NumberField from '../components/NumberField';
 import RequestModal from '../components/RequestModal';

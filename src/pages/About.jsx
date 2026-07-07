@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Globe, ExternalLink, GitBranch, Heart, Code2, Check } from 'lucide-react';
 import { usePageMeta } from '../lib/usePageMeta';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import ThemeLogo from '../components/ThemeLogo';
 import './About.css';
 

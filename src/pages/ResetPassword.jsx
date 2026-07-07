@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import PasswordInput from '../components/PasswordInput';
 import { usePageMeta } from '../lib/usePageMeta';
 import { MIN_PASSWORD_LENGTH } from '../lib/authRules';

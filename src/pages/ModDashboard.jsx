@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { Check, X, ExternalLink, Flag, Pencil } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/useAuth';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import EditPaperModal from '../components/EditPaperModal';
 import RejectReasonForm from '../components/RejectReasonForm';
 import './ModDashboard.css';

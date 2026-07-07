@@ -9,7 +9,7 @@ import { deleteImage } from '../lib/storage';
 import { logActivity } from '../lib/activity';
 import { MIN_PASSWORD_LENGTH } from '../lib/authRules';
 import { useAuth } from '../context/useAuth';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import StatusBadge from '../components/StatusBadge';
 import { SkeletonRow } from '../components/Skeleton';
 import '../components/RejectReasonForm.css';
