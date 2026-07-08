@@ -220,8 +220,3 @@ export function SoundProvider({ children }) {
     </SoundContext.Provider>
   );
 }
-
-export function useSound() {
-  // Safe outside the provider: components can call play() unconditionally.
-  return useContext(SoundContext) ?? { enabled: false, setEnabled: () => {}, toggle: () => {}, play: () => {} };
-}
