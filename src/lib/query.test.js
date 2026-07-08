@@ -1,7 +1,11 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { safeQuery } from './query';
 
 describe('safeQuery', () => {
+  // safeQuery logs failures with console.error when no onError is given; keep test output clean.
+  beforeEach(() => { vi.spyOn(console, 'error').mockImplementation(() => {}); });
+  afterEach(() => { vi.restoreAllMocks(); });
+
   it('returns data when the query succeeds', async () => {
     const builder = Promise.resolve({ data: [1, 2, 3], error: null });
     const result = await safeQuery(builder);
