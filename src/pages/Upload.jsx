@@ -127,6 +127,7 @@ export default function Upload() {
       // Log activity
       await logActivity({ action: 'upload', user, profile, fallbackRole: 'student', paperId: paper.id, paperTitle: paper.title });
 
+      addToast('Paper uploaded. It will appear once a moderator approves it.', 'success');
       setSuccess(true);
       setForm({ subjectId: '', teacherId: '', year: new Date().getFullYear(), term: '', examType: '', title: '' });
       setTitleManual(false);
