@@ -12,6 +12,7 @@ import NumberField from '../components/NumberField';
 import RequestModal from '../components/RequestModal';
 import { Link } from 'react-router-dom';
 import { logActivity } from '../lib/activity';
+import { confirmDialog } from '../components/ConfirmDialog';
 import { teacherLabel } from '../lib/teacherName';
 import { buildTitle } from '../lib/paperTitle';
 import './Upload.css';
@@ -104,6 +105,23 @@ export default function Upload() {
     if (!Number.isInteger(year) || year < 1990 || year > 2099) { setError('Please enter a year between 1990 and 2099.'); return; }
     setLoading(true);
     try {
+      // Warn about an existing paper with the same subject, teacher, year, term and exam type.
+      // RLS limits this to approved papers plus your own, which is what a student can act on.
+      let dup = supabase.from('papers').select('id', { count: 'exact', head: true })
+        .eq('subject_id', form.subjectId).eq('year', year).eq('exam_type', form.examType);
+      dup = form.teacherId ? dup.eq('teacher_id', form.teacherId) : dup.is('teacher_id', null);
+      dup = form.term ? dup.eq('semester', form.term) : dup.is('semester', null);
+      const { count: existing } = await dup;
+      if (existing > 0) {
+        setLoading(false);
+        const ok = await confirmDialog({
+          title: 'This paper may already exist',
+          body: 'A paper with the same subject, teacher, year, term and exam type is already in the library. Upload yours anyway?',
+          confirmLabel: 'Upload anyway',
+        });
+        if (!ok) return;
+        setLoading(true);
+      }
       const { url, path } = await uploadImage(compressed, user.id);
       const { data: paper, error: dbErr } = await supabase.from('papers').insert({
         title:      form.title || buildTitle(form, subjects, teachers),
