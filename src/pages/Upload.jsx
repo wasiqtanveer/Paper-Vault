@@ -39,6 +39,7 @@ export default function Upload() {
   const [error,        setError]        = useState('');
   const [fileError,    setFileError]    = useState('');
   const [loading,      setLoading]      = useState(false);
+  const [progress,     setProgress]     = useState(0); // 0..1 while the image uploads
   const [success,      setSuccess]      = useState(false);
   const [dragOver,     setDragOver]     = useState(false);
   const [requestKind,  setRequestKind]  = useState(null); // 'subject' | 'teacher' | null
@@ -122,7 +123,7 @@ export default function Upload() {
         if (!ok) return;
         setLoading(true);
       }
-      const { url, path } = await uploadImage(compressed, user.id);
+      const { url, path } = await uploadImage(compressed, user.id, setProgress);
       const { data: paper, error: dbErr } = await supabase.from('papers').insert({
         title:      form.title || buildTitle(form, subjects, teachers),
         subject_id: form.subjectId,
@@ -154,6 +155,7 @@ export default function Upload() {
       setError(err.message || 'Upload failed.');
     } finally {
       setLoading(false);
+      setProgress(0);
     }
   }
 
@@ -323,7 +325,7 @@ export default function Upload() {
             {error && <div className="inline-error" role="alert" style={{ marginBottom: 10 }}>{error}</div>}
             <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }}
               disabled={loading || compressing}>
-              {loading ? 'Uploading…' : 'Submit Paper'}
+              {loading ? `Uploading… ${progress > 0 && progress < 1 ? Math.round(progress * 100) + '%' : ''}`.trim() : 'Submit Paper'}
             </button>
           </form>
         </motion.div>
