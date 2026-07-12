@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { FileImage, CheckCircle2, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { uploadImage, deleteImage } from '../lib/storage';
-import { validateImage, compressImage, formatBytes } from '../lib/imageUtils';
+import { validateImage, compressImage, combineImages, formatBytes, MAX_PAGES } from '../lib/imageUtils';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import CustomSelect from '../components/CustomSelect';
@@ -74,13 +74,18 @@ export default function Upload() {
   }
   useEffect(() => () => { if (previewRef.current) URL.revokeObjectURL(previewRef.current); }, []);
 
-  async function processFile(f) {
-    if (!f) return;
-    setFileError(''); setCompressed(null); replacePreview(''); setFile(f);
-    try { validateImage(f); } catch (err) { setFileError(err.message); return; }
+  async function processFile(fileOrList) {
+    const files = Array.from(fileOrList?.length !== undefined && !fileOrList.name ? fileOrList : [fileOrList]).filter(Boolean);
+    if (!files.length) return;
+    setFileError(''); setCompressed(null); replacePreview('');
+    if (files.length > MAX_PAGES) { setFileError(`Choose up to ${MAX_PAGES} pages at once.`); return; }
+    const total = files.reduce((n, f) => n + f.size, 0);
+    setFile(files.length === 1 ? files[0] : { name: `${files.length} pages`, size: total });
+    try { files.forEach(validateImage); } catch (err) { setFileError(err.message); return; }
     setCompressing(true);
     try {
-      const comp = await compressImage(f);
+      const source = files.length === 1 ? files[0] : await combineImages(files);
+      const comp = await compressImage(source, files.length);
       setCompressed(comp);
       replacePreview(URL.createObjectURL(comp));
     } catch (err) {
@@ -93,7 +98,7 @@ export default function Upload() {
   function handleDrop(e) {
     e.preventDefault(); setDragOver(false);
     // Same validation as the file picker, so both paths accept the same files.
-    processFile(e.dataTransfer.files[0]);
+    processFile(e.dataTransfer.files);
   }
 
   async function handleSubmit(e) {
@@ -302,10 +307,10 @@ export default function Upload() {
                 onDrop={handleDrop}
               >
                 <FileImage size={28} strokeWidth={1.4} className="upload-zone-icon" aria-hidden="true" />
-                <div className="upload-zone-text">{file ? file.name : 'Choose or drag an image here'}</div>
-                <div className="upload-zone-sub">JPEG, PNG, WEBP · Max 5MB</div>
-                <input id="paper-file" ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only"
-                  onChange={e => processFile(e.target.files[0])} />
+                <div className="upload-zone-text">{file ? file.name : 'Choose or drag the paper image here'}</div>
+                <div className="upload-zone-sub">JPEG, PNG, WEBP · Max 5MB each · Up to 4 pages</div>
+                <input id="paper-file" ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="sr-only"
+                  onChange={e => processFile(e.target.files)} />
               </label>
               {fileError && <div className="form-error">{fileError}</div>}
               {compressing && <div className="form-hint">Compressing image…</div>}
