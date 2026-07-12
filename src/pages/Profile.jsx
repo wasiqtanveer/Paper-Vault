@@ -21,6 +21,8 @@ const fadeUp = (i = 0) => ({
 
 export default function Profile() {
   const { user, profile, refreshProfile } = useAuth();
+  // Google-only accounts have no password to verify, so the change-password flow can't work for them.
+  const hasPassword = user?.app_metadata?.providers?.includes('email') ?? true;
   const { addToast } = useToast();
   const [papers,    setPapers]    = useState([]);
   const [modStats,  setModStats]  = useState(null);
@@ -196,7 +198,7 @@ export default function Profile() {
         </motion.div>
 
         {/* Change password accordion */}
-        <motion.div className="pw-accordion" {...fadeUp(2)}>
+        {hasPassword && <motion.div className="pw-accordion" {...fadeUp(2)}>
           <button
             className={'pw-accordion-trigger' + (pwOpen ? ' open' : '')}
             onClick={() => { setPwOpen(v => !v); setPwError(''); setPwSuccess(false); }}
@@ -260,7 +262,7 @@ export default function Profile() {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </motion.div>}
 
         {/* Upload stats */}
         <motion.div className="profile-stats-row" {...fadeUp(3)}>
