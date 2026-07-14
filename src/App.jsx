@@ -17,6 +17,7 @@ const Browse       = lazy(routeLoaders['/browse']);
 const PaperViewer  = lazy(routeLoaders['/paper']);
 const Login        = lazy(routeLoaders['/login']);
 const Register     = lazy(routeLoaders['/register']);
+const ResetPassword = lazy(routeLoaders['/reset-password']);
 const Upload       = lazy(routeLoaders['/upload']);
 const Profile      = lazy(routeLoaders['/profile']);
 const ModDashboard = lazy(routeLoaders['/mod']);
@@ -130,6 +131,7 @@ function Shell() {
               <Route path="/profile"   element={<ProtectedRoute><PageWrap><Profile /></PageWrap></ProtectedRoute>} />
               <Route path="/mod"       element={<ProtectedRoute roles={['moderator','admin']}><PageWrap><ModDashboard /></PageWrap></ProtectedRoute>} />
               <Route path="/admin"     element={<ProtectedRoute roles={['admin']}><PageWrap><AdminPanel /></PageWrap></ProtectedRoute>} />
+              <Route path="/reset-password" element={<PageWrap><ResetPassword /></PageWrap>} />
               <Route path="/about"         element={<PageWrap><About /></PageWrap>} />
               <Route path="/hall-of-fame" element={<PageWrap><HallOfFame /></PageWrap>} />
             </Routes>

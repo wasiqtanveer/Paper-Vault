@@ -165,7 +165,7 @@ export default function Register() {
               </div>
               <div className="form-group">
                 <label className="form-label">Password</label>
-                <PasswordInput value={form.password} onChange={set('password')} placeholder="Min. 6 characters" required />
+                <PasswordInput value={form.password} onChange={set('password')} placeholder={`Min. ${MIN_PASSWORD_LENGTH} characters`} required />
               </div>
               <div className="form-group">
                 <label className="form-label">Confirm Password</label>

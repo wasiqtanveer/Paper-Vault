@@ -14,6 +14,7 @@ const loaders = {
   '/browse':       () => import('../pages/Browse'),
   '/paper':        () => import('../pages/PaperViewer'),
   '/login':        () => import('../pages/Login'),
+  '/reset-password': () => import('../pages/ResetPassword'),
   '/register':     () => import('../pages/Register'),
   '/upload':       () => import('../pages/Upload'),
   '/profile':      () => import('../pages/Profile'),
