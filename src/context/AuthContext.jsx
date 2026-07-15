@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
 
   function fetchProfile(userId) {
     if (profileReq.current.id === userId && profileReq.current.promise) return profileReq.current.promise;
-    const promise = supabase.from('profiles').select('*').eq('id', userId).single()
+    const promise = supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
       .then(({ data }) => { setProfile(data ?? null); })
       .catch(() => {})
       .finally(() => { if (profileReq.current.promise === promise) profileReq.current = { id: null, promise: null }; });
