@@ -13,6 +13,7 @@ export function AuthProvider({ children }) {
   const [profileReady, setProfileReady] = useState(false);
   const lastUserId = useRef(null);
   const [signingOut, setSigningOut] = useState(false);
+  const [profileError, setProfileError] = useState('');
 
   // Profile fetches are de-duplicated per user: getSession() and the first
   // onAuthStateChange event both ask for the same row on load.
@@ -21,8 +22,13 @@ export function AuthProvider({ children }) {
   function fetchProfile(userId) {
     if (profileReq.current.id === userId && profileReq.current.promise) return profileReq.current.promise;
     const promise = supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
-      .then(({ data }) => { setProfile(data ?? null); })
-      .catch(() => {})
+      .then(({ data, error }) => {
+        if (error) throw error;
+        setProfile(data ?? null);
+        setProfileError('');
+      })
+      // Surface the failure instead of silently treating the user as a student.
+      .catch(err => setProfileError(err?.message || 'Could not load your profile.'))
       .finally(() => { if (profileReq.current.promise === promise) profileReq.current = { id: null, promise: null }; });
     profileReq.current = { id: userId, promise };
     return promise;
@@ -96,7 +102,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, user, profile, profileReady, loading, signingOut, signIn, signInWithGoogle, resetPassword, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ session, user, profile, profileReady, profileError, loading, signingOut, signIn, signInWithGoogle, resetPassword, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
