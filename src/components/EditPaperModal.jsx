@@ -106,7 +106,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
         >
           <div className="epm-header">
             <span className="epm-title" id="epm-title">Edit Paper</span>
-            <button className="epm-close" onClick={onClose} type="button"><X size={16} /></button>
+            <button className="epm-close" onClick={onClose} type="button" aria-label="Close"><X size={16} aria-hidden="true" /></button>
           </div>
 
           <form className="epm-body" onSubmit={handleSave}>
