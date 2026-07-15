@@ -112,8 +112,9 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
           <form className="epm-body" onSubmit={handleSave}>
             <div className="epm-two-col">
               <div className="form-group">
-                <label className="form-label">Subject</label>
+                <label className="form-label" htmlFor="epm-subject">Subject</label>
                 <CustomSelect
+                  id="epm-subject"
                   value={form.subjectId}
                   onChange={setField('subjectId')}
                   placeholder="Select subject…"
@@ -122,8 +123,9 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Teacher</label>
+                <label className="form-label" htmlFor="epm-teacher">Teacher</label>
                 <CustomSelect
+                  id="epm-teacher"
                   value={form.teacherId}
                   onChange={setField('teacherId')}
                   placeholder="Unknown / N/A"
@@ -135,17 +137,19 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
 
             <div className="epm-two-col">
               <div className="form-group">
-                <label className="form-label">Year</label>
+                <label className="form-label" htmlFor="epm-year">Year</label>
                 <NumberField
+                  id="epm-year"
                   value={form.year}
                   onChange={e => setForm(f => ({ ...f, year: e.target.value }))}
                   min={1990} max={2099}
-                  aria-label="Year"
+                  
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Term</label>
+                <label className="form-label" htmlFor="epm-term">Term</label>
                 <CustomSelect
+                  id="epm-term"
                   value={form.term}
                   onChange={setField('term')}
                   placeholder="Select term…"
@@ -155,8 +159,8 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
             </div>
 
             <div className="form-group">
-              <label className="form-label">Exam Type</label>
-              <div className="exam-type-row">
+              <label className="form-label" id="epm-exam-label">Exam Type</label>
+              <div className="exam-type-row" role="group" aria-labelledby="epm-exam-label">
                 <button
                   type="button"
                   className={'exam-type-btn' + (form.examType === '' ? ' active' : '')}
@@ -173,8 +177,9 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
             </div>
 
             <div className="form-group">
-              <label className="form-label">Title</label>
+              <label className="form-label" htmlFor="epm-title-input">Title</label>
               <input
+                id="epm-title-input"
                 value={shownTitle}
                 onChange={e => { setTitleManual(true); setForm(f => ({ ...f, title: e.target.value })); }}
                 placeholder="Paper title…"
