@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { invalidate } from '../lib/cache';
 
 const AuthContext = createContext(null);
 
@@ -93,8 +94,14 @@ export function AuthProvider({ children }) {
 
   async function signOut() {
     setSigningOut(true);
-    await supabase.auth.signOut();
-    setSigningOut(false);
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      // Always drop cached data so the next account in this tab never sees it,
+      // and never leave the signing-out flag stuck on if signOut throws.
+      invalidate();
+      setSigningOut(false);
+    }
   }
 
   async function refreshProfile() {
