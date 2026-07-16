@@ -242,17 +242,18 @@ export default function Upload() {
 
             <div className="upload-two-col">
               <div className="form-group">
-                <label className="form-label">Year</label>
+                <label className="form-label" htmlFor="up-year">Year</label>
                 <NumberField
+                  id="up-year"
                   value={form.year}
                   onChange={e => setForm(f => ({ ...f, year: e.target.value }))}
                   min={1990} max={2099} required
-                  aria-label="Year"
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Term</label>
+                <label className="form-label" htmlFor="up-term">Term</label>
                 <CustomSelect
+                  id="up-term"
                   value={form.term}
                   onChange={setField('term')}
                   placeholder="Select term…"
@@ -262,8 +263,8 @@ export default function Upload() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Exam Type</label>
-              <div className="exam-type-row">
+              <label className="form-label" id="up-exam-label">Exam Type</label>
+              <div className="exam-type-row" role="group" aria-labelledby="up-exam-label">
                 {EXAM_TYPES.map(et => (
                   <button
                     key={et} type="button"
@@ -277,7 +278,7 @@ export default function Upload() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">
+              <label className="form-label" htmlFor="up-title">
                 Title
                 {titleManual && (
                   <button type="button" className="title-reset-btn" onClick={() => { setTitleManual(false); }}>
@@ -286,6 +287,7 @@ export default function Upload() {
                 )}
               </label>
               <input
+                id="up-title"
                 value={title}
                 onChange={e => { setTitleManual(true); setForm(f => ({ ...f, title: e.target.value })); }}
                 placeholder="Auto-generated from fields above"
@@ -294,11 +296,12 @@ export default function Upload() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Paper Image</label>
+              <span className="form-label" id="up-image-label">Paper Image</span>
               {/* A <label> wrapping a visually-hidden input: click, tap, Enter and
                   Space all open the picker, and screen readers announce it. */}
               <label
                 htmlFor="paper-file"
+                aria-labelledby="up-image-label"
                 className={`upload-zone${dragOver ? ' drag-over' : ''}`}
                 onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={() => setDragOver(false)}
