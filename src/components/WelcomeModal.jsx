@@ -1,3 +1,4 @@
+import { readStorage, writeStorage } from '../lib/safeStorage';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,7 +16,7 @@ export default function WelcomeModal() {
 
   useEffect(() => {
     if (!user) return;
-    const seen = localStorage.getItem(STORAGE_KEY);
+    const seen = readStorage(STORAGE_KEY);
     if (!seen) setVisible(true);
   }, [user]);
 
@@ -28,7 +29,7 @@ export default function WelcomeModal() {
   }, [visible]);
 
   function dismiss() {
-    localStorage.setItem(STORAGE_KEY, '1');
+    writeStorage(STORAGE_KEY, '1');
     setVisible(false);
   }
 
