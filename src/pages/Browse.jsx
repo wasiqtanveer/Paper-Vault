@@ -170,6 +170,7 @@ export default function Browse() {
             <div className="search-wrapper">
               <span className="search-icon"><Search size={14} /></span>
               <input
+                type="search"
                 className="search-input"
                 value={filters.q}
                 onChange={set('q')}
