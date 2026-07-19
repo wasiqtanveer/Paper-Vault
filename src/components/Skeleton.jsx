@@ -33,7 +33,8 @@ export function SkeletonCard() {
 /** A grid of SkeletonCards, mirroring `.papers-grid`. */
 export function SkeletonCardGrid({ count = 8 }) {
   return (
-    <div className="papers-grid papers-grid-inner">
+    <div className="papers-grid papers-grid-inner" aria-busy="true">
+      <span className="sr-only" role="status">Loading papers…</span>
       {Array.from({ length: count }).map((_, i) => <SkeletonCard key={i} />)}
     </div>
   );
