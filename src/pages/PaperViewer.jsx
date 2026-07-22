@@ -320,6 +320,7 @@ export default function PaperViewer() {
                 <form className="report-form" onSubmit={handleReport}>
                   <textarea
                     rows={3}
+                    aria-label="Describe the problem with this paper"
                     value={reportReason}
                     onChange={e => setReportReason(e.target.value)}
                     placeholder="Describe the issue…"
