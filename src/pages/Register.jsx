@@ -8,6 +8,7 @@ import AuthHelp from '../components/AuthHelp';
 import ThemeLogo from '../components/ThemeLogo';
 import { looksLikePausedBackend } from '../lib/authErrors';
 import { MIN_PASSWORD_LENGTH } from '../lib/authRules';
+import { isDisposableEmail } from '../lib/disposableEmail';
 import './Login.css';
 import './Register.css';
 
@@ -79,9 +80,7 @@ export default function Register() {
     if (countdown > 0) return;
     if (form.password !== form.confirm) { setError('Passwords do not match.'); return; }
     if (form.password.length < MIN_PASSWORD_LENGTH) { setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`); return; }
-    const emailDomain = form.email.split('@')[1]?.toLowerCase() ?? '';
-    const throwaway = ['mailinator.com','guerrillamail.com','tempmail.com','10minutemail.com','yopmail.com','trashmail.com','sharklasers.com','disposablemail.com'];
-    if (throwaway.includes(emailDomain)) { setError('Please use a real email address.'); return; }
+    if (isDisposableEmail(form.email)) { setError('Please use a real email address.'); return; }
     setLoading(true);
     try {
       const { error: signUpError } = await supabase.auth.signUp({
