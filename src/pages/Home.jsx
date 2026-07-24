@@ -12,11 +12,15 @@ import './Home.css';
 import PaperCard from '../components/PaperCard';
 import { SkeletonCardGrid } from '../components/Skeleton';
 
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
 function useCountUp(target, duration = 700) {
   const [val, setVal] = useState(0);
   const raf = useRef(null);
   useEffect(() => {
-    if (target === 0) return;
+    // The CSS reduced-motion rule can't stop a JS animation; skip it here.
+    if (target === 0 || prefersReducedMotion()) return;
     const start = performance.now();
     function tick(now) {
       const p = Math.min((now - start) / duration, 1);
@@ -28,7 +32,7 @@ function useCountUp(target, duration = 700) {
     return () => cancelAnimationFrame(raf.current);
   }, [target, duration]);
   // A zero target renders 0 directly rather than resetting state from the effect.
-  return target === 0 ? 0 : val;
+  return target === 0 ? 0 : prefersReducedMotion() ? target : val;
 }
 
 function StatCard({ label, value, sub, color, suffix = '' }) {
