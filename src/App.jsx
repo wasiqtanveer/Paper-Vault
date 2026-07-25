@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { PageSkeleton, ShellSkeleton } from './components/Skeleton';
 import WelcomeModal from './components/WelcomeModal';
 import ErrorBoundary from './components/ErrorBoundary';
+import RouteAnnouncer from './components/RouteAnnouncer';
 import { EASE_OUT } from './lib/motion';
 import { routeLoaders, prefetchAllRoutes } from './lib/routes';
 
@@ -121,6 +122,7 @@ function Shell() {
     <div className="app-shell">
       <a href="#main-scroll" className="skip-link">Skip to content</a>
       <WelcomeModal />
+      <RouteAnnouncer />
       <Sidebar />
       <main className="main-content" id="main-scroll">
         <Suspense fallback={<PageFallback />}>
