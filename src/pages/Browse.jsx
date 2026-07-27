@@ -259,7 +259,7 @@ export default function Browse() {
                 </div>
                 {hasMore && (
                   <div className="load-more-wrap">
-                    <button className="btn btn-ghost" onClick={loadMore} disabled={loading}>
+                    <button type="button" className="btn btn-ghost" onClick={loadMore} disabled={loading}>
                       {loading ? 'Loading…' : 'Load More'}
                     </button>
                   </div>
