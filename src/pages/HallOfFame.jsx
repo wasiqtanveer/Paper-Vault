@@ -35,7 +35,7 @@ function EmailCopyBtn({ email }) {
   }
 
   return (
-    <button className={'hof-social-btn' + (copied ? ' hof-social-btn-copied' : '')} onClick={handleCopy} title={copied ? 'Copied!' : email}>
+    <button type="button" className={'hof-social-btn' + (copied ? ' hof-social-btn-copied' : '')} onClick={handleCopy} title={copied ? 'Copied!' : email}>
       {copied ? <Check size={12} /> : <Copy size={12} />}
       <span>{copied ? 'Copied!' : 'Email'}</span>
     </button>
@@ -99,7 +99,7 @@ export default function HallOfFame() {
       <audio ref={audioRef} src="/sounds/hall of fame.mp3" loop preload="auto" />
 
       {/* Floating music toggle — bottom-right corner */}
-      <button
+      <button type="button"
         className="hof-music-fab"
         onClick={toggleMusic}
         title={playing ? 'Pause music' : 'Play music'}
