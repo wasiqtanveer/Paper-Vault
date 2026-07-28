@@ -231,11 +231,11 @@ export default function PaperViewer() {
     // parent, so this is an enter-only fade rather than a true crossfade.
     <motion.div className="page-content" initial={CONTENT_SWAP.initial} animate={CONTENT_SWAP.animate}>
       <div className="topbar">
-        <button className="btn btn-ghost btn-sm" onClick={goBack} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={goBack} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
           <ArrowLeft size={14} /> Back
         </button>
         {canEdit && (
-          <button
+          <button type="button"
             className="btn btn-ghost btn-sm"
             onClick={openEdit}
             disabled={editLoading}
@@ -301,7 +301,7 @@ export default function PaperViewer() {
             <div className="divider" style={{ margin: '0' }} />
 
             <div className="meta-actions">
-              <button
+              <button type="button"
                 className="btn btn-primary"
                 onClick={handleDownload}
                 disabled={downloading}
@@ -311,7 +311,7 @@ export default function PaperViewer() {
               </button>
 
               {user && !showReport && (
-                <button className="btn btn-ghost btn-sm" onClick={() => setShowReport(true)} style={{ gap: 6 }}>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowReport(true)} style={{ gap: 6 }}>
                   <Flag size={13} /> Report
                 </button>
               )}
@@ -339,18 +339,18 @@ export default function PaperViewer() {
               )}
 
               {isOwner && (
-                <button className="btn btn-danger btn-sm" onClick={handleDelete} style={{ gap: 6 }}>
+                <button type="button" className="btn btn-danger btn-sm" onClick={handleDelete} style={{ gap: 6 }}>
                   <Trash2 size={13} /> Delete Paper
                 </button>
               )}
 
               {isMod && paper.status !== 'approved' && (
-                <button className="btn-approve" onClick={handleApprove} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <button type="button" className="btn-approve" onClick={handleApprove} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <Check size={13} /> Approve
                 </button>
               )}
               {isMod && paper.status !== 'rejected' && !showReject && (
-                <button className="btn-reject" onClick={() => setShowReject(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                <button type="button" className="btn-reject" onClick={() => setShowReject(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
                   <X size={13} /> Reject
                 </button>
               )}
