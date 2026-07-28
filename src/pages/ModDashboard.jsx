@@ -153,11 +153,11 @@ export default function ModDashboard() {
 
       <div className="page-inner">
         <div className="mod-tabs">
-          <button className={`tab-btn${tab === 'pending' ? ' active' : ''}`} onClick={() => setTab('pending')}>
+          <button type="button" className={`tab-btn${tab === 'pending' ? ' active' : ''}`} onClick={() => setTab('pending')}>
             Pending
             {pending.length > 0 && <span className="tab-badge">{pending.length}</span>}
           </button>
-          <button className={`tab-btn${tab === 'reported' ? ' active' : ''}`} onClick={() => setTab('reported')}>
+          <button type="button" className={`tab-btn${tab === 'reported' ? ' active' : ''}`} onClick={() => setTab('reported')}>
             Reports
             {tab !== 'reported' && openReports.length > 0 && <span className="tab-badge tab-badge-warn">{openReports.length}</span>}
           </button>
@@ -189,7 +189,7 @@ export default function ModDashboard() {
                       <span className="mod-card-date">{date}</span>
                       <div className="mod-card-actions">
                         {isSiteOwner && (
-                          <button
+                          <button type="button"
                             className="btn-mod-edit"
                             title="Edit paper details"
                             onClick={() => setEditingPaper(p)}
@@ -197,10 +197,10 @@ export default function ModDashboard() {
                             <Pencil size={12} />
                           </button>
                         )}
-                        <button className="btn-approve" title="Approve" aria-label={`Approve ${p.title}`} onClick={() => updateStatus(p.id, 'approved')}>
+                        <button type="button" className="btn-approve" title="Approve" aria-label={`Approve ${p.title}`} onClick={() => updateStatus(p.id, 'approved')}>
                           <Check size={13} />
                         </button>
-                        <button className="btn-reject" title="Reject" aria-label={`Reject ${p.title}`} aria-expanded={rejectingId === p.id} onClick={() => setRejectingId(id => id === p.id ? null : p.id)}>
+                        <button type="button" className="btn-reject" title="Reject" aria-label={`Reject ${p.title}`} aria-expanded={rejectingId === p.id} onClick={() => setRejectingId(id => id === p.id ? null : p.id)}>
                           <X size={13} />
                         </button>
                       </div>
@@ -253,7 +253,7 @@ export default function ModDashboard() {
                               {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             </td>
                             <td>
-                              <button className="btn btn-ghost btn-sm" onClick={() => resolveReport(r.id)}>Resolve</button>
+                              <button type="button" className="btn btn-ghost btn-sm" onClick={() => resolveReport(r.id)}>Resolve</button>
                             </td>
                           </tr>
                         ))}
