@@ -82,7 +82,7 @@ export default function Login() {
         {error && <div className="inline-error">{error}</div>}
         {notice && <div className="form-hint" role="status">{notice}</div>}
 
-        <button className="btn-google" onClick={handleGoogle} disabled={gLoading || loading}>
+        <button type="button" className="btn-google" onClick={handleGoogle} disabled={gLoading || loading}>
           <GoogleIcon /> {gLoading ? 'Redirecting…' : 'Continue with Google'}
         </button>
 
