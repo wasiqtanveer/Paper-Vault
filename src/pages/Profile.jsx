@@ -166,7 +166,7 @@ export default function Profile() {
 
         {/* Edit name accordion */}
         <motion.div className="pw-accordion" {...fadeUp(1)}>
-          <button
+          <button type="button"
             className={'pw-accordion-trigger' + (nameOpen ? ' open' : '')}
             onClick={() => { setNameOpen(v => !v); setNameValue(profile?.full_name ?? ''); setNameError(''); setNameSuccess(false); }}
           >
@@ -200,7 +200,7 @@ export default function Profile() {
 
         {/* Change password accordion */}
         {hasPassword && <motion.div className="pw-accordion" {...fadeUp(2)}>
-          <button
+          <button type="button"
             className={'pw-accordion-trigger' + (pwOpen ? ' open' : '')}
             onClick={() => { setPwOpen(v => !v); setPwError(''); setPwSuccess(false); }}
           >
@@ -386,7 +386,7 @@ export default function Profile() {
                       </td>
                       <td>
                         {p.status === 'pending' && (
-                          <button className="btn btn-danger btn-sm" onClick={() => handleDelete(p)}>
+                          <button type="button" className="btn btn-danger btn-sm" onClick={() => handleDelete(p)}>
                             Delete
                           </button>
                         )}
