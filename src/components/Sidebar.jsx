@@ -158,13 +158,14 @@ export default function Sidebar() {
   const { theme, toggle } = useTheme();
   const [collapsed,  setCollapsed]  = useState(false);
   const [dropOpen,   setDropOpen]   = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  // The drawer is open only for the route it was opened on, so navigating closes
+  // it without an effect that sets state.
+  const [drawerPath, setDrawerPath] = useState(null);
   const dropRef  = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Close mobile drawer on route change
-  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+  const mobileOpen = drawerPath === location.pathname;
+  const setMobileOpen = open => setDrawerPath(open ? location.pathname : null);
 
   useEffect(() => {
     function handleClick(e) {
