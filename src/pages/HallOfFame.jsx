@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, GitBranch, ExternalLink, Globe, Mail, AlertTriangle, Copy, Check, Music, VolumeX } from 'lucide-react';
+import { Trophy, GitBranch, ExternalLink, Globe, AlertTriangle, Copy, Check, Music, VolumeX } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { usePageMeta } from '../lib/usePageMeta';
 import { SkeletonRow } from '../components/Skeleton';
