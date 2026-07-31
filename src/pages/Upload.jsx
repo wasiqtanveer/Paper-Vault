@@ -179,7 +179,7 @@ export default function Upload() {
             You can track it on your profile.
           </p>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="btn btn-primary btn-lg" onClick={() => setSuccess(false)}>Upload another</button>
+            <button type="button" className="btn btn-primary btn-lg" onClick={() => setSuccess(false)}>Upload another</button>
             <Link to="/profile" className="btn btn-ghost btn-lg">View my papers</Link>
           </div>
         </motion.div>
