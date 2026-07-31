@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import process from 'node:process';
 
 /**
  * WCAG AA contrast audit of the colour tokens in variables.css. Text colours
