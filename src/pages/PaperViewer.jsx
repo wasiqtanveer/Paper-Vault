@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
 import { logActivity } from '../lib/activity';
 import { confirmDialog } from '../components/ConfirmDialog';
@@ -17,6 +17,7 @@ import EditPaperModal from '../components/EditPaperModal';
 import RejectReasonForm from '../components/RejectReasonForm';
 import { SkeletonLine, SkeletonBlock } from '../components/Skeleton';
 import { usePageMeta } from '../lib/usePageMeta';
+import { useAsync } from '../hooks/useAsync';
 import './PaperViewer.css';
 
 export default function PaperViewer() {
@@ -25,9 +26,6 @@ export default function PaperViewer() {
   const { addToast } = useToast();
   const navigate = useNavigate();
 
-  const [paper,        setPaper]        = useState(null);
-  const [loading,      setLoading]      = useState(true);
-  const [error,        setError]        = useState('');
   const [showReport,    setShowReport]    = useState(false);
   const [reportReason,  setReportReason]  = useState('');
   const [reportLoading, setReportLoading] = useState(false);
@@ -40,26 +38,32 @@ export default function PaperViewer() {
   const [subjects,      setSubjects]      = useState([]);
   const [teachers,      setTeachers]      = useState([]);
 
-  usePageMeta(paper?.title ?? 'Paper', paper?.title ? `View and download "${paper.title}" on PaperVault.` : undefined);
+  const { data: loaded, error: loadError, loading } = useAsync(async () => {
+    let res;
+    try {
+      res = await supabase
+        .from('papers')
+        .select('*, subjects(name), teachers(name), profiles!papers_uploader_id_fkey(full_name, id)')
+        .eq('id', id)
+        .single();
+    } catch {
+      throw new Error('Could not load this paper. Check your connection and try again.');
+    }
+    if (res.error || !res.data) throw new Error('Paper not found.');
+    return res.data;
+  }, id);
+  const error = loadError?.message ?? '';
 
-  useEffect(() => {
-    let alive = true;
-    setLoading(true);
-    setError('');
-    Promise.resolve(supabase
-      .from('papers')
-      .select('*, subjects(name), teachers(name), profiles!papers_uploader_id_fkey(full_name, id)')
-      .eq('id', id)
-      .single())
-      .then(({ data, error: err }) => {
-        if (!alive) return;
-        if (err || !data) setError('Paper not found.');
-        else setPaper(data);
-      })
-      .catch(() => { if (alive) setError('Could not load this paper. Check your connection and try again.'); })
-      .finally(() => { if (alive) setLoading(false); });
-    return () => { alive = false; };
-  }, [id]);
+  // Local edits (approve, reject, edit details) layer over the loaded row, keyed by
+  // id so navigating to another paper never shows the previous one's edits.
+  const [local, setLocal] = useState({ id: null, paper: null });
+  const paper = local.id === id ? local.paper : loaded ?? null;
+  const setPaper = update => setLocal(prev => {
+    const current = prev.id === id ? prev.paper : loaded;
+    return { id, paper: typeof update === 'function' ? update(current) : update };
+  });
+
+  usePageMeta(paper?.title ?? 'Paper', paper?.title ? `View and download "${paper.title}" on PaperVault.` : undefined);
 
   // Load subjects/teachers *before* the modal opens so its dropdowns are never empty.
   async function openEdit() {
