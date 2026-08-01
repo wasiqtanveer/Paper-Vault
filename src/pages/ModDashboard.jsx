@@ -1,3 +1,4 @@
+import { paperAlt } from '../lib/paperTitle';
 import { CONTACT } from '../lib/contact';
 import { useEffect, useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
@@ -178,7 +179,7 @@ export default function ModDashboard() {
                   <div key={p.id} className="mod-paper-card">
                     {p.image_url && (
                       <Link to={`/paper/${p.id}`}>
-                        <img src={p.image_url} alt={p.title} className="mod-paper-thumb" />
+                        <img src={p.image_url} alt={paperAlt(p)} className="mod-paper-thumb" />
                       </Link>
                     )}
                     <div className="mod-paper-title">{p.title}</div>

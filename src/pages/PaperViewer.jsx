@@ -1,3 +1,4 @@
+import { paperAlt } from '../lib/paperTitle';
 import { useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
 import { logActivity } from '../lib/activity';
@@ -248,7 +249,7 @@ export default function PaperViewer() {
 
       <div className="page-inner">
         <div className="paper-viewer-layout">
-          <ImageViewer src={paper.image_url} alt={paper.title} />
+          <ImageViewer src={paper.image_url} alt={paperAlt(paper)} />
 
           <div className="paper-meta-panel">
             <div>

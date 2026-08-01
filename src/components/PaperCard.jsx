@@ -1,3 +1,4 @@
+import { paperAlt } from '../lib/paperTitle';
 import { memo, useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -83,7 +84,7 @@ function PaperCard({ paper, index = 0 }) {
           <img
             ref={imgRef}
             src={paper.image_url}
-            alt={paper.title}
+            alt={paperAlt(paper)}
             className={'paper-card-image' + (imgLoaded ? ' is-loaded' : '')}
             // The first row is above the fold: load it eagerly and at high
             // priority. Everything below stays lazy.
