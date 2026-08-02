@@ -36,7 +36,9 @@ export default function ModDashboard() {
   const [tab,     setTab]     = useState('pending');
   const [pending, setPending] = useState([]);
   const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Loading is derived: the tab whose data last arrived vs. the tab being shown.
+  const [loadedTab, setLoadedTab] = useState(null);
+  const loading = loadedTab !== tab;
   const [subjects, setSubjects] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [editingPaper, setEditingPaper] = useState(null); // paper object being edited
@@ -47,7 +49,6 @@ export default function ModDashboard() {
 
   useEffect(() => {
     let alive = true; // a fast tab switch must not let the slower response win
-    setLoading(true);
     const query = tab === 'pending'
       ? supabase
           .from('papers')
@@ -66,7 +67,7 @@ export default function ModDashboard() {
         else set(data ?? []);
       })
       .catch(() => { if (alive) addToast('Failed to load. Check your connection and try again.', 'error'); })
-      .finally(() => { if (alive) setLoading(false); });
+      .finally(() => { if (alive) setLoadedTab(tab); });
     return () => { alive = false; };
   }, [tab, addToast]);
 
