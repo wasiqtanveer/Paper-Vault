@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Mail, Globe, ExternalLink, GitBranch, Heart, Code2, Check } from 'lucide-react';
 import { usePageMeta } from '../lib/usePageMeta';
 import { useToast } from '../context/useToast';
@@ -48,15 +48,15 @@ export default function About() {
       <div className="page-inner">
         <div className="about-wrap">
 
-          <motion.div className="about-brand" {...fadeUp(0)}>
+          <m.div className="about-brand" {...fadeUp(0)}>
             <ThemeLogo size={170} />
-          </motion.div>
+          </m.div>
 
           {/* Cards grid */}
           <div className="about-grid">
 
             {/* Why I built this */}
-            <motion.div className="about-card" {...fadeUp(1)}>
+            <m.div className="about-card" {...fadeUp(1)}>
               <div className="about-card-icon"><Heart size={18} /></div>
               <div className="about-card-title">About This App &amp; Why We Built It</div>
               <div className="about-card-body">
@@ -64,10 +64,10 @@ export default function About() {
                 <p>PaperVault is one organized place where students can upload, browse, and access past papers by subject, teacher, term, and exam type.</p>
                 <p>It was built from scratch, including the design, backend, database, and moderation system, to help university students study smarter.</p>
               </div>
-            </motion.div>
+            </m.div>
 
             {/* Tech stack */}
-            <motion.div className="about-card" {...fadeUp(2)}>
+            <m.div className="about-card" {...fadeUp(2)}>
               <div className="about-card-icon"><Code2 size={18} /></div>
               <div className="about-card-title">Built With</div>
               <div className="about-stack-grid">
@@ -87,10 +87,10 @@ export default function About() {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
 
             {/* Contribute */}
-            <motion.div className="about-card about-card-contribute" {...fadeUp(3)}>
+            <m.div className="about-card about-card-contribute" {...fadeUp(3)}>
               <div className="about-card-icon contribute"><GitBranch size={18} /></div>
               <div className="about-card-title">Want to Contribute?</div>
               <div className="about-card-body">
@@ -106,11 +106,11 @@ export default function About() {
                   <ExternalLink size={14} /> Message on LinkedIn
                 </a>
               </div>
-            </motion.div>
+            </m.div>
 
           </div>
 
-          <motion.div className="about-footer" {...fadeUp(5)}>
+          <m.div className="about-footer" {...fadeUp(5)}>
             <div>Built by <strong>Wasiq Tanveer</strong></div>
             <div className="about-links">
               <a href={`mailto:${EMAIL}`} className="about-link-btn">
@@ -126,7 +126,7 @@ export default function About() {
                 <GitBranch size={14} /> GitHub
               </a>
             </div>
-          </motion.div>
+          </m.div>
 
         </div>
       </div>

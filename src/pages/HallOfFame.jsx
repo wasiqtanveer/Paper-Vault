@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, GitBranch, ExternalLink, Globe, AlertTriangle, Copy, Check, Music, VolumeX } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { usePageMeta } from '../lib/usePageMeta';
@@ -117,7 +117,7 @@ export default function HallOfFame() {
       <div className="page-inner">
 
         {/* Banner card heading */}
-        <motion.div className="hof-banner" {...fadeUp(0)}>
+        <m.div className="hof-banner" {...fadeUp(0)}>
           <div className="hof-banner-icon">
             <Trophy size={22} />
           </div>
@@ -130,10 +130,10 @@ export default function HallOfFame() {
               makes this platform better for students.
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Contributors table card */}
-        <motion.div className="admin-section" {...fadeUp(1)}>
+        <m.div className="admin-section" {...fadeUp(1)}>
           <div className="admin-section-header">
             <div className="section-title">Contributors</div>
             {!loading && !fetchError && (
@@ -223,11 +223,11 @@ export default function HallOfFame() {
               </table>
             </div>
           )}
-        </motion.div>
+        </m.div>
 
-        <motion.div className="hof-footer" {...fadeUp(2)}>
+        <m.div className="hof-footer" {...fadeUp(2)}>
           Want to be featured here? Contribute to PaperVault and the admin will add you.
-        </motion.div>
+        </m.div>
 
       </div>
     </div>

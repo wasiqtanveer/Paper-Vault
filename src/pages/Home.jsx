@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { CONTENT_SWAP, EASE_OUT } from '../lib/motion';
 import { supabase } from '../lib/supabase';
@@ -139,18 +139,18 @@ export default function Home() {
         <div className="swap-stack">
         <AnimatePresence initial={false}>
           {loading ? (
-            <motion.div key="skeleton" {...CONTENT_SWAP} exit={{ opacity: 0, transition: { duration: 0.24, ease: EASE_OUT } }}>
+            <m.div key="skeleton" {...CONTENT_SWAP} exit={{ opacity: 0, transition: { duration: 0.24, ease: EASE_OUT } }}>
               <SkeletonCardGrid count={12} />
-            </motion.div>
+            </m.div>
           ) : papers.length === 0 ? (
-            <motion.div key="empty" {...CONTENT_SWAP} className="empty-state">
+            <m.div key="empty" {...CONTENT_SWAP} className="empty-state">
               No papers yet.{' '}
               <Link to="/upload" style={{ color: 'var(--accent-blue)' }}>Be the first to upload!</Link>
-            </motion.div>
+            </m.div>
           ) : (
-            <motion.div key="grid" {...CONTENT_SWAP} initial={{ opacity: 1 }} className="papers-grid papers-grid-inner">
+            <m.div key="grid" {...CONTENT_SWAP} initial={{ opacity: 1 }} className="papers-grid papers-grid-inner">
               {papers.map((p, i) => <PaperCard key={p.id} paper={p} index={i} />)}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
         </div>

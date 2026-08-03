@@ -5,7 +5,7 @@ import { logActivity } from '../lib/activity';
 import { confirmDialog } from '../lib/confirmDialog';
 import { cachedSafeQuery } from '../lib/cache';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Flag, Trash2, Check, X, ArrowLeft, Download, Pencil } from 'lucide-react';
 import { CONTENT_SWAP } from '../lib/motion';
 import { supabase } from '../lib/supabase';
@@ -230,7 +230,7 @@ export default function PaperViewer() {
     // Fades in over the outgoing skeleton instead of hard-cutting. The early
     // returns above mean skeleton and content never share an AnimatePresence
     // parent, so this is an enter-only fade rather than a true crossfade.
-    <motion.div className="page-content" initial={CONTENT_SWAP.initial} animate={CONTENT_SWAP.animate}>
+    <m.div className="page-content" initial={CONTENT_SWAP.initial} animate={CONTENT_SWAP.animate}>
       <div className="topbar">
         <button type="button" className="btn btn-ghost btn-sm" onClick={goBack} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
           <ArrowLeft size={14} /> Back
@@ -372,6 +372,6 @@ export default function PaperViewer() {
           onClose={() => setShowEdit(false)}
         />
       )}
-    </motion.div>
+    </m.div>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import './EditPaperModal.css';
@@ -23,13 +23,13 @@ export default function ConfirmDialog({ title, body, confirmLabel = 'Confirm', d
   }, [onDone]);
 
   return (
-    <motion.div
+    <m.div
       className="epm-backdrop"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }}
       transition={{ duration: 0.14 }}
       onClick={() => onDone(false)}
     >
-      <motion.div
+      <m.div
         ref={panelRef}
         className="epm-panel cfd-panel"
         role="alertdialog" aria-modal="true" aria-labelledby="cfd-title" aria-describedby="cfd-body"
@@ -51,7 +51,7 @@ export default function ConfirmDialog({ title, body, confirmLabel = 'Confirm', d
             {confirmLabel}
           </button>
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

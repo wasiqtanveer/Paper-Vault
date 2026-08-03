@@ -45,9 +45,9 @@ export default defineConfig({
           if (id.includes('react-router') || id.includes('/react/') || id.includes('/react-dom/')) {
             return 'react-vendor'
           }
-          if (id.includes('framer-motion') || id.includes('motion-dom') || id.includes('motion-utils')) {
-            return 'framer-motion'
-          }
+          // framer-motion is deliberately not forced into one chunk: its feature
+          // bundle is loaded lazily (see LazyMotion in App.jsx) and a manual chunk
+          // would pull it back into the entry path.
           if (id.includes('@supabase')) return 'supabase'
         },
       },

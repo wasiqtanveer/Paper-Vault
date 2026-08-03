@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { m, useMotionValue, useSpring } from 'framer-motion';
 import { Calendar, User, BookOpen, GraduationCap } from 'lucide-react';
 import './PaperPreview.css';
 
@@ -98,7 +98,7 @@ export default function PaperPreview({ paper, origin }) {
   const terms = [paper.year, paper.semester, paper.exam_type].filter(Boolean).join(' · ');
 
   return createPortal(
-    <motion.div
+    <m.div
       ref={ref}
       className="ppv"
       style={{ x, y, width: WIDTH }}
@@ -137,7 +137,7 @@ export default function PaperPreview({ paper, origin }) {
           </div>
         )}
       </div>
-    </motion.div>,
+    </m.div>,
     document.body,
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, ChevronUp, ArrowUpDown, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { safeQuery, countRows } from '../lib/query';
@@ -36,14 +36,14 @@ function SortTh({ col, label, sort, onSort, style }) {
         onClick={() => onSort(col)}
       >
         {label}
-        <motion.span
+        <m.span
           className="sort-th-icon"
           animate={active ? { rotate: sort.dir === 'asc' ? 0 : 180, opacity: 1 } : { rotate: 0, opacity: 0.4 }}
           transition={{ duration: 0.2 }}
           style={{ display: 'inline-flex', alignItems: 'center' }}
         >
           {active ? <ChevronUp size={11} /> : <ArrowUpDown size={11} />}
-        </motion.span>
+        </m.span>
       </button>
     </th>
   );
@@ -398,7 +398,7 @@ export default function AdminPanel() {
       <div className="page-inner">
 
         {/* Stats */}
-        <motion.div className="metrics-grid" {...fadeUp(0)}>
+        <m.div className="metrics-grid" {...fadeUp(0)}>
           {[
             { label: 'Total Papers', value: stats.approved + stats.pending, color: null },
             { label: 'Approved',     value: stats.approved, color: 'var(--status-approved)' },
@@ -410,10 +410,10 @@ export default function AdminPanel() {
               <div className="metric-value" style={s.color ? { color: s.color } : {}}>{s.value}</div>
             </div>
           ))}
-        </motion.div>
+        </m.div>
 
         {/* Users */}
-        <motion.div className="admin-section" {...fadeUp(1)}>
+        <m.div className="admin-section" {...fadeUp(1)}>
           <div className="admin-section-header">
             <div className="section-title">Users</div>
             <input value={userSearch} onChange={e => { setUserSearch(e.target.value); setUserLimit(USERS_PAGE_SIZE); }} placeholder="Search users…" style={{ maxWidth: 200 }} />
@@ -431,7 +431,7 @@ export default function AdminPanel() {
               <tbody>
                 <AnimatePresence initial={false}>
                   {visibleUsers.map(u => (
-                    <motion.tr
+                    <m.tr
                       key={u.id}
                       layout
                       initial={{ opacity: 0, y: -6 }}
@@ -457,7 +457,7 @@ export default function AdminPanel() {
                       <td style={{ color: 'var(--text-muted)', fontSize: 12, whiteSpace: 'nowrap' }}>
                         {new Date(u.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </td>
-                    </motion.tr>
+                    </m.tr>
                   ))}
                 </AnimatePresence>
               </tbody>
@@ -470,10 +470,10 @@ export default function AdminPanel() {
               </div>
             )}
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Requests from students for missing subjects / teachers */}
-        <motion.div className="admin-section" {...fadeUp(2)}>
+        <m.div className="admin-section" {...fadeUp(2)}>
           <div className="admin-section-header">
             <div className="section-title">Subject &amp; Teacher Requests</div>
             <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{requests.length} pending</span>
@@ -508,10 +508,10 @@ export default function AdminPanel() {
               </table>
             </div>
           )}
-        </motion.div>
+        </m.div>
 
         {/* Subjects + Teachers side by side */}
-        <motion.div className="admin-two-col" {...fadeUp(2)}>
+        <m.div className="admin-two-col" {...fadeUp(2)}>
 
           {/* Subjects */}
           <div className="admin-section">
@@ -621,10 +621,10 @@ export default function AdminPanel() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Activity Log — grouped by paper, expandable */}
-        <motion.div className="admin-section" {...fadeUp(3)}>
+        <m.div className="admin-section" {...fadeUp(3)}>
           <div className="admin-section-header">
             <div className="section-title">Activity Log</div>
             <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Last 50 actions · click a row with an arrow to see its history</span>
@@ -698,7 +698,7 @@ export default function AdminPanel() {
                         <tr key={key + '-expand'} className="act-expand-row">
                           <td colSpan={6} className="act-expand-cell">
                             <AnimatePresence>
-                              <motion.div
+                              <m.div
                                 className="act-history"
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
@@ -721,7 +721,7 @@ export default function AdminPanel() {
                                     </span>
                                   </div>
                                 ))}
-                              </motion.div>
+                              </m.div>
                             </AnimatePresence>
                           </td>
                         </tr>
@@ -733,10 +733,10 @@ export default function AdminPanel() {
               </tbody>
             </table>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Hall of Fame */}
-        <motion.div className="admin-section" {...fadeUp(4)}>
+        <m.div className="admin-section" {...fadeUp(4)}>
           <div className="admin-section-header">
             <div className="section-title">Hall of Fame <span className="admin-count">{hofList.length}</span></div>
             <button type="button" className="btn btn-primary btn-sm" onClick={() => setAdding('hof')}>
@@ -786,7 +786,7 @@ export default function AdminPanel() {
               </div>
             )}
           </div>
-        </motion.div>
+        </m.div>
 
       </div>
 

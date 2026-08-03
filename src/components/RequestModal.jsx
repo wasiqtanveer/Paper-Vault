@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Send } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/useAuth';
@@ -68,13 +68,13 @@ export default function RequestModal({ kind, existing = [], onClose }) {
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         className="epm-backdrop"
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         transition={{ duration: 0.16 }}
         onClick={onClose}
       >
-        <motion.div
+        <m.div
           ref={panelRef}
           className="epm-panel rqm-panel"
           initial={{ opacity: 0, y: 16, scale: 0.98 }}
@@ -114,8 +114,8 @@ export default function RequestModal({ kind, existing = [], onClose }) {
               </button>
             </div>
           </form>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>
   );
 }

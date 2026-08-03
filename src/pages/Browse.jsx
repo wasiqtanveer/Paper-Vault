@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { CONTENT_SWAP, EASE_OUT } from '../lib/motion';
 import { supabase } from '../lib/supabase';
@@ -243,17 +243,17 @@ export default function Browse() {
           <div className="swap-stack">
           <AnimatePresence initial={false}>
             {loading && papers.length === 0 ? (
-              <motion.div key="skeleton" {...CONTENT_SWAP} exit={{ opacity: 0, transition: { duration: 0.24, ease: EASE_OUT } }}>
+              <m.div key="skeleton" {...CONTENT_SWAP} exit={{ opacity: 0, transition: { duration: 0.24, ease: EASE_OUT } }}>
                 <SkeletonCardGrid count={12} />
-              </motion.div>
+              </m.div>
             ) : papers.length === 0 ? (
-              <motion.div key={`empty-${resultsToken}`} {...CONTENT_SWAP} className="empty-state">
+              <m.div key={`empty-${resultsToken}`} {...CONTENT_SWAP} className="empty-state">
                 No papers found. Try adjusting filters.
-              </motion.div>
+              </m.div>
             ) : (
               // Keyed on the token so appending via Load More extends the existing
               // grid in place instead of remounting everything.
-              <motion.div key={`grid-${resultsToken}`} {...CONTENT_SWAP} initial={{ opacity: 1 }}>
+              <m.div key={`grid-${resultsToken}`} {...CONTENT_SWAP} initial={{ opacity: 1 }}>
                 <div className="papers-grid papers-grid-inner">
                   {papers.map((p, i) => <PaperCard key={p.id} paper={p} index={i} />)}
                 </div>
@@ -264,7 +264,7 @@ export default function Browse() {
                     </button>
                   </div>
                 )}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
           </div>

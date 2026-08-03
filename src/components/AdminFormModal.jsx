@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import './EditPaperModal.css';
@@ -18,13 +18,13 @@ export default function AdminFormModal({ title, submitLabel = 'Add', busy = fals
   }, [onClose]);
 
   return (
-    <motion.div
+    <m.div
       className="epm-backdrop"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       transition={{ duration: 0.16 }}
       onClick={onClose}
     >
-      <motion.div
+      <m.div
         ref={panelRef}
         className="epm-panel"
         style={{ maxWidth: width }}
@@ -46,7 +46,7 @@ export default function AdminFormModal({ title, submitLabel = 'Add', busy = fals
             <button type="submit" className="btn btn-primary" disabled={busy}>{busy ? 'Saving…' : submitLabel}</button>
           </div>
         </form>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 }

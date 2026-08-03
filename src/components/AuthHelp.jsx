@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { HelpCircle, ChevronDown, Mail, Check, ExternalLink, GitBranch } from 'lucide-react';
 import { CONTACT, copyText } from '../lib/contact';
 import { useToast } from '../context/useToast';
@@ -27,7 +27,7 @@ export default function AuthHelp({ open, onToggle }) {
 
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div
+          <m.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -52,7 +52,7 @@ export default function AuthHelp({ open, onToggle }) {
                 </a>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
