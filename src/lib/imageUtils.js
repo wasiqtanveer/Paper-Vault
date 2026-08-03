@@ -1,5 +1,3 @@
-import imageCompression from 'browser-image-compression';
-
 const MAX_RAW_SIZE_MB = 5;
 export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -42,6 +40,8 @@ export async function combineImages(files) {
 
 /** @param {number} [pages] how many pages were stacked; scales the size and dimension caps */
 export async function compressImage(file, pages = 1) {
+  // Loaded on demand: the library is only needed once a file has been chosen.
+  const { default: imageCompression } = await import('browser-image-compression');
   return imageCompression(file, {
     maxSizeMB: Math.min(pages, 4),
     maxWidthOrHeight: Math.min(1920 * pages, 8000),
