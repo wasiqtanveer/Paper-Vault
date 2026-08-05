@@ -1,19 +1,16 @@
 import { useEffect, useRef } from 'react';
-import { createRoot } from 'react-dom/client';
 import { motion } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
 import './EditPaperModal.css';
 import './ConfirmDialog.css';
 
 /**
- * Styled replacement for window.confirm.
- *
- *   if (!(await confirmDialog({ title: 'Delete paper?', body: `"${paper.title}" …`, confirmLabel: 'Delete' }))) return;
+ * The dialog UI behind `confirmDialog()` (see lib/confirmDialog.jsx).
  *
  * Names the thing being destroyed, focuses the safe choice (Cancel) first, and
  * closes on Escape or a backdrop click, which all resolve to "no".
  */
-function Dialog({ title, body, confirmLabel = 'Confirm', danger = true, onDone }) {
+export default function ConfirmDialog({ title, body, confirmLabel = 'Confirm', danger = true, onDone }) {
   const cancelRef = useRef(null);
 
   useEffect(() => {
@@ -54,20 +51,4 @@ function Dialog({ title, body, confirmLabel = 'Confirm', danger = true, onDone }
       </motion.div>
     </motion.div>
   );
-}
-
-export function confirmDialog(opts) {
-  return new Promise(resolve => {
-    const host = document.createElement('div');
-    document.body.appendChild(host);
-    const root = createRoot(host);
-    const previouslyFocused = document.activeElement;
-    const done = result => {
-      root.unmount();
-      host.remove();
-      previouslyFocused?.focus?.();
-      resolve(result);
-    };
-    root.render(<Dialog {...opts} onDone={done} />);
-  });
 }

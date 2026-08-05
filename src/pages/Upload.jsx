@@ -12,7 +12,7 @@ import NumberField from '../components/NumberField';
 import RequestModal from '../components/RequestModal';
 import { Link } from 'react-router-dom';
 import { logActivity } from '../lib/activity';
-import { confirmDialog } from '../components/ConfirmDialog';
+import { confirmDialog } from '../lib/confirmDialog';
 import { teacherLabel } from '../lib/teacherName';
 import { buildTitle } from '../lib/paperTitle';
 import './Upload.css';

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
-import { confirmDialog } from '../components/ConfirmDialog';
+import { confirmDialog } from '../lib/confirmDialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FileText, CheckCircle, Clock, ShieldCheck, Settings2, Users, KeyRound, ChevronDown, Pencil } from 'lucide-react';
