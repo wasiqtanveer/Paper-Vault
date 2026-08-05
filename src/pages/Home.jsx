@@ -48,7 +48,7 @@ function StatCard({ label, value, sub, color, suffix = '' }) {
   );
 }
 
-const RECENT_SELECT = '*, subjects(name), teachers(name), profiles!papers_uploader_id_fkey(full_name)';
+const RECENT_SELECT = '*, subjects(name), teachers(name)';
 
 const fetchRecent = onError => cachedSafeQuery('home:recent', () =>
   supabase.from('papers').select(RECENT_SELECT)
