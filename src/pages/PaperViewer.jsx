@@ -44,7 +44,7 @@ export default function PaperViewer() {
     try {
       res = await supabase
         .from('papers')
-        .select('*, subjects(name), teachers(name), profiles!papers_uploader_id_fkey(full_name, id)')
+        .select('*, subjects(name), teachers(name)')
         .eq('id', id)
         .single();
     } catch {
@@ -218,7 +218,7 @@ export default function PaperViewer() {
   );
 
   const isMod      = profile?.role === 'moderator' || profile?.role === 'admin';
-  const isOwner    = user && paper.profiles?.id === user.id;
+  const isOwner    = !!user && paper.uploader_id === user.id;
   // Staff can edit any paper (RLS allows it); gate on role, not an email address.
   const canEdit    = isOwner || isMod;
 
@@ -290,9 +290,8 @@ export default function PaperViewer() {
             )}
             <div className="meta-row">
               <span className="meta-label">Uploaded by</span>
-              {/* The embedded profile is only readable by staff, so non-staff
-                  fall through to the name stamped on the paper itself. */}
-              <span className="meta-value">{paper.profiles?.full_name ?? paper.uploader_name ?? 'Unknown'}</span>
+              {/* The name is stamped on the paper itself, so no profiles join is needed. */}
+              <span className="meta-value">{paper.uploader_name ?? 'Unknown'}</span>
             </div>
             <div className="meta-row">
               <span className="meta-label">Upload date</span>

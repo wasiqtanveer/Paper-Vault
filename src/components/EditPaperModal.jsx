@@ -72,7 +72,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
       .from('papers')
       .update(payload)
       .eq('id', paper.id)
-      .select('*, subjects(name), profiles!papers_uploader_id_fkey(full_name, id)')
+      .select('*, subjects(name), teachers(name)')
       .single();
     setSaving(false);
     if (error) { addToast(error.message, 'error'); return; }
