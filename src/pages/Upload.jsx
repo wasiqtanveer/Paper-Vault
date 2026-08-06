@@ -1,3 +1,4 @@
+import { getSubjects, getTeachers } from '../lib/lookups';
 import { useEffect, useRef, useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
 import { m } from 'framer-motion';
@@ -45,12 +46,9 @@ export default function Upload() {
   const [requestKind,  setRequestKind]  = useState(null); // 'subject' | 'teacher' | null
 
   useEffect(() => {
-    Promise.all([
-      supabase.from('subjects').select('id, name').order('name'),
-      supabase.from('teachers').select('id, name, department').order('name'),
-    ]).then(([{ data: s }, { data: t }]) => {
-      setSubjects(s ?? []);
-      setTeachers(t ?? []);
+    Promise.all([getSubjects(), getTeachers()]).then(([s, t]) => {
+      setSubjects(s);
+      setTeachers(t);
     });
   }, []);
 

@@ -1,3 +1,4 @@
+import { getSubjects, getTeachers } from '../lib/lookups';
 import { paperAlt } from '../lib/paperTitle';
 import { CONTACT } from '../lib/contact';
 import { useEffect, useState } from 'react';
@@ -76,12 +77,9 @@ export default function ModDashboard() {
   // Load subjects/teachers when edit modal is about to open
   useEffect(() => {
     if (!editingPaper) return;
-    Promise.all([
-      supabase.from('subjects').select('id, name').order('name'),
-      supabase.from('teachers').select('id, name, department').order('name'),
-    ]).then(([{ data: s }, { data: t }]) => {
-      setSubjects(s ?? []);
-      setTeachers(t ?? []);
+    Promise.all([getSubjects(), getTeachers()]).then(([s, t]) => {
+      setSubjects(s);
+      setTeachers(t);
     });
   }, [editingPaper]);
 

@@ -1,3 +1,4 @@
+import { getSubjects, SUBJECTS_KEY } from '../lib/lookups';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { m, AnimatePresence } from 'framer-motion';
@@ -28,7 +29,7 @@ export default function Browse() {
   const initialQ = searchParams.get('q') || '';
 
   const [papers,   setPapers]   = useState([]);
-  const [subjects, setSubjects] = useState(peek('browse:subjects') ?? []);
+  const [subjects, setSubjects] = useState(peek(SUBJECTS_KEY) ?? []);
   const [years,    setYears]    = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [hasMore,  setHasMore]  = useState(false);
@@ -44,7 +45,7 @@ export default function Browse() {
   // requests, and without this a slow earlier one can overwrite a fast later one.
   const requestId = useRef(0);
   // Latest subject list for the fetch callback, which must not re-create on every load.
-  const subjectsRef = useRef(peek('browse:subjects') ?? []);
+  const subjectsRef = useRef(peek(SUBJECTS_KEY) ?? []);
 
   const [filters, setFilters] = useState({
     q:        initialQ,
@@ -67,8 +68,7 @@ export default function Browse() {
   useEffect(() => {
     const onError = msg => addToast(msg, 'error');
     // Lookups are read-mostly — cached, but a failed request is never stored.
-    cachedSafeQuery('browse:subjects', () => supabase.from('subjects').select('id, name').order('name'),
-      { fallback: [], onError, label: 'subjects', ttl: 300_000 }).then(s => { subjectsRef.current = s; setSubjects(s); });
+    getSubjects(onError).then(s => { subjectsRef.current = s; setSubjects(s); });
     cachedSafeQuery('browse:years', () => supabase.rpc('paper_years'),
       { fallback: [], onError, label: 'years', ttl: 300_000 })
       .then(data => setYears(data.map(r => r.year)));
