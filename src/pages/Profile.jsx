@@ -53,9 +53,12 @@ export default function Profile() {
       supabase.from('papers').select('*, subjects(name)').eq('uploader_id', user.id).order('uploaded_at', { ascending: false }),
     ];
     if (isMod) {
-      queries.push(
-        supabase.from('papers').select('id, status').eq('reviewed_by', user.id)
-      );
+      // Three head-only counts instead of downloading every reviewed paper
+      // (which also silently capped at 1000 rows).
+      const reviewed = () => supabase.from('papers').select('id', { count: 'exact', head: true }).eq('reviewed_by', user.id);
+      queries.push(Promise.all([
+        reviewed(), reviewed().eq('status', 'approved'), reviewed().eq('status', 'rejected'),
+      ]));
     }
     if (isAdmin) {
       queries.push(supabase.from('profiles').select('id', { count: 'exact', head: true }));
@@ -66,12 +69,8 @@ export default function Profile() {
       if (!alive) return;
       setPapers(papersRes.data ?? []);
       if (modRes) {
-        const reviewed = modRes.data ?? [];
-        setModStats({
-          total:    reviewed.length,
-          approved: reviewed.filter(p => p.status === 'approved').length,
-          rejected: reviewed.filter(p => p.status === 'rejected').length,
-        });
+        const [all, approved, rejected] = modRes;
+        setModStats({ total: all.count ?? 0, approved: approved.count ?? 0, rejected: rejected.count ?? 0 });
       }
       if (adminRes) setUserCount(adminRes.count ?? 0);
     })
