@@ -9,7 +9,7 @@ import { Flag, Trash2, Check, X, ArrowLeft, Download, Pencil } from 'lucide-reac
 import { CONTENT_SWAP } from '../lib/motion';
 import { supabase } from '../lib/supabase';
 import { deleteImage } from '../lib/storage';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { useToast } from '../context/ToastContext';
 import ImageViewer from '../components/ImageViewer';
 import StatusBadge from '../components/StatusBadge';

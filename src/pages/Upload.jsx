@@ -5,7 +5,7 @@ import { FileImage, CheckCircle2, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { uploadImage, deleteImage } from '../lib/storage';
 import { validateImage, compressImage, combineImages, formatBytes, MAX_PAGES } from '../lib/imageUtils';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import { useToast } from '../context/ToastContext';
 import CustomSelect from '../components/CustomSelect';
 import NumberField from '../components/NumberField';

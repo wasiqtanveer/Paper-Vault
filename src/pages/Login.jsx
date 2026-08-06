@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/useAuth';
 import PasswordInput from '../components/PasswordInput';
 import AuthHelp from '../components/AuthHelp';
 import ThemeLogo from '../components/ThemeLogo';
