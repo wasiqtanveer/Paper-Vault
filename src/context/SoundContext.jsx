@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { SoundContext } from './sound-context';
 import { playSound, unlockAudio } from '../lib/sound';
-
-const SoundContext = createContext(null);
 
 const STORAGE_KEY = 'pv_sound_enabled';
 
