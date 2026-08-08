@@ -16,7 +16,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import CustomSelect from './CustomSelect';
 import NumberField from './NumberField';
 import './EditPaperModal.css';

@@ -7,7 +7,7 @@ import { supabase } from '../lib/supabase';
 import { escapeLike } from '../lib/query';
 import { cachedSafeQuery, peek } from '../lib/cache';
 import { usePageMeta } from '../lib/usePageMeta';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import './Browse.css';
 import PaperCard from '../components/PaperCard';
 import CustomSelect from '../components/CustomSelect';

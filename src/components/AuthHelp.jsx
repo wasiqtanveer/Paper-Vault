@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HelpCircle, ChevronDown, Mail, Check, ExternalLink, GitBranch } from 'lucide-react';
 import { CONTACT, copyText } from '../lib/contact';
-import { useToast } from '../context/ToastContext';
+import { useToast } from '../context/useToast';
 import './AuthHelp.css';
 
 // Controlled so a page can open it itself when a request fails in a way that
