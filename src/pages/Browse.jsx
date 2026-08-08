@@ -69,7 +69,7 @@ export default function Browse() {
     const onError = msg => addToast(msg, 'error');
     // Lookups are read-mostly — cached, but a failed request is never stored.
     getSubjects(onError).then(s => { subjectsRef.current = s; setSubjects(s); });
-    cachedSafeQuery('browse:years', () => supabase.rpc('paper_years'),
+    cachedSafeQuery('papers:years', () => supabase.rpc('paper_years'),
       { fallback: [], onError, label: 'years', ttl: 300_000 })
       .then(data => setYears(data.map(r => r.year)));
   }, [addToast]);

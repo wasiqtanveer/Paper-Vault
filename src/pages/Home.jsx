@@ -50,13 +50,13 @@ function StatCard({ label, value, sub, color, suffix = '' }) {
 
 const RECENT_SELECT = '*, subjects(name), teachers(name)';
 
-const fetchRecent = onError => cachedSafeQuery('home:recent', () =>
+const fetchRecent = onError => cachedSafeQuery('papers:recent', () =>
   supabase.from('papers').select(RECENT_SELECT)
     .eq('status', 'approved').order('uploaded_at', { ascending: false }).limit(12),
   { fallback: [], onError, label: 'recent papers', ttl: 30_000 });
 
 // Two head-only counts: no rows cross the wire, and a failure throws so it is never cached.
-const fetchStats = () => cachedQuery('home:stats', async () => {
+const fetchStats = () => cachedQuery('papers:stats', async () => {
   const [approved, pending] = await Promise.all([
     countRows(supabase.from('papers').select('id', { count: 'exact', head: true }).eq('status', 'approved')),
     countRows(supabase.from('papers').select('id', { count: 'exact', head: true }).eq('status', 'pending')),
@@ -67,8 +67,8 @@ const fetchStats = () => cachedQuery('home:stats', async () => {
 export default function Home() {
   // Seed from the last visit so returning to Home paints instantly; the
   // effect below revalidates in the background.
-  const cachedPapers = peek('home:recent');
-  const cachedStats  = peek('home:stats');
+  const cachedPapers = peek('papers:recent');
+  const cachedStats  = peek('papers:stats');
   const [papers, setPapers]   = useState(cachedPapers ?? []);
   const [stats, setStats]     = useState(cachedStats ?? { approved: 0, pending: 0 });
   const [loading, setLoading] = useState(!cachedPapers);
