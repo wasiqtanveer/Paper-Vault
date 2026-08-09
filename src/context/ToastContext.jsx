@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { ToastContext } from './toast-context';
 import { AnimatePresence } from 'framer-motion';
 import Toast from '../components/Toast';
-import { useSound } from './SoundContext';
+import { useSound } from './useSound';
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
