@@ -12,7 +12,8 @@ dist
 dist-ssr
 *.local
 
-# Bulk import working folder (paper images + credentials-adjacent manifest)
+# Local bulk-import working dir. Scans were removed after upload; the papers
+# live in Supabase storage. Must never be committed.
 bulk-import-data
 
 # Editor directories and files
