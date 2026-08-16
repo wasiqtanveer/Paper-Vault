@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Globe, ExternalLink, GitBranch, Heart, Code2 } from 'lucide-react';
+import { Mail, Globe, ExternalLink, GitBranch, Heart, Code2, Check } from 'lucide-react';
 import { usePageMeta } from '../lib/usePageMeta';
+import { useToast } from '../context/ToastContext';
 import './About.css';
+
+const EMAIL = 'mwasiqt@gmail.com';
 
 const fadeUp = (i = 0) => ({
   initial: { opacity: 0, y: 16 },
@@ -10,6 +14,30 @@ const fadeUp = (i = 0) => ({
 
 export default function About() {
   usePageMeta('About', 'About PaperVault and the developer behind this community past-paper library.');
+  const { addToast } = useToast();
+  const [copied, setCopied] = useState(false);
+
+  // Copy rather than mailto: a webmail user has no desktop client to hand off
+  // to, so the address itself is the more useful thing to give them.
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+    } catch {
+      // Clipboard API needs a secure context; fall back for plain http.
+      const el = document.createElement('textarea');
+      el.value = EMAIL;
+      el.setAttribute('readonly', '');
+      el.style.position = 'fixed';
+      el.style.opacity = '0';
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+    }
+    addToast('Email copied to clipboard', 'success');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   return (
     <div className="page-content">
       <div className="topbar">
@@ -24,10 +52,9 @@ export default function About() {
             <div className="about-avatar">WT</div>
             <div className="about-hero-info">
               <div className="about-name">Wasiq Tanveer</div>
-              <div className="about-tagline">Full-Stack Developer · CS Student</div>
               <div className="about-links">
-                <a href="mailto:mwasiqt@gmail.com" className="about-link-btn">
-                  <Mail size={14} /> mwasiqt@gmail.com
+                <a href={`mailto:${EMAIL}`} className="about-link-btn">
+                  <Mail size={14} /> {EMAIL}
                 </a>
                 <a href="https://www.linkedin.com/in/wasiq-tanveer/" target="_blank" rel="noreferrer" className="about-link-btn">
                   <ExternalLink size={14} /> LinkedIn
@@ -88,9 +115,10 @@ export default function About() {
                 <p>Reach out via LinkedIn or email and let's build something useful together.</p>
               </div>
               <div className="about-contribute-actions">
-                <a href="mailto:mwasiqt@gmail.com" className="btn btn-primary">
-                  <Mail size={14} /> Send an Email
-                </a>
+                <button type="button" onClick={copyEmail} className="btn btn-primary">
+                  {copied ? <Check size={14} /> : <Mail size={14} />}
+                  {copied ? 'Copied!' : 'Send an Email'}
+                </button>
                 <a href="https://www.linkedin.com/in/wasiq-tanveer/" target="_blank" rel="noreferrer" className="btn btn-ghost">
                   <ExternalLink size={14} /> Message on LinkedIn
                 </a>
