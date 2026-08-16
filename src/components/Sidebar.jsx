@@ -1,13 +1,16 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { prefetchRoute } from '../lib/routes';
 import {
   Home, LayoutGrid, Upload, ShieldCheck, Settings2,
   User, LogOut, ChevronUp, ChevronDown, Sun, Moon,
-  PanelLeftClose, PanelLeftOpen, Info, Menu, X, Trophy
+  PanelLeftClose, PanelLeftOpen, Info, Menu, X, Trophy,
+  Volume2, VolumeX
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useSound } from '../context/SoundContext';
 import './Sidebar.css';
 
 /* ── Shared inner nav content (used by both desktop sidebar and mobile drawer) ── */
@@ -17,6 +20,7 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
     : '?';
   const isMod   = profile?.role === 'moderator' || profile?.role === 'admin';
   const isAdmin = profile?.role === 'admin';
+  const { enabled: soundEnabled, toggle: toggleSound } = useSound();
 
   const navCls = ({ isActive }) =>
     'nav-link' + (isActive ? ' active' : '') + (collapsed ? ' nav-link-icon-only' : '');
@@ -30,6 +34,11 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
         title={collapsed ? label : undefined}
         aria-label={collapsed ? label : undefined}
         onClick={onNav}
+        // Warm the chunk on intent rather than on click. Pointer/focus lands
+        // well before the navigation does, so the route is already resolved and
+        // the transition never gets replaced by the Suspense spinner.
+        onPointerEnter={() => prefetchRoute(to)}
+        onFocus={() => prefetchRoute(to)}
       >
         <Icon size={16} className="nav-link-icon" />
         {!collapsed && <span className="nav-link-label">{label}</span>}
@@ -62,6 +71,21 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
       >
         {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
         {!collapsed && <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>}
+      </button>
+
+      {/* Sound is on by default, so the control that turns it off has to be
+          somewhere a visitor will actually look — beside the other preference,
+          not buried in a settings page. aria-pressed also drives the toggle
+          sound in SoundContext. */}
+      <button
+        className={'theme-toggle-sidebar' + (collapsed ? ' icon-only' : '')}
+        onClick={toggleSound}
+        aria-pressed={soundEnabled}
+        title={soundEnabled ? 'Mute interface sounds' : 'Unmute interface sounds'}
+        aria-label={soundEnabled ? 'Mute interface sounds' : 'Unmute interface sounds'}
+      >
+        {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
+        {!collapsed && <span>{soundEnabled ? 'Sound On' : 'Sound Off'}</span>}
       </button>
 
       <NavItem to="/about"        icon={Info}   label="About Developer" />

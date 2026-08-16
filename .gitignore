@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Bulk import working folder (paper images + credentials-adjacent manifest)
+bulk-import-data
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,0 +1,72 @@
+.ppv {
+  position: fixed;
+  /* Positioned entirely by transform (x/y motion values) so following the
+     cursor stays on the compositor and never triggers layout. `left`/`top`
+     would relayout the document on every pointermove. */
+  left: 0;
+  top: 0;
+  z-index: 600;
+  /* Inert by design: the preview follows the pointer, so if it accepted events
+     it would sit under the cursor and steal the hover keeping it open. */
+  pointer-events: none;
+  will-change: transform;
+
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 11px 13px 12px;
+  box-shadow:
+    0 12px 40px -8px rgba(0, 0, 0, 0.45),
+    0 4px 12px -4px rgba(0, 0, 0, 0.28);
+}
+
+.ppv-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-primary);
+  /* Deliberately unclamped — the card underneath truncates to a single line,
+     and showing the title in full is most of the reason this panel exists. */
+}
+
+.ppv-terms {
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+}
+
+.ppv-rows {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid var(--border-subtle, var(--border));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ppv-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  min-width: 0;
+}
+
+.ppv-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ppv-row-icon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+/* Touch and coarse pointers never open this, but guard the styles too so it can
+   never appear on a device where it cannot be dismissed by moving away. */
+@media (hover: none), (pointer: coarse) {
+  .ppv { display: none; }
+}

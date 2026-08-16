@@ -9,7 +9,10 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "papers:prepare": "node scripts/bulk-import/prepare.mjs",
+    "papers:check": "node scripts/bulk-import/import.mjs",
+    "papers:import": "node scripts/bulk-import/import.mjs --apply"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",
@@ -34,6 +37,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
     "jsdom": "^29.1.1",
+    "sharp": "^0.35.3",
     "vite": "^8.0.12",
     "vitest": "^3.2.6"
   }

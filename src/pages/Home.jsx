@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
+import { CONTENT_SWAP } from '../lib/motion';
 import { supabase } from '../lib/supabase';
 import { safeQuery } from '../lib/query';
 import { cachedQuery } from '../lib/cache';
@@ -120,18 +122,22 @@ export default function Home() {
           <Link to="/browse" className="btn btn-ghost">View all →</Link>
         </div>
 
-        {loading ? (
-          <SkeletonCardGrid count={8} />
-        ) : papers.length === 0 ? (
-          <div className="empty-state">
-            No papers yet.{' '}
-            <Link to="/upload" style={{ color: 'var(--accent-blue)' }}>Be the first to upload!</Link>
-          </div>
-        ) : (
-          <div className="papers-grid papers-grid-inner">
-            {papers.map((p, i) => <PaperCard key={p.id} paper={p} index={i} />)}
-          </div>
-        )}
+        <AnimatePresence mode="wait" initial={false}>
+          {loading ? (
+            <motion.div key="skeleton" {...CONTENT_SWAP}>
+              <SkeletonCardGrid count={8} />
+            </motion.div>
+          ) : papers.length === 0 ? (
+            <motion.div key="empty" {...CONTENT_SWAP} className="empty-state">
+              No papers yet.{' '}
+              <Link to="/upload" style={{ color: 'var(--accent-blue)' }}>Be the first to upload!</Link>
+            </motion.div>
+          ) : (
+            <motion.div key="grid" {...CONTENT_SWAP} className="papers-grid papers-grid-inner">
+              {papers.map((p, i) => <PaperCard key={p.id} paper={p} index={i} />)}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

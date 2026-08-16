@@ -15,6 +15,7 @@ import { X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/ToastContext';
 import CustomSelect from './CustomSelect';
+import NumberField from './NumberField';
 import './EditPaperModal.css';
 
 const TERMS      = ['Spring', 'Summer', 'Fall'];
@@ -116,11 +117,11 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
             <div className="epm-two-col">
               <div className="form-group">
                 <label className="form-label">Year</label>
-                <input
-                  type="number"
+                <NumberField
                   value={form.year}
                   onChange={e => setForm(f => ({ ...f, year: e.target.value }))}
                   min={1990} max={2099}
+                  aria-label="Year"
                 />
               </div>
               <div className="form-group">
