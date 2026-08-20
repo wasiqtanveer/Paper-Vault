@@ -6,3 +6,5 @@ Disallow: /upload
 Disallow: /profile
 Disallow: /mod
 Disallow: /admin
+
+Sitemap: https://paper-vault-ivory.vercel.app/sitemap.xml
