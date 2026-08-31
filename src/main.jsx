@@ -7,6 +7,13 @@ import { installChunkReload } from './lib/chunkReload';
 
 installChunkReload();
 
+// Offline support: only in production builds, so dev never serves a stale cache.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* optional enhancement */ });
+  });
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
