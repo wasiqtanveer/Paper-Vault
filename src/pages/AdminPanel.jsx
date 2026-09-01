@@ -1,3 +1,4 @@
+import { fadeUp as baseFadeUp } from '../lib/motion';
 import { SUBJECTS_KEY, TEACHERS_KEY } from '../lib/lookups';
 import { useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
@@ -21,10 +22,7 @@ const ROLES = ['student', 'moderator', 'admin'];
 const OWNER_EMAIL = CONTACT.email;
 const USERS_PAGE_SIZE = 25;
 
-const fadeUp = (i = 0) => ({
-  initial: { opacity: 0, y: 12 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.22, delay: i * 0.05, ease: 'easeOut' } },
-});
+const fadeUp = i => baseFadeUp(i, { y: 12, duration: 0.22, step: 0.05 });
 
 /** Sortable column header with animated icon */
 function SortTh({ col, label, sort, onSort, style }) {

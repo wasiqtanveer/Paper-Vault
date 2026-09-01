@@ -1,3 +1,4 @@
+import { fadeUp as baseFadeUp } from '../lib/motion';
 import { useEffect, useState, useRef } from 'react';
 import { m } from 'framer-motion';
 import { Trophy, GitBranch, ExternalLink, Globe, AlertTriangle, Copy, Check, Music, VolumeX } from 'lucide-react';
@@ -6,10 +7,7 @@ import { usePageMeta } from '../lib/usePageMeta';
 import { SkeletonRow } from '../components/Skeleton';
 import './HallOfFame.css';
 
-const fadeUp = (i = 0) => ({
-  initial: { opacity: 0, y: 14 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.26, delay: i * 0.07, ease: 'easeOut' } },
-});
+const fadeUp = i => baseFadeUp(i, { y: 14, duration: 0.26, step: 0.07 });
 
 /** Regular link — opens in new tab */
 function SocialLink({ href, icon: Icon, label }) {

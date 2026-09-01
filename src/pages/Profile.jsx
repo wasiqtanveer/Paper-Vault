@@ -1,3 +1,4 @@
+import { fadeUp as baseFadeUp } from '../lib/motion';
 import { useEffect, useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
 import { confirmDialog } from '../lib/confirmDialog';
@@ -15,10 +16,7 @@ import { SkeletonRow } from '../components/Skeleton';
 import '../components/RejectReasonForm.css';
 import './Profile.css';
 
-const fadeUp = (i = 0) => ({
-  initial: { opacity: 0, y: 14 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.25, delay: i * 0.06, ease: 'easeOut' } },
-});
+const fadeUp = i => baseFadeUp(i, { y: 14, duration: 0.25, step: 0.06 });
 
 export default function Profile() {
   const { user, profile, refreshProfile } = useAuth();
