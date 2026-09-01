@@ -9,6 +9,7 @@
  *  onSave       – (updatedPaper) => void
  *  onClose      – () => void
  */
+import { TERMS, EXAM_TYPES } from '../lib/paperOptions';
 import { invalidatePapers } from '../lib/cache';
 import { teacherLabel } from '../lib/teacherName';
 import { buildTitle } from '../lib/paperTitle';
@@ -22,8 +23,6 @@ import CustomSelect from './CustomSelect';
 import NumberField from './NumberField';
 import './EditPaperModal.css';
 
-const TERMS      = ['Spring', 'Summer', 'Fall'];
-const EXAM_TYPES = ['Mid', 'Final'];
 
 export default function EditPaperModal({ paper, subjects, teachers, onSave, onClose }) {
   const { addToast } = useToast();
