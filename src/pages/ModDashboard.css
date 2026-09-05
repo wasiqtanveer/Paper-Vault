@@ -57,8 +57,6 @@
 }
 
 /* Skeleton */
-.mod-skel-img  { width: 100%; aspect-ratio: 4/3; border-radius: var(--radius-sm); margin-bottom: 10px; }
-.mod-skel-line { height: 11px; border-radius: 6px; }
 
 /* Mod card */
 .mod-paper-card {
