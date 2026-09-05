@@ -3,11 +3,12 @@ import { useState } from 'react';
 import { m } from 'framer-motion';
 import { Mail, Globe, ExternalLink, GitBranch, Heart, Code2, Check } from 'lucide-react';
 import { usePageMeta } from '../lib/usePageMeta';
+import { CONTACT, copyText } from '../lib/contact';
 import { useToast } from '../context/useToast';
 import ThemeLogo from '../components/ThemeLogo';
 import './About.css';
 
-const EMAIL = 'mwasiqt@gmail.com';
+const EMAIL = CONTACT.email;
 
 const fadeUp = i => baseFadeUp(i, { y: 16, duration: 0.28, step: 0.07 });
 
@@ -19,20 +20,7 @@ export default function About() {
   // Copy rather than mailto: a webmail user has no desktop client to hand off
   // to, so the address itself is the more useful thing to give them.
   const copyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(EMAIL);
-    } catch {
-      // Clipboard API needs a secure context; fall back for plain http.
-      const el = document.createElement('textarea');
-      el.value = EMAIL;
-      el.setAttribute('readonly', '');
-      el.style.position = 'fixed';
-      el.style.opacity = '0';
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-    }
+    await copyText(EMAIL);
     addToast('Email copied to clipboard', 'success');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
