@@ -73,7 +73,7 @@
 }
 .mod-paper-card:hover {
   background: var(--bg-card-hover);
-  border-color: #2a2a2a;
+  border-color: var(--border-focus);
 }
 .mod-paper-card:last-child { margin-bottom: 0; }
 
