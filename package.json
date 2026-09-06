@@ -25,7 +25,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "typecheck": "npx -p typescript tsc -p tsconfig.json"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",

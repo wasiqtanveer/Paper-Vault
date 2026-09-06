@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "types": ["vite/client"]
+  },
+  "include": ["src/lib", "src/hooks"],
+  // Excluded, with the reason:
+  //   routes.js  - lazy-imports every page, which drags the whole UI into the check
+  //   cache.js   - options-object params need @param JSDoc (onError, label, ttl)
+  //   sound.js   - uses window.webkitAudioContext
+  //   storage.js - bare `new Promise()` needs a resolve type hint
+  "exclude": [
+    "src/lib/routes.js",
+    "src/lib/cache.js",
+    "src/lib/sound.js",
+    "src/lib/storage.js",
+    "**/*.test.js",
+    "**/*.test.jsx"
+  ]
+}
