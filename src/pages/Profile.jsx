@@ -1,3 +1,4 @@
+import { DATE_SHORT_YEAR, MONTH_YEAR, formatDate } from '../lib/formatDate';
 import { fadeUp as baseFadeUp } from '../lib/motion';
 import { useEffect, useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
@@ -135,7 +136,7 @@ export default function Profile() {
     : '?';
 
   const joinDate = profile?.created_at
-    ? new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+    ? formatDate(profile.created_at, MONTH_YEAR)
     : '—';
 
   const uploadedCount  = papers.length;
@@ -380,7 +381,7 @@ export default function Profile() {
                         )}
                       </td>
                       <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>
-                        {new Date(p.uploaded_at).toLocaleDateString()}
+                        {formatDate(p.uploaded_at, DATE_SHORT_YEAR)}
                       </td>
                       <td>
                         {p.status === 'pending' && (

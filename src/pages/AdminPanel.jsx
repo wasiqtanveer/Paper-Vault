@@ -1,3 +1,4 @@
+import { DATE_SHORT, DATE_SHORT_YEAR, DATE_TIME, DATE_TIME_YEAR, formatDate, formatDateTime } from '../lib/formatDate';
 import { fadeUp as baseFadeUp } from '../lib/motion';
 import { SUBJECTS_KEY, TEACHERS_KEY } from '../lib/lookups';
 import { useEffect, useState } from 'react';
@@ -454,7 +455,7 @@ export default function AdminPanel() {
                         )}
                       </td>
                       <td style={{ color: 'var(--text-muted)', fontSize: 12, whiteSpace: 'nowrap' }}>
-                        {new Date(u.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {formatDate(u.created_at, DATE_SHORT_YEAR)}
                       </td>
                     </m.tr>
                   ))}
@@ -493,7 +494,7 @@ export default function AdminPanel() {
                       </td>
                       <td style={{ color: 'var(--text-muted)', fontSize: 12.5 }}>{requesterName(r.requested_by)}</td>
                       <td style={{ color: 'var(--text-muted)', fontSize: 12, whiteSpace: 'nowrap' }}>
-                        {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        {formatDate(r.created_at, DATE_SHORT)}
                       </td>
                       <td>
                         <div className="admin-row-actions">
@@ -688,7 +689,7 @@ export default function AdminPanel() {
                         </td>
                         <td className="act-cell-paper">{primary.paper_title ?? '—'}</td>
                         <td className="act-cell-when">
-                          {new Date(primary.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          {formatDateTime(primary.created_at, DATE_TIME)}
                         </td>
                       </tr>
                     );
@@ -716,7 +717,7 @@ export default function AdminPanel() {
                                       {h.actor_role && <span className={`role-pill role-pill-${h.actor_role}`} style={{ height: 18, fontSize: 10, marginLeft: 6 }}>{h.actor_role}</span>}
                                     </span>
                                     <span className="act-history-when">
-                                      {new Date(h.created_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                      {formatDateTime(h.created_at, DATE_TIME_YEAR)}
                                     </span>
                                   </div>
                                 ))}

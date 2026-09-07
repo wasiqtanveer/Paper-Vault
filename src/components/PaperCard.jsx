@@ -1,3 +1,4 @@
+import { DATE_SHORT_YEAR, formatDate } from '../lib/formatDate';
 import { paperAlt } from '../lib/paperTitle';
 import { memo, useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -52,7 +53,7 @@ function PaperCard({ paper, index = 0 }) {
   const teacher  = paper.teachers?.name ?? null;
   const uploader = paper.profiles?.full_name ?? paper.uploader_name ?? 'Unknown';
   const date     = paper.uploaded_at
-    ? new Date(paper.uploaded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    ? formatDate(paper.uploaded_at, DATE_SHORT_YEAR)
     : '—';
 
   return (
