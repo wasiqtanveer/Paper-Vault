@@ -20,7 +20,7 @@ import './Profile.css';
 const fadeUp = i => baseFadeUp(i, { y: 14, duration: 0.25, step: 0.06 });
 
 export default function Profile() {
-  const { user, profile, refreshProfile } = useAuth();
+  const { user, profile, refreshProfile, isStaff: isMod, isAdmin } = useAuth();
   // Google-only accounts have no password to verify, so the change-password flow can't work for them.
   const hasPassword = user?.app_metadata?.providers?.includes('email') ?? true;
   const { addToast } = useToast();
@@ -43,8 +43,6 @@ export default function Profile() {
   const [pwError,   setPwError]   = useState('');
   const [pwSuccess, setPwSuccess] = useState(false);
 
-  const isMod   = profile?.role === 'moderator' || profile?.role === 'admin';
-  const isAdmin = profile?.role === 'admin';
 
   useEffect(() => {
     if (!user) return;

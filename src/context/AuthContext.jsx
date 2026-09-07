@@ -108,9 +108,13 @@ export function AuthProvider({ children }) {
   }, [user]);
 
   // Memoised so consumers only re-render when something they read changes.
+  // Role helpers so pages don't each re-spell the role checks.
+  const isAdmin = profile?.role === 'admin';
+  const isStaff = isAdmin || profile?.role === 'moderator';
+
   const value = useMemo(
-    () => ({ session, user, profile, profileReady, profileError, loading, signingOut, signIn, signInWithGoogle, resetPassword, signOut, refreshProfile }),
-    [session, user, profile, profileReady, profileError, loading, signingOut, signIn, signInWithGoogle, resetPassword, signOut, refreshProfile],
+    () => ({ session, user, profile, isStaff, isAdmin, profileReady, profileError, loading, signingOut, signIn, signInWithGoogle, resetPassword, signOut, refreshProfile }),
+    [session, user, profile, isStaff, isAdmin, profileReady, profileError, loading, signingOut, signIn, signInWithGoogle, resetPassword, signOut, refreshProfile],
   );
 
   return (
