@@ -7,7 +7,7 @@
 -- THE PROBLEM
 -- Browse and Home read the uploader's name by embedding the profiles row:
 --     papers?select=*,profiles!papers_uploader_id_fkey(full_name)
--- but profiles_select in supabase_rls_fix.sql (correctly) restricts profiles to
+-- but profiles_select in supabase/migrations/20260201_rls_fix.sql (correctly) restricts profiles to
 --     id = auth.uid() or public.is_staff()
 -- so a student sees a name only on their own uploads. Everything else renders
 -- "Unknown", while admins and moderators see every name.

@@ -1,9 +1,9 @@
 -- ============================================================================
 -- PaperVault - teacher titles, departments, and the activity-log fix
 -- Run in Supabase Dashboard -> SQL Editor -> New query -> Run
---   (or: npx supabase db query --remote -f supabase_teachers_departments.sql)
+--   (or: npx supabase db query --remote -f supabase/migrations/20260205_teachers_departments.sql)
 -- Safe to run more than once: every step is idempotent.
--- Run AFTER supabase_catalog_requests.sql.
+-- Run AFTER supabase/migrations/20260204_catalog_requests.sql.
 -- ============================================================================
 
 begin;

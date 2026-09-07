@@ -24,7 +24,7 @@ create index if not exists reports_created_idx      on public.reports (created_a
 -- ── RLS: evaluate the role lookup once per query, not once per row ──────────
 -- `public.is_staff()` written bare is re-run for every candidate row.
 -- Wrapped in (select …) Postgres hoists it into a single InitPlan.
--- Same rules as supabase_rls_fix.sql — only the evaluation strategy changes.
+-- Same rules as supabase/migrations/20260201_rls_fix.sql — only the evaluation strategy changes.
 drop policy if exists papers_select on public.papers;
 create policy papers_select on public.papers
   for select using (

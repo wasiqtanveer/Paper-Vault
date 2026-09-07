@@ -213,7 +213,7 @@ Still readable after the paper is deleted and the account is gone.
 Row Level Security is the authorization layer — the front end asks nicely, but **Postgres is
 what actually says no**. RLS is enabled on every table. Writes to `papers` and `profiles` are additionally guarded by
 database triggers, and the activity log is written client-side with the actor fields stamped
-server-side. The policy set lives in [`supabase_rls_fix.sql`](supabase_rls_fix.sql) and is safe
+server-side. The policy set lives in [`supabase/migrations/20260201_rls_fix.sql`](supabase/migrations/20260201_rls_fix.sql) and is safe
 to re-run; this is a description of the current policies, not a formal security audit.
 
 ```mermaid
@@ -420,7 +420,7 @@ create trigger on_auth_user_created
 
 <br/>
 
-Run [`supabase_rls_fix.sql`](supabase_rls_fix.sql) as-is. It creates the `is_staff()` /
+Run [`supabase/migrations/20260201_rls_fix.sql`](supabase/migrations/20260201_rls_fix.sql) as-is. It creates the `is_staff()` /
 `is_admin()` helpers, enables RLS on every table and installs the policy set.
 Re-running it is safe — it drops each policy before recreating it.
 
