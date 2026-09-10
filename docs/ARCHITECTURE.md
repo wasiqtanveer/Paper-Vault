@@ -94,3 +94,10 @@ and `image/jpeg`, `image/png`, `image/webp` (`20260524`).
 Report reason length 3 to 500 and one open report per user per paper; profile `full_name` up to
 60 characters; rejection reason up to 200; `paper_years()` is `security invoker`, so RLS still
 decides which papers count.
+
+## Verifying the live database
+
+`npm run db:verify` runs `scripts/db-verify.sh`, which issues the VERIFY queries from the
+migration files through `npx supabase db query --remote --read-only` (RLS enabled per table,
+guard and stamp triggers present, rejection reasons, uploader names, teacher titles). It needs a
+linked Supabase project (`npx supabase link`) and is read-only; it never writes.

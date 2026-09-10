@@ -26,7 +26,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "npx -p typescript tsc -p tsconfig.json"
+    "typecheck": "npx -p typescript tsc -p tsconfig.json",
+    "db:verify": "bash scripts/db-verify.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",
