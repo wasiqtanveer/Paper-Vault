@@ -37,3 +37,4 @@ paper-inbox/
 .env
 .env.*
 !.env.example
+coverage
