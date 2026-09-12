@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/useToast';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import CustomSelect from './CustomSelect';
 import NumberField from './NumberField';
 import './EditPaperModal.css';
@@ -27,6 +28,7 @@ const EXAM_TYPES = ['Mid', 'Final'];
 export default function EditPaperModal({ paper, subjects, teachers, onSave, onClose }) {
   const { addToast } = useToast();
   const [saving, setSaving] = useState(false);
+  const panelRef = useFocusTrap();
   const [form,   setForm]   = useState({
     subjectId: paper.subject_id  ?? '',
     teacherId: paper.teacher_id  ?? '',
@@ -91,6 +93,10 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
         onClick={onClose}
       >
         <motion.div
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="epm-title"
           className="epm-panel"
           initial={{ opacity: 0, y: 24, scale: 0.97 }}
           animate={{ opacity: 1, y: 0,  scale: 1    }}
@@ -99,7 +105,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
           onClick={e => e.stopPropagation()}
         >
           <div className="epm-header">
-            <span className="epm-title">Edit Paper</span>
+            <span className="epm-title" id="epm-title">Edit Paper</span>
             <button className="epm-close" onClick={onClose} type="button"><X size={16} /></button>
           </div>
 
