@@ -32,3 +32,8 @@ supabase/.temp/
 
 # PDFs dropped in for bulk import (local only)
 paper-inbox/
+
+# Local environment files (only .env.example is tracked)
+.env
+.env.*
+!.env.example
