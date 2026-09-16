@@ -163,12 +163,14 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
               <div className="exam-type-row" role="group" aria-labelledby="epm-exam-label">
                 <button
                   type="button"
+                  aria-pressed={form.examType === ''}
                   className={'exam-type-btn' + (form.examType === '' ? ' active' : '')}
                   onClick={() => setForm(f => ({ ...f, examType: '' }))}
                 >None</button>
                 {EXAM_TYPES.map(et => (
                   <button
                     key={et} type="button"
+                    aria-pressed={form.examType === et}
                     className={'exam-type-btn' + (form.examType === et ? ' active' : '')}
                     onClick={() => setForm(f => ({ ...f, examType: et }))}
                   >{et}</button>

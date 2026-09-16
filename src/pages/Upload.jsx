@@ -268,6 +268,7 @@ export default function Upload() {
                 {EXAM_TYPES.map(et => (
                   <button
                     key={et} type="button"
+                    aria-pressed={form.examType === et}
                     className={'exam-type-btn' + (form.examType === et ? ' active' : '')}
                     onClick={() => setForm(f => ({ ...f, examType: et }))}
                   >
