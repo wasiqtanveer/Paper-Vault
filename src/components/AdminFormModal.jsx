@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import './EditPaperModal.css';
 
 /**
@@ -9,6 +10,7 @@ import './EditPaperModal.css';
  * Escape or a backdrop click closes it; Enter submits.
  */
 export default function AdminFormModal({ title, submitLabel = 'Add', busy = false, onSubmit, onClose, children, width = 460 }) {
+  const panelRef = useFocusTrap();
   useEffect(() => {
     const onKey = e => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
@@ -23,6 +25,7 @@ export default function AdminFormModal({ title, submitLabel = 'Add', busy = fals
       onClick={onClose}
     >
       <motion.div
+        ref={panelRef}
         className="epm-panel"
         style={{ maxWidth: width }}
         role="dialog" aria-modal="true" aria-label={title}
