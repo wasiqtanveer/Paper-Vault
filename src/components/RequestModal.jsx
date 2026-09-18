@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/useAuth';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useToast } from '../context/useToast';
 import { joinTeacherName, cleanName } from '../lib/teacherName';
 import TeacherNameField from './TeacherNameField';
@@ -63,6 +64,8 @@ export default function RequestModal({ kind, existing = [], onClose }) {
     onClose();
   }
 
+  const panelRef = useFocusTrap();
+
   return (
     <AnimatePresence>
       <motion.div
@@ -72,6 +75,7 @@ export default function RequestModal({ kind, existing = [], onClose }) {
         onClick={onClose}
       >
         <motion.div
+          ref={panelRef}
           className="epm-panel rqm-panel"
           initial={{ opacity: 0, y: 16, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
