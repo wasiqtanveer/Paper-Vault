@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import './EditPaperModal.css';
 import './ConfirmDialog.css';
 
@@ -12,9 +13,10 @@ import './ConfirmDialog.css';
  */
 export default function ConfirmDialog({ title, body, confirmLabel = 'Confirm', danger = true, onDone }) {
   const cancelRef = useRef(null);
+  // Focus starts on Cancel (the safe choice) and Tab stays inside the dialog.
+  const panelRef = useFocusTrap({ initialFocus: () => cancelRef.current });
 
   useEffect(() => {
-    cancelRef.current?.focus();
     const onKey = e => { if (e.key === 'Escape') onDone(false); };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -28,6 +30,7 @@ export default function ConfirmDialog({ title, body, confirmLabel = 'Confirm', d
       onClick={() => onDone(false)}
     >
       <motion.div
+        ref={panelRef}
         className="epm-panel cfd-panel"
         role="alertdialog" aria-modal="true" aria-labelledby="cfd-title" aria-describedby="cfd-body"
         initial={{ opacity: 0, y: 10, scale: 0.98 }}
