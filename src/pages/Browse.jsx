@@ -181,7 +181,7 @@ export default function Browse() {
           </div>
 
           {/* Row 2: three dropdowns side by side */}
-          <div className="filters-dropdowns-row">
+          <div className="filters-dropdowns-row" role="group" aria-label="Filter and sort papers">
             <CustomSelect
               value={filters.subject}
               onChange={v => setFilters(f => ({ ...f, subject: v }))}
@@ -239,7 +239,7 @@ export default function Browse() {
           <div className="results-count" aria-live="polite">{total} {total === 1 ? 'paper' : 'papers'}</div>
         )}
 
-        <div className={`results-region${refreshing && papers.length > 0 ? ' is-refreshing' : ''}`}>
+        <div className={`results-region${refreshing && papers.length > 0 ? ' is-refreshing' : ''}`} aria-busy={refreshing || (loading && papers.length === 0)}>
           <div className="swap-stack">
           <AnimatePresence initial={false}>
             {loading && papers.length === 0 ? (
