@@ -192,8 +192,9 @@ export default function PaperViewer() {
   }
 
   if (loading) return (
-    <div className="page-content">
-      <div className="topbar"><span style={{ fontSize: 14, color: 'var(--text-muted)' }}>Loading…</span></div>
+    <div className="page-content" aria-busy="true">
+      <div className="topbar"><SkeletonLine width={140} height={18} /></div>
+      <span className="sr-only" role="status">Loading paper…</span>
       <div className="page-inner">
         <div className="paper-viewer-layout">
           <SkeletonBlock height={420} style={{ aspectRatio: '3 / 4', height: 'auto' }} />
