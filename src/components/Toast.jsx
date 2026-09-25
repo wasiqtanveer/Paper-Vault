@@ -4,7 +4,7 @@ import './Toast.css';
 
 const ICONS = { success: CheckCircle2, error: AlertCircle, info: Info };
 
-export default function Toast({ toast, onClose }) {
+export default function Toast({ toast, onClose, onPause, onResume }) {
   const Icon = ICONS[toast.type] ?? Info;
   return (
     <motion.div
@@ -16,6 +16,10 @@ export default function Toast({ toast, onClose }) {
       exit={{    opacity: 0, x: 48, scale: 0.95 }}
       transition={{ duration: 0.22, ease: 'easeOut' }}
       layout
+      onMouseEnter={onPause}
+      onMouseLeave={onResume}
+      onFocus={onPause}
+      onBlur={onResume}
     >
       <Icon size={16} className="toast-icon" aria-hidden="true" />
       <span className="toast-msg">{toast.message}</span>
