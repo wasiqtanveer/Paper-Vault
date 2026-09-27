@@ -19,8 +19,8 @@ that scrolls into oblivion two weeks before finals.
 
 ![Roles](https://img.shields.io/badge/roles-student%20→%20mod%20→%20admin-6c5ce7?style=flat-square&labelColor=12121a)
 ![Moderated](https://img.shields.io/badge/every%20upload-reviewed-6c5ce7?style=flat-square&labelColor=12121a)
-![RLS](https://img.shields.io/badge/postgres-RLS%20hardened-6c5ce7?style=flat-square&labelColor=12121a)
-![Audit](https://img.shields.io/badge/actions-fully%20audited-6c5ce7?style=flat-square&labelColor=12121a)
+![RLS](https://img.shields.io/badge/postgres-RLS%20enabled-6c5ce7?style=flat-square&labelColor=12121a)
+![Audit](https://img.shields.io/badge/moderation-activity%20log-6c5ce7?style=flat-square&labelColor=12121a)
 
 <br/>
 
@@ -28,7 +28,7 @@ that scrolls into oblivion two weeks before finals.
 
 > **The problem.** Past papers exist. They're just scattered across a hundred phone galleries, three dead group chats and one senior who graduated. Nobody knows which ones are real, which year they're from, or who taught that course.
 >
-> **This.** One vault. Every paper tagged with subject, teacher, year, semester and exam type. Every upload reviewed by a human before anyone else sees it. Every moderation action written to an audit log.
+> **This.** One vault. Every paper tagged with subject, teacher, year, semester and exam type. Every upload reviewed by a human before anyone else sees it. Moderation actions are recorded in an activity log.
 
 <br/>
 
@@ -211,8 +211,10 @@ Still readable after the paper is deleted and the account is gone.
 ## Security
 
 Row Level Security is the authorization layer — the front end asks nicely, but **Postgres is
-what actually says no**. The hardened policy set lives in
-[`supabase_rls_fix.sql`](supabase_rls_fix.sql) and is safe to re-run.
+what actually says no**. RLS is enabled on every table. Writes to `papers` and `profiles` are additionally guarded by
+database triggers, and the activity log is written client-side with the actor fields stamped
+server-side. The policy set lives in [`supabase_rls_fix.sql`](supabase_rls_fix.sql) and is safe
+to re-run; this is a description of the current policies, not a formal security audit.
 
 ```mermaid
 flowchart TB
@@ -419,7 +421,7 @@ create trigger on_auth_user_created
 <br/>
 
 Run [`supabase_rls_fix.sql`](supabase_rls_fix.sql) as-is. It creates the `is_staff()` /
-`is_admin()` helpers, enables RLS on every table and installs the hardened policy set.
+`is_admin()` helpers, enables RLS on every table and installs the policy set.
 Re-running it is safe — it drops each policy before recreating it.
 
 </details>
