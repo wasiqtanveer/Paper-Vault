@@ -65,7 +65,7 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
 
       <div className="sidebar-spacer" />
 
-      <button
+      <button type="button"
         className={'theme-toggle-sidebar' + (collapsed ? ' icon-only' : '')}
         onClick={toggle}
         title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -79,7 +79,7 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
           somewhere a visitor will actually look — beside the other preference,
           not buried in a settings page. aria-pressed also drives the toggle
           sound in SoundContext. */}
-      <button
+      <button type="button"
         className={'theme-toggle-sidebar' + (collapsed ? ' icon-only' : '')}
         onClick={toggleSound}
         aria-pressed={soundEnabled}
@@ -133,7 +133,7 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
                     <User size={13} /> Profile
                   </Link>
                   <div className="sidebar-drop-divider" />
-                  <button onClick={onSignOut}>
+                  <button type="button" onClick={onSignOut}>
                     <LogOut size={13} /> Sign Out
                   </button>
                 </motion.div>
@@ -209,7 +209,7 @@ export default function Sidebar() {
           {!collapsed && (
             <Link to="/" className="sidebar-logo"><ThemeLogo variant="mark" size={28} /> PaperVault</Link>
           )}
-          <button
+          <button type="button"
             className={'sidebar-collapse-btn' + (collapsed ? ' sidebar-collapse-btn-only' : '')}
             onClick={() => { setCollapsed(v => !v); setDropOpen(false); }}
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -228,7 +228,7 @@ export default function Sidebar() {
           <ThemeLogo variant="mark" size={28} />
           <span>PaperVault</span>
         </Link>
-        <button className="mobile-hamburger" onClick={() => setMobileOpen(true)} aria-label="Open menu" aria-expanded={mobileOpen}>
+        <button type="button" className="mobile-hamburger" onClick={() => setMobileOpen(true)} aria-label="Open menu" aria-expanded={mobileOpen}>
           <Menu size={20} />
         </button>
       </div>
@@ -256,7 +256,7 @@ export default function Sidebar() {
                 <Link to="/" className="sidebar-logo" onClick={() => setMobileOpen(false)}>
                   <ThemeLogo variant="mark" size={28} /> PaperVault
                 </Link>
-                <button className="sidebar-collapse-btn" onClick={() => setMobileOpen(false)} title="Close menu" aria-label="Close menu">
+                <button type="button" className="sidebar-collapse-btn" onClick={() => setMobileOpen(false)} title="Close menu" aria-label="Close menu">
                   <X size={16} />
                 </button>
               </div>
