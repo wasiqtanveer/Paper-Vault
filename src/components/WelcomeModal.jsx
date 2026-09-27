@@ -53,7 +53,7 @@ export default function WelcomeModal() {
             exit={{    opacity: 0, scale: 0.96, y: 10 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
           >
-            <button className="wm-close" onClick={dismiss} aria-label="Close">
+            <button type="button" className="wm-close" onClick={dismiss} aria-label="Close">
               <X size={16} />
             </button>
 
@@ -94,10 +94,10 @@ export default function WelcomeModal() {
             </div>
 
             <div className="wm-footer">
-              <button className="btn btn-ghost" onClick={dismiss}>
+              <button type="button" className="btn btn-ghost" onClick={dismiss}>
                 Get Started
               </button>
-              <button className="btn btn-primary" onClick={goToAbout}>
+              <button type="button" className="btn btn-primary" onClick={goToAbout}>
                 About PaperVault →
               </button>
             </div>
