@@ -464,7 +464,7 @@ export default function AdminPanel() {
             </table>
             {hasMoreUsers && (
               <div className="load-more-wrap">
-                <button className="btn btn-ghost" onClick={() => setUserLimit(l => l + USERS_PAGE_SIZE)}>
+                <button type="button" className="btn btn-ghost" onClick={() => setUserLimit(l => l + USERS_PAGE_SIZE)}>
                   Show more ({filteredUsers.length - userLimit} more)
                 </button>
               </div>
@@ -498,8 +498,8 @@ export default function AdminPanel() {
                       </td>
                       <td>
                         <div className="admin-row-actions">
-                          <button className="btn btn-primary btn-sm" onClick={() => reviewRequest(r, true)}>Approve</button>
-                          <button className="btn btn-ghost btn-sm" onClick={() => reviewRequest(r, false)}>Decline</button>
+                          <button type="button" className="btn btn-primary btn-sm" onClick={() => reviewRequest(r, true)}>Approve</button>
+                          <button type="button" className="btn btn-ghost btn-sm" onClick={() => reviewRequest(r, false)}>Decline</button>
                         </div>
                       </td>
                     </tr>
@@ -517,7 +517,7 @@ export default function AdminPanel() {
           <div className="admin-section">
             <div className="admin-section-header">
               <div className="section-title">Subjects <span className="admin-count">{subjects.length}</span></div>
-              <button className="btn btn-primary btn-sm" onClick={() => setAdding('subject')}>
+              <button type="button" className="btn btn-primary btn-sm" onClick={() => setAdding('subject')}>
                 <Plus size={13} aria-hidden="true" /> Add subject
               </button>
             </div>
@@ -545,13 +545,13 @@ export default function AdminPanel() {
                           <div className="admin-row-actions">
                             {editSubject?.id === s.id ? (
                               <>
-                                <button className="btn btn-primary btn-sm" onClick={saveSubject}>Save</button>
-                                <button className="btn btn-ghost btn-sm" onClick={() => setEditSubject(null)}>Cancel</button>
+                                <button type="button" className="btn btn-primary btn-sm" onClick={saveSubject}>Save</button>
+                                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditSubject(null)}>Cancel</button>
                               </>
                             ) : (
                               <>
-                                <button className="btn btn-ghost btn-sm" onClick={() => setEditSubject({ id: s.id, name: s.name })}>Edit</button>
-                                <button className="btn btn-danger btn-sm" onClick={() => deleteSubject(s.id)}>Delete</button>
+                                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditSubject({ id: s.id, name: s.name })}>Edit</button>
+                                <button type="button" className="btn btn-danger btn-sm" onClick={() => deleteSubject(s.id)}>Delete</button>
                               </>
                             )}
                           </div>
@@ -568,7 +568,7 @@ export default function AdminPanel() {
           <div className="admin-section">
             <div className="admin-section-header">
               <div className="section-title">Teachers <span className="admin-count">{teachers.length}</span></div>
-              <button className="btn btn-primary btn-sm" onClick={() => setAdding('teacher')}>
+              <button type="button" className="btn btn-primary btn-sm" onClick={() => setAdding('teacher')}>
                 <Plus size={13} aria-hidden="true" /> Add teacher
               </button>
             </div>
@@ -603,13 +603,13 @@ export default function AdminPanel() {
                           <div className="admin-row-actions">
                             {editTeacher?.id === t.id ? (
                               <>
-                                <button className="btn btn-primary btn-sm" onClick={saveTeacher}>Save</button>
-                                <button className="btn btn-ghost btn-sm" onClick={() => setEditTeacher(null)}>Cancel</button>
+                                <button type="button" className="btn btn-primary btn-sm" onClick={saveTeacher}>Save</button>
+                                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setEditTeacher(null)}>Cancel</button>
                               </>
                             ) : (
                               <>
-                                <button className="btn btn-ghost btn-sm" onClick={() => { const { title, rest } = splitTeacherName(t.name); setEditTeacher({ id: t.id, title, name: rest, department: t.department ?? '' }); }}>Edit</button>
-                                <button className="btn btn-danger btn-sm" onClick={() => deleteTeacher(t.id)}>Delete</button>
+                                <button type="button" className="btn btn-ghost btn-sm" onClick={() => { const { title, rest } = splitTeacherName(t.name); setEditTeacher({ id: t.id, title, name: rest, department: t.department ?? '' }); }}>Edit</button>
+                                <button type="button" className="btn btn-danger btn-sm" onClick={() => deleteTeacher(t.id)}>Delete</button>
                               </>
                             )}
                           </div>
@@ -739,7 +739,7 @@ export default function AdminPanel() {
         <motion.div className="admin-section" {...fadeUp(4)}>
           <div className="admin-section-header">
             <div className="section-title">Hall of Fame <span className="admin-count">{hofList.length}</span></div>
-            <button className="btn btn-primary btn-sm" onClick={() => setAdding('hof')}>
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => setAdding('hof')}>
               <Plus size={13} aria-hidden="true" /> Add contributor
             </button>
           </div>
@@ -777,7 +777,7 @@ export default function AdminPanel() {
                           </div>
                         </td>
                         <td>
-                          <button className="btn btn-danger btn-sm" onClick={() => removeFromHof(c.id)}>Remove</button>
+                          <button type="button" className="btn btn-danger btn-sm" onClick={() => removeFromHof(c.id)}>Remove</button>
                         </td>
                       </tr>
                     ))}
