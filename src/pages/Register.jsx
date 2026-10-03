@@ -136,7 +136,7 @@ export default function Register() {
         <div className="form-title">Create account</div>
         <div className="form-subtitle">Join PaperVault to upload past papers</div>
 
-        <button className="btn-google" onClick={async () => { setGLoading(true); try { await signInWithGoogle(); } catch (err) { setGLoading(false); if (looksLikePausedBackend(err)) setHelpOpen(true); } }} disabled={gLoading}>
+        <button type="button" className="btn-google" onClick={async () => { setGLoading(true); try { await signInWithGoogle(); } catch (err) { setGLoading(false); if (looksLikePausedBackend(err)) setHelpOpen(true); } }} disabled={gLoading}>
           <GoogleIcon /> {gLoading ? 'Redirecting…' : 'Continue with Google'}
         </button>
 
