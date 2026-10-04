@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import PasswordInput from '../components/PasswordInput';
 import AuthHelp from '../components/AuthHelp';
+import ThemeLogo from '../components/ThemeLogo';
 import { looksLikePausedBackend } from '../lib/authErrors';
 import './Login.css';
 import './Register.css';
@@ -130,7 +131,7 @@ export default function Register() {
 
   return (
     <div className="form-page">
-      <div className="form-page-brand">Paper<span>Vault</span></div>
+      <div className="form-page-brand"><ThemeLogo size={150} /></div>
       <div className="form-card">
         <div className="form-title">Create account</div>
         <div className="form-subtitle">Join PaperVault to upload past papers</div>

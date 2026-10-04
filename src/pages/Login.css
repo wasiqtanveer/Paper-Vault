@@ -9,6 +9,8 @@
 }
 
 .form-page-brand {
+  display: flex;
+  justify-content: center;
   font-size: 22px;
   font-weight: 800;
   color: var(--text-primary);

@@ -11,6 +11,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useSound } from '../context/SoundContext';
+import ThemeLogo from './ThemeLogo';
 import './Sidebar.css';
 
 /* ── Shared inner nav content (used by both desktop sidebar and mobile drawer) ── */
@@ -204,7 +205,7 @@ export default function Sidebar() {
       >
         <div className="sidebar-header">
           {!collapsed && (
-            <Link to="/" className="sidebar-logo">PaperVault</Link>
+            <Link to="/" className="sidebar-logo"><ThemeLogo variant="mark" size={28} /> PaperVault</Link>
           )}
           <button
             className={'sidebar-collapse-btn' + (collapsed ? ' sidebar-collapse-btn-only' : '')}
@@ -222,6 +223,7 @@ export default function Sidebar() {
       {/* ── Mobile topbar ── */}
       <div className="mobile-topbar">
         <Link to="/" className="mobile-topbar-logo">
+          <ThemeLogo variant="mark" size={28} />
           <span>PaperVault</span>
         </Link>
         <button className="mobile-hamburger" onClick={() => setMobileOpen(true)} aria-label="Open menu" aria-expanded={mobileOpen}>
@@ -250,7 +252,7 @@ export default function Sidebar() {
             >
               <div className="sidebar-header">
                 <Link to="/" className="sidebar-logo" onClick={() => setMobileOpen(false)}>
-                  PaperVault
+                  <ThemeLogo variant="mark" size={28} /> PaperVault
                 </Link>
                 <button className="sidebar-collapse-btn" onClick={() => setMobileOpen(false)} title="Close menu">
                   <X size={16} />

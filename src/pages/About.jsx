@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Mail, Globe, ExternalLink, GitBranch, Heart, Code2, Check } from 'lucide-react';
 import { usePageMeta } from '../lib/usePageMeta';
 import { useToast } from '../context/ToastContext';
+import ThemeLogo from '../components/ThemeLogo';
 import './About.css';
 
 const EMAIL = 'mwasiqt@gmail.com';
@@ -46,6 +47,10 @@ export default function About() {
 
       <div className="page-inner">
         <div className="about-wrap">
+
+          <motion.div className="about-brand" {...fadeUp(0)}>
+            <ThemeLogo size={170} />
+          </motion.div>
 
           {/* Cards grid */}
           <div className="about-grid">

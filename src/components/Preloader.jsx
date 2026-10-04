@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import ThemeLogo from './ThemeLogo';
 import './Preloader.css';
 
 export default function Preloader({ show, message = 'Loading…' }) {
@@ -20,7 +21,7 @@ export default function Preloader({ show, message = 'Loading…' }) {
             transition={{ duration: 0.28, ease: 'easeOut' }}
           >
             <div className="preloader-logo">
-              Paper<strong>Vault</strong>
+              <ThemeLogo size={130} />
             </div>
             <div className="preloader-spinner">
               <div className="preloader-dot" />
