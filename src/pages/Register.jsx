@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import PasswordInput from '../components/PasswordInput';
+import AuthHelp from '../components/AuthHelp';
+import { looksLikePausedBackend } from '../lib/authErrors';
 import './Login.css';
 import './Register.css';
 
@@ -25,7 +27,8 @@ export default function Register() {
   const { signInWithGoogle } = useAuth();
   const { addToast } = useToast();
   const [gLoading, setGLoading] = useState(false);
-  const [form,      setForm]      = useState({ fullName: '', email: '', password: '', confirm: '' });
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [form,     setForm]      = useState({ fullName: '', email: '', password: '', confirm: '' });
   const [error,     setError]     = useState('');
   const [loading,   setLoading]   = useState(false);
   const [sent,      setSent]      = useState(false);
@@ -83,7 +86,10 @@ export default function Register() {
       });
       if (signUpError) {
         const msg = signUpError.message || '';
-        if (msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('too many') || msg.toLowerCase().includes('limit')) {
+        if (looksLikePausedBackend(signUpError)) {
+          setError('We couldn\'t reach the server. It may be paused.');
+          setHelpOpen(true);
+        } else if (msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('too many') || msg.toLowerCase().includes('limit')) {
           const until = Date.now() + 3600 * 1000;
           // Write expiry to Supabase so all users see the same countdown
           await supabase.from('app_settings').update({ value: String(until) }).eq('key', 'email_ratelimit_until');
@@ -100,6 +106,7 @@ export default function Register() {
       setSent(true);
     } catch (err) {
       setError(err.message || 'Registration failed. Please try again.');
+      if (looksLikePausedBackend(err)) setHelpOpen(true);
     } finally {
       setLoading(false);
     }
@@ -128,7 +135,7 @@ export default function Register() {
         <div className="form-title">Create account</div>
         <div className="form-subtitle">Join PaperVault to upload past papers</div>
 
-        <button className="btn-google" onClick={async () => { setGLoading(true); try { await signInWithGoogle(); } catch { setGLoading(false); } }} disabled={gLoading}>
+        <button className="btn-google" onClick={async () => { setGLoading(true); try { await signInWithGoogle(); } catch (err) { setGLoading(false); if (looksLikePausedBackend(err)) setHelpOpen(true); } }} disabled={gLoading}>
           <GoogleIcon /> {gLoading ? 'Redirecting…' : 'Continue with Google'}
         </button>
 
@@ -172,6 +179,7 @@ export default function Register() {
         <div className="form-footer">
           Already have an account? <Link to="/login">Sign in</Link>
         </div>
+        <AuthHelp open={helpOpen} onToggle={() => setHelpOpen(o => !o)} />
       </div>
     </div>
   );

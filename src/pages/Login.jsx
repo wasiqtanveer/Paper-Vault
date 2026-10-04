@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PasswordInput from '../components/PasswordInput';
+import AuthHelp from '../components/AuthHelp';
+import { looksLikePausedBackend } from '../lib/authErrors';
 import './Login.css';
 
 function GoogleIcon() {
@@ -28,6 +30,7 @@ export default function Login() {
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
   const [gLoading, setGLoading] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -38,6 +41,7 @@ export default function Login() {
       navigate(from, { replace: true });
     } catch (err) {
       setError(err.message || 'Invalid email or password.');
+      if (looksLikePausedBackend(err)) setHelpOpen(true);
     } finally {
       setLoading(false);
     }
@@ -46,7 +50,11 @@ export default function Login() {
   async function handleGoogle() {
     setGLoading(true);
     try { await signInWithGoogle(); }
-    catch (err) { setError(err.message || 'Google sign-in failed.'); setGLoading(false); }
+    catch (err) {
+      setError(err.message || 'Google sign-in failed.');
+      setGLoading(false);
+      if (looksLikePausedBackend(err)) setHelpOpen(true);
+    }
   }
 
   return (
@@ -92,6 +100,7 @@ export default function Login() {
         <div className="form-footer">
           Don&apos;t have an account? <Link to="/register">Create one</Link>
         </div>
+        <AuthHelp open={helpOpen} onToggle={() => setHelpOpen(o => !o)} />
       </div>
     </div>
   );
