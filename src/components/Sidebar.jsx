@@ -88,7 +88,7 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
         {!collapsed && <span>{soundEnabled ? 'Sound On' : 'Sound Off'}</span>}
       </button>
 
-      <NavItem to="/about"        icon={Info}   label="About Developer" />
+      <NavItem to="/about"        icon={Info}   label="About" />
       <NavItem to="/hall-of-fame" icon={Trophy} label="Hall of Fame" />
 
       {user ? (

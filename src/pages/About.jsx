@@ -13,7 +13,7 @@ const fadeUp = (i = 0) => ({
 });
 
 export default function About() {
-  usePageMeta('About', 'About PaperVault and the developer behind this community past-paper library.');
+  usePageMeta('About', 'About PaperVault, the community past-paper library, and why it was built.');
   const { addToast } = useToast();
   const [copied, setCopied] = useState(false);
 
@@ -41,33 +41,11 @@ export default function About() {
   return (
     <div className="page-content">
       <div className="topbar">
-        <span style={{ fontSize: 18, fontWeight: 700 }}>About Developer</span>
+        <span style={{ fontSize: 18, fontWeight: 700 }}>About</span>
       </div>
 
       <div className="page-inner">
         <div className="about-wrap">
-
-          {/* Hero card */}
-          <motion.div className="about-hero-card" {...fadeUp(0)}>
-            <div className="about-avatar">WT</div>
-            <div className="about-hero-info">
-              <div className="about-name">Wasiq Tanveer</div>
-              <div className="about-links">
-                <a href={`mailto:${EMAIL}`} className="about-link-btn">
-                  <Mail size={14} /> {EMAIL}
-                </a>
-                <a href="https://www.linkedin.com/in/wasiq-tanveer/" target="_blank" rel="noreferrer" className="about-link-btn">
-                  <ExternalLink size={14} /> LinkedIn
-                </a>
-                <a href="https://wasiq-portfolio-delta.vercel.app/" target="_blank" rel="noreferrer" className="about-link-btn">
-                  <Globe size={14} /> Portfolio
-                </a>
-                <a href="https://github.com/wasiqtanveer" target="_blank" rel="noreferrer" className="about-link-btn">
-                  <GitBranch size={14} /> GitHub
-                </a>
-              </div>
-            </div>
-          </motion.div>
 
           {/* Cards grid */}
           <div className="about-grid">
@@ -75,11 +53,11 @@ export default function About() {
             {/* Why I built this */}
             <motion.div className="about-card" {...fadeUp(1)}>
               <div className="about-card-icon"><Heart size={18} /></div>
-              <div className="about-card-title">Why I Built This</div>
+              <div className="about-card-title">About This App &amp; Why We Built It</div>
               <div className="about-card-body">
-                <p>As a CS student, I constantly struggled to find past exam papers. They were scattered across WhatsApp groups, random drives, and shared only if you knew the right person.</p>
-                <p>PaperVault was built to fix that — a single organized platform where students can upload, browse, and access past papers by subject, teacher, term, and exam type.</p>
-                <p>Everything here — design, backend, database, and moderation system — was built from scratch as a passion project to genuinely help university students study smarter.</p>
+                <p>Past exam papers are hard to find. They end up scattered across WhatsApp groups and random drives, and you only get them if you know the right person.</p>
+                <p>PaperVault is one organized place where students can upload, browse, and access past papers by subject, teacher, term, and exam type.</p>
+                <p>It was built from scratch, including the design, backend, database, and moderation system, to help university students study smarter.</p>
               </div>
             </motion.div>
 
@@ -125,23 +103,24 @@ export default function About() {
               </div>
             </motion.div>
 
-            {/* Other project */}
-            <motion.div className="about-card" {...fadeUp(4)}>
-              <div className="about-card-icon project"><ExternalLink size={18} /></div>
-              <div className="about-card-title">Another Project for Students</div>
-              <div className="about-card-body">
-                <p>Also built <strong>CR Attendance App</strong> — a university attendance tracking tool that helps students monitor their attendance across courses and get alerts before they fall short of the required percentage.</p>
-              </div>
-              <a href="https://crattendanceapp.vercel.app/login" target="_blank" rel="noreferrer"
-                className="btn btn-ghost" style={{ marginTop: 16, alignSelf: 'flex-start' }}>
-                <ExternalLink size={14} /> Open CR Attendance App
-              </a>
-            </motion.div>
-
           </div>
 
           <motion.div className="about-footer" {...fadeUp(5)}>
-            Built with care for students · by <strong>WT</strong>
+            <div>Built by <strong>Wasiq Tanveer</strong></div>
+            <div className="about-links">
+              <a href={`mailto:${EMAIL}`} className="about-link-btn">
+                <Mail size={14} /> Email
+              </a>
+              <a href="https://www.linkedin.com/in/wasiq-tanveer/" target="_blank" rel="noreferrer" className="about-link-btn">
+                <ExternalLink size={14} /> LinkedIn
+              </a>
+              <a href="https://wasiq-portfolio-delta.vercel.app/" target="_blank" rel="noreferrer" className="about-link-btn">
+                <Globe size={14} /> Portfolio
+              </a>
+              <a href="https://github.com/wasiqtanveer" target="_blank" rel="noreferrer" className="about-link-btn">
+                <GitBranch size={14} /> GitHub
+              </a>
+            </div>
           </motion.div>
 
         </div>
