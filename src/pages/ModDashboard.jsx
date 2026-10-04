@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import EditPaperModal from '../components/EditPaperModal';
+import RejectReasonForm from '../components/RejectReasonForm';
 import './ModDashboard.css';
 
 const OWNER_EMAIL = 'mwasiqt@gmail.com';
@@ -36,6 +37,8 @@ export default function ModDashboard() {
   const [subjects, setSubjects] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [editingPaper, setEditingPaper] = useState(null); // paper object being edited
+  const [rejectingId,  setRejectingId]  = useState(null); // paper whose reject-reason form is open
+  const [rejectBusy,   setRejectBusy]   = useState(false);
 
   const isSiteOwner = user?.email === OWNER_EMAIL;
 
@@ -79,13 +82,16 @@ export default function ModDashboard() {
     addToast('Report marked as resolved.', 'success');
   }
 
-  async function updateStatus(paperId, status) {
+  async function updateStatus(paperId, status, reason = null) {
     const paper = pending.find(p => p.id === paperId);
     const { error } = await supabase
       .from('papers')
-      .update({ status, reviewed_at: new Date().toISOString(), reviewed_by: user.id })
+      .update({
+        status, reviewed_at: new Date().toISOString(), reviewed_by: user.id,
+        rejection_reason: status === 'rejected' ? reason : null,
+      })
       .eq('id', paperId);
-    if (error) { addToast(error.message, 'error'); return; }
+    if (error) { addToast(error.message, 'error'); return false; }
     await supabase.from('activity_log').insert({
       action: status, actor_id: user.id,
       actor_name: profile?.full_name ?? user.email,
@@ -94,6 +100,14 @@ export default function ModDashboard() {
     });
     setPending(prev => prev.filter(p => p.id !== paperId));
     addToast(`Paper ${status}.`, status === 'approved' ? 'success' : 'info');
+    return true;
+  }
+
+  async function confirmReject(paperId, reason) {
+    setRejectBusy(true);
+    const ok = await updateStatus(paperId, 'rejected', reason);
+    setRejectBusy(false);
+    if (ok) setRejectingId(null);
   }
 
   function handlePaperEdited(updatedPaper) {
@@ -158,11 +172,18 @@ export default function ModDashboard() {
                         <button className="btn-approve" title="Approve" onClick={() => updateStatus(p.id, 'approved')}>
                           <Check size={13} />
                         </button>
-                        <button className="btn-reject" title="Reject" onClick={() => updateStatus(p.id, 'rejected')}>
+                        <button className="btn-reject" title="Reject" onClick={() => setRejectingId(id => id === p.id ? null : p.id)}>
                           <X size={13} />
                         </button>
                       </div>
                     </div>
+                    {rejectingId === p.id && (
+                      <RejectReasonForm
+                        busy={rejectBusy}
+                        onConfirm={reason => confirmReject(p.id, reason)}
+                        onCancel={() => setRejectingId(null)}
+                      />
+                    )}
                   </div>
                 );
               })}

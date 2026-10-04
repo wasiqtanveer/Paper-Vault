@@ -1,0 +1,56 @@
+.reject-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.reject-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.reject-chip {
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.reject-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+}
+.reject-chip.active {
+  color: var(--status-rejected);
+  border-color: var(--status-rejected-bdr);
+  background: var(--status-rejected-bg);
+}
+
+.reject-form textarea {
+  resize: vertical;
+  min-height: 52px;
+}
+
+.reject-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Shown to the uploader on their own rejected papers */
+.rejection-note {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--status-rejected);
+  background: var(--status-rejected-bg);
+  border: 1px solid var(--status-rejected-bdr);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  margin-top: 8px;
+}
+.rejection-note strong { font-weight: 700; }
