@@ -318,7 +318,7 @@ export default function Upload() {
               {compressing && <div className="form-hint">Compressing image…</div>}
               {compressed && !compressing && (
                 <div className="upload-preview">
-                  <img src={preview} alt="Preview" />
+                  <img src={preview} alt="Preview of the compressed paper image" />
                   <div className="upload-preview-meta">
                     <span>Compressed: {formatBytes(compressed.size)}</span>
                     {file && <span>Original: {formatBytes(file.size)}</span>}
