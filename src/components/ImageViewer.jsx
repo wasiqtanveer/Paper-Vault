@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import './ImageViewer.css';
 
@@ -8,7 +8,7 @@ import './ImageViewer.css';
 function ZoomDialog({ src, alt, onClose }) {
   const ref = useFocusTrap();
   return (
-    <motion.div
+    <m.div
       ref={ref}
       className="image-viewer-modal"
       onClick={onClose}
@@ -20,7 +20,7 @@ function ZoomDialog({ src, alt, onClose }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
     >
-      <motion.img
+      <m.img
         src={src}
         alt={alt}
         initial={{ scale: 0.88, opacity: 0 }}
@@ -28,7 +28,7 @@ function ZoomDialog({ src, alt, onClose }) {
         exit={{    scale: 0.92, opacity: 0 }}
         transition={{ duration: 0.22, ease: 'easeOut' }}
       />
-    </motion.div>
+    </m.div>
   );
 }
 

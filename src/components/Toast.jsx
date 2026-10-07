@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 import './Toast.css';
 
@@ -7,7 +7,7 @@ const ICONS = { success: CheckCircle2, error: AlertCircle, info: Info };
 export default function Toast({ toast, onClose, onPause, onResume }) {
   const Icon = ICONS[toast.type] ?? Info;
   return (
-    <motion.div
+    <m.div
       className={`toast toast-${toast.type}`}
       // Errors interrupt; everything else waits its turn.
       role={toast.type === 'error' ? 'alert' : 'status'}
@@ -35,6 +35,6 @@ export default function Toast({ toast, onClose, onPause, onResume }) {
       <button type="button" className="toast-close" onClick={onClose} aria-label="Dismiss notification">
         <X size={14} aria-hidden="true" />
       </button>
-    </motion.div>
+    </m.div>
   );
 }

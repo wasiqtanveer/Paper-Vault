@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
+import { AnimatePresence, m, MotionConfig, LazyMotion } from 'framer-motion';
 import { Suspense, lazy, useDeferredValue, useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { useAuth } from './context/useAuth';
@@ -56,9 +56,9 @@ const pageVariants = {
 
 function PageWrap({ children }) {
   return (
-    <motion.div variants={pageVariants} initial="initial" animate="animate" exit="exit" style={{ height: '100%' }}>
+    <m.div variants={pageVariants} initial="initial" animate="animate" exit="exit" style={{ height: '100%' }}>
       {children}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -151,6 +151,7 @@ function Shell() {
 export default function App() {
   return (
     <BrowserRouter>
+      <LazyMotion features={() => import('./lib/motionFeatures').then(mod => mod.default)} strict>
       <MotionConfig reducedMotion="user">
         <ErrorBoundary>
         <ThemeProvider>
@@ -164,6 +165,7 @@ export default function App() {
         </ThemeProvider>
         </ErrorBoundary>
       </MotionConfig>
+      </LazyMotion>
     </BrowserRouter>
   );
 }

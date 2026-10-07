@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
 import { confirmDialog } from '../lib/confirmDialog';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FileText, CheckCircle, Clock, ShieldCheck, Settings2, Users, KeyRound, ChevronDown, Pencil } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -153,7 +153,7 @@ export default function Profile() {
       <div className="page-inner">
 
         {/* Header card */}
-        <motion.div className="profile-header-card" {...fadeUp(0)}>
+        <m.div className="profile-header-card" {...fadeUp(0)}>
           <div className="profile-avatar">{initials}</div>
           <div className="profile-header-info">
             <div className="profile-name">{profile?.full_name ?? 'Unknown'}</div>
@@ -162,10 +162,10 @@ export default function Profile() {
           <div className={`profile-role-badge role-${profile?.role ?? 'student'}`}>
             {profile?.role ?? 'student'}
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Edit name accordion */}
-        <motion.div className="pw-accordion" {...fadeUp(1)}>
+        <m.div className="pw-accordion" {...fadeUp(1)}>
           <button type="button"
             className={'pw-accordion-trigger' + (nameOpen ? ' open' : '')}
             onClick={() => { setNameOpen(v => !v); setNameValue(profile?.full_name ?? ''); setNameError(''); setNameSuccess(false); }}
@@ -175,7 +175,7 @@ export default function Profile() {
           </button>
           <AnimatePresence initial={false}>
             {nameOpen && (
-              <motion.div
+              <m.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
@@ -193,13 +193,13 @@ export default function Profile() {
                     {nameLoading ? 'Saving…' : 'Save Name'}
                   </button>
                 </form>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </m.div>
 
         {/* Change password accordion */}
-        {hasPassword && <motion.div className="pw-accordion" {...fadeUp(2)}>
+        {hasPassword && <m.div className="pw-accordion" {...fadeUp(2)}>
           <button type="button"
             className={'pw-accordion-trigger' + (pwOpen ? ' open' : '')}
             onClick={() => { setPwOpen(v => !v); setPwError(''); setPwSuccess(false); }}
@@ -213,7 +213,7 @@ export default function Profile() {
 
           <AnimatePresence initial={false}>
             {pwOpen && (
-              <motion.div
+              <m.div
                 className="pw-accordion-body"
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
@@ -260,13 +260,13 @@ export default function Profile() {
                     {pwLoading ? 'Updating…' : 'Update Password'}
                   </button>
                 </form>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
-        </motion.div>}
+        </m.div>}
 
         {/* Upload stats */}
-        <motion.div className="profile-stats-row" {...fadeUp(3)}>
+        <m.div className="profile-stats-row" {...fadeUp(3)}>
           <div className="profile-stat">
             <FileText size={16} className="profile-stat-icon" />
             <div className="profile-stat-value">{uploadedCount}</div>
@@ -282,11 +282,11 @@ export default function Profile() {
             <div className="profile-stat-value" style={{ color: 'var(--status-pending)' }}>{pendingCount}</div>
             <div className="profile-stat-label">Pending</div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Mod stats */}
         {isMod && modStats && (
-          <motion.div className="profile-section" {...fadeUp(5)}>
+          <m.div className="profile-section" {...fadeUp(5)}>
             <div className="profile-section-title">
               <ShieldCheck size={15} />
               Moderation Activity
@@ -305,12 +305,12 @@ export default function Profile() {
                 <div className="profile-stat-label">Rejected</div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Admin section */}
         {isAdmin && (
-          <motion.div className="profile-section" {...fadeUp(6)}>
+          <m.div className="profile-section" {...fadeUp(6)}>
             <div className="profile-section-title">
               <Settings2 size={15} />
               Admin Overview
@@ -325,11 +325,11 @@ export default function Profile() {
                 <Link to="/admin" className="btn btn-ghost btn-sm">Open Admin Panel →</Link>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Papers table */}
-        <motion.div className="papers-table-wrap" {...fadeUp(isMod ? 4 : 3)}>
+        <m.div className="papers-table-wrap" {...fadeUp(isMod ? 4 : 3)}>
           <div className="papers-table-header">
             <div className="section-title" style={{ marginBottom: 0 }}>My Papers</div>
             <Link to="/upload" className="btn btn-primary btn-sm">+ Upload New</Link>
@@ -397,7 +397,7 @@ export default function Profile() {
               </table>
             </div>
           )}
-        </motion.div>
+        </m.div>
 
       </div>
     </div>

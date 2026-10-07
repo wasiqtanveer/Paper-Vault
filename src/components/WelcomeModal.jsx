@@ -1,7 +1,7 @@
 import { readStorage, writeStorage } from '../lib/safeStorage';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, BookOpen, Upload, ShieldCheck, GitBranch } from 'lucide-react';
 import { useAuth } from '../context/useAuth';
 import ThemeLogo from './ThemeLogo';
@@ -38,7 +38,7 @@ export default function WelcomeModal() {
     <AnimatePresence>
       {visible && (
         <>
-          <motion.div
+          <m.div
             className="wm-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -46,7 +46,7 @@ export default function WelcomeModal() {
             transition={{ duration: 0.2 }}
             onClick={dismiss}
           />
-          <motion.div
+          <m.div
             className="wm-modal"
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1,    y: 0  }}
@@ -101,7 +101,7 @@ export default function WelcomeModal() {
                 About PaperVault →
               </button>
             </div>
-          </motion.div>
+          </m.div>
         </>
       )}
     </AnimatePresence>

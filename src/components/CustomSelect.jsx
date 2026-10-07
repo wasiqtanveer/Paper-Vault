@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback, useId } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Check, ChevronDown, Search } from 'lucide-react';
 import './CustomSelect.css';
 
@@ -188,7 +188,7 @@ export default function CustomSelect({ value, onChange, options, placeholder = '
       {createPortal(
         <AnimatePresence>
           {open && (
-            <motion.div
+            <m.div
               ref={menuRef}
               className="cselect-menu"
               style={menuStyle}
@@ -240,7 +240,7 @@ export default function CustomSelect({ value, onChange, options, placeholder = '
                   );
                 })}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>,
         document.body

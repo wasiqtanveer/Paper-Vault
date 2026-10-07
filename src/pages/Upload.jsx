@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { FileImage, CheckCircle2, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { uploadImage, deleteImage } from '../lib/storage';
@@ -166,7 +166,7 @@ export default function Upload() {
     <div className="page-content">
       <div className="topbar"><span style={{ fontSize: 18, fontWeight: 700 }}>Upload Paper</span></div>
       <div className="page-inner">
-        <motion.div
+        <m.div
           className="form-card upload-success-card"
           initial={{ scale: 0.94, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -182,7 +182,7 @@ export default function Upload() {
             <button type="button" className="btn btn-primary btn-lg" onClick={() => setSuccess(false)}>Upload another</button>
             <Link to="/profile" className="btn btn-ghost btn-lg">View my papers</Link>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );
@@ -194,7 +194,7 @@ export default function Upload() {
       </div>
 
       <div className="page-inner">
-        <motion.div
+        <m.div
           style={{ maxWidth: 580, margin: '0 auto' }}
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
@@ -335,7 +335,7 @@ export default function Upload() {
               {loading ? `Uploading… ${progress > 0 && progress < 1 ? Math.round(progress * 100) + '%' : ''}`.trim() : 'Submit Paper'}
             </button>
           </form>
-        </motion.div>
+        </m.div>
       </div>
       {requestKind && (
         <RequestModal

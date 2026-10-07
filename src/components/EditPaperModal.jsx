@@ -13,7 +13,7 @@ import { invalidatePapers } from '../lib/cache';
 import { teacherLabel } from '../lib/teacherName';
 import { buildTitle } from '../lib/paperTitle';
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useToast } from '../context/useToast';
@@ -84,7 +84,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         className="epm-backdrop"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -92,7 +92,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
         transition={{ duration: 0.18 }}
         onClick={onClose}
       >
-        <motion.div
+        <m.div
           ref={panelRef}
           role="dialog"
           aria-modal="true"
@@ -195,8 +195,8 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
               </button>
             </div>
           </form>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>
   );
 }

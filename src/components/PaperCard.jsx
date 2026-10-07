@@ -1,7 +1,7 @@
 import { paperAlt } from '../lib/paperTitle';
 import { memo, useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Calendar, FileText } from 'lucide-react';
 import { EASE_OUT } from '../lib/motion';
 import PaperPreview from './PaperPreview';
@@ -56,7 +56,7 @@ function PaperCard({ paper, index = 0 }) {
     : '—';
 
   return (
-    <motion.div
+    <m.div
       // A short settle, not an arrival. The travel is small enough to read as
       // the card resolving into place rather than flying in, and the scale is
       // gone: scaling a card resamples its cover image for the whole entrance,
@@ -115,7 +115,7 @@ function PaperCard({ paper, index = 0 }) {
           </div>
         </div>
       </Link>
-    </motion.div>
+    </m.div>
   );
 }
 

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { prefetchRoute } from '../lib/routes';
 import {
   Home, LayoutGrid, Upload, ShieldCheck, Settings2,
@@ -122,7 +122,7 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
             )}
             <AnimatePresence>
               {dropOpen && (
-                <motion.div
+                <m.div
                   className={'sidebar-user-dropdown' + (collapsed ? ' dropdown-collapsed' : '')}
                   initial={{ opacity: 0, y: 6, scale: 0.97 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -136,7 +136,7 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
                   <button type="button" onClick={onSignOut}>
                     <LogOut size={13} /> Sign Out
                   </button>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>
@@ -199,7 +199,7 @@ export default function Sidebar() {
   return (
     <>
       {/* ── Desktop sidebar ── */}
-      <motion.aside
+      <m.aside
         className={'sidebar sidebar-desktop' + (collapsed ? ' sidebar-collapsed' : '')}
         animate={{ width: collapsed ? 56 : 240 }}
         transition={{ duration: 0.22, ease: 'easeInOut' }}
@@ -220,7 +220,7 @@ export default function Sidebar() {
           </button>
         </div>
         <SidebarContent collapsed={collapsed} {...sharedProps} />
-      </motion.aside>
+      </m.aside>
 
       {/* ── Mobile topbar ── */}
       <div className="mobile-topbar">
@@ -237,7 +237,7 @@ export default function Sidebar() {
       <AnimatePresence>
         {mobileOpen && (
           <>
-            <motion.div
+            <m.div
               className="mobile-drawer-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -245,7 +245,7 @@ export default function Sidebar() {
               transition={{ duration: 0.2 }}
               onClick={() => setMobileOpen(false)}
             />
-            <motion.aside
+            <m.aside
               className="sidebar mobile-drawer"
               initial={{ x: -280 }}
               animate={{ x: 0 }}
@@ -261,7 +261,7 @@ export default function Sidebar() {
                 </button>
               </div>
               <SidebarContent collapsed={false} onNav={() => setMobileOpen(false)} {...sharedProps} />
-            </motion.aside>
+            </m.aside>
           </>
         )}
       </AnimatePresence>
