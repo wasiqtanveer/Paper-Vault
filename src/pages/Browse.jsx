@@ -81,7 +81,7 @@ export default function Browse() {
 
     let q = supabase
       .from('papers')
-      .select('*, subjects(name), teachers(name), profiles!papers_uploader_id_fkey(full_name)', { count: 'exact' })
+      .select('*, subjects(name), teachers(name)', { count: 'exact' })
       .eq('status', 'approved')
       .order(SORTS[currentFilters.sort]?.column ?? 'uploaded_at', { ascending: SORTS[currentFilters.sort]?.ascending ?? false })
       .range(currentOffset, currentOffset + PAGE_SIZE - 1);
