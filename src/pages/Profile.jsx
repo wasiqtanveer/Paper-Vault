@@ -50,7 +50,8 @@ export default function Profile() {
   useEffect(() => {
     if (!user) return;
     const queries = [
-      supabase.from('papers').select('*, subjects(name)').eq('uploader_id', user.id).order('uploaded_at', { ascending: false }),
+      supabase.from('papers').select('id, title, status, year, uploaded_at, rejection_reason, image_url, image_path, subjects(name)')
+        .eq('uploader_id', user.id).order('uploaded_at', { ascending: false }).limit(200),
     ];
     if (isMod) {
       // Three head-only counts instead of downloading every reviewed paper

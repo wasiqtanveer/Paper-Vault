@@ -56,6 +56,7 @@ export default function ModDashboard() {
           .select('*, subjects(name), profiles!papers_uploader_id_fkey(full_name)')
           .eq('status', 'pending')
           .order('uploaded_at', { ascending: false })
+          .limit(100)
       : supabase
           .from('reports')
           .select('*, papers(id, title, status), profiles!reports_reporter_id_fkey(full_name)')
