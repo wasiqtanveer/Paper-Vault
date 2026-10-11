@@ -1,3 +1,4 @@
+import { SUBJECTS_KEY, TEACHERS_KEY } from '../lib/lookups';
 import { useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, ChevronUp, ArrowUpDown, Plus } from 'lucide-react';
@@ -217,7 +218,7 @@ export default function AdminPanel() {
 
   // Subjects/teachers feed cached dropdowns on Browse, the viewer and the edit modal.
   function invalidateLookups() {
-    ['browse:subjects', 'lookup:subjects', 'lookup:teachers'].forEach(k => invalidate(k));
+    [SUBJECTS_KEY, TEACHERS_KEY].forEach(k => invalidate(k));
   }
 
   const requesterName = id => {

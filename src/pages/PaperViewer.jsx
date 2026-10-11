@@ -1,9 +1,9 @@
+import { getSubjects, getTeachers } from '../lib/lookups';
 import { paperAlt } from '../lib/paperTitle';
 import { useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
 import { logActivity } from '../lib/activity';
 import { confirmDialog } from '../lib/confirmDialog';
-import { cachedSafeQuery } from '../lib/cache';
 import { useParams, useNavigate } from 'react-router-dom';
 import { m } from 'framer-motion';
 import { Flag, Trash2, Check, X, ArrowLeft, Download, Pencil } from 'lucide-react';
@@ -70,8 +70,8 @@ export default function PaperViewer() {
   async function openEdit() {
     setEditLoading(true);
     const [s, t] = await Promise.all([
-      cachedSafeQuery('lookup:subjects', () => supabase.from('subjects').select('id, name').order('name'), { fallback: [], ttl: 300_000 }),
-      cachedSafeQuery('lookup:teachers', () => supabase.from('teachers').select('id, name, department').order('name'), { fallback: [], ttl: 300_000 }),
+      getSubjects(),
+      getTeachers(),
     ]);
     setSubjects(s); setTeachers(t);
     setEditLoading(false);
