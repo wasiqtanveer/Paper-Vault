@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AuthContext } from './auth-context';
 import { supabase } from '../lib/supabase';
 import { invalidate } from '../lib/cache';
@@ -70,28 +70,28 @@ export function AuthProvider({ children }) {
     return () => { clearTimeout(safety); subscription.unsubscribe(); };
   }, []);
 
-  async function signIn(email, password) {
+  const signIn = useCallback(async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     return data;
-  }
+  }, []);
 
-  async function signInWithGoogle() {
+  const signInWithGoogle = useCallback(async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin },
     });
     if (error) throw error;
-  }
+  }, []);
 
-  async function resetPassword(email) {
+  const resetPassword = useCallback(async email => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     if (error) throw error;
-  }
+  }, []);
 
-  async function signOut() {
+  const signOut = useCallback(async () => {
     setSigningOut(true);
     try {
       await supabase.auth.signOut();
@@ -101,14 +101,20 @@ export function AuthProvider({ children }) {
       invalidate();
       setSigningOut(false);
     }
-  }
+  }, []);
 
-  async function refreshProfile() {
+  const refreshProfile = useCallback(async () => {
     if (user) await fetchProfile(user.id);
-  }
+  }, [user]);
+
+  // Memoised so consumers only re-render when something they read changes.
+  const value = useMemo(
+    () => ({ session, user, profile, profileReady, profileError, loading, signingOut, signIn, signInWithGoogle, resetPassword, signOut, refreshProfile }),
+    [session, user, profile, profileReady, profileError, loading, signingOut, signIn, signInWithGoogle, resetPassword, signOut, refreshProfile],
+  );
 
   return (
-    <AuthContext.Provider value={{ session, user, profile, profileReady, profileError, loading, signingOut, signIn, signInWithGoogle, resetPassword, signOut, refreshProfile }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
