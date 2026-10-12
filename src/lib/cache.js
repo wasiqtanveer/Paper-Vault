@@ -97,7 +97,16 @@ export async function cachedSafeQuery(key, makeBuilder, { fallback = null, onErr
   }
 }
 
-/** Drop every cache entry derived from the papers table. Call after any paper mutation. */
+/** Drop every entry whose key starts with `prefix`. */
+export function invalidatePrefix(prefix) {
+  for (const key of [...store.keys()]) if (key.startsWith(prefix)) store.delete(key);
+}
+
+/**
+ * Drop every cache entry derived from the papers table. Call after any paper
+ * mutation. Keys are namespaced with a `papers:` prefix so a new cached query can't
+ * be forgotten here: name it `papers:<something>` and it is covered.
+ */
 export function invalidatePapers() {
-  ['home:recent', 'home:stats', 'browse:years'].forEach(k => store.delete(k));
+  invalidatePrefix('papers:');
 }

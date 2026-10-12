@@ -38,13 +38,13 @@ describe('cachedSafeQuery', () => {
 
 describe('invalidatePapers', () => {
   it('clears every paper-derived key but leaves others alone', async () => {
-    for (const k of ['home:recent', 'home:stats', 'browse:years', 'subjects']) {
+    for (const k of ['papers:recent', 'papers:stats', 'papers:years', 'subjects']) {
       await cachedQuery(k, () => Promise.resolve(k));
     }
     invalidatePapers();
-    expect(peek('home:recent')).toBeUndefined();
-    expect(peek('home:stats')).toBeUndefined();
-    expect(peek('browse:years')).toBeUndefined();
+    expect(peek('papers:recent')).toBeUndefined();
+    expect(peek('papers:stats')).toBeUndefined();
+    expect(peek('papers:years')).toBeUndefined();
     expect(peek('subjects')).toBe('subjects');
   });
 });
