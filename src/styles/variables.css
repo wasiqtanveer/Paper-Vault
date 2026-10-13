@@ -146,5 +146,5 @@
   --lh-base:  1.55;
   --lh-loose: 1.75;
 
-  --font: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
