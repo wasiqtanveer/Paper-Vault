@@ -96,7 +96,7 @@ export default function HallOfFame() {
   return (
     <div className="page-content">
       {/* Hidden audio element — looping background track */}
-      <audio ref={audioRef} src="/sounds/hall of fame.mp3" loop preload="auto" />
+      <audio ref={audioRef} src="/sounds/hall-of-fame.mp3" loop preload="none" />
 
       {/* Floating music toggle — bottom-right corner */}
       <button type="button"
