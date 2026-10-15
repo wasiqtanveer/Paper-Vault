@@ -41,6 +41,18 @@ describe('usePageMeta', () => {
     expect(meta()).toBeNull();
   });
 
+  it('restores the previous description on unmount', () => {
+    const tag = document.createElement('meta');
+    tag.setAttribute('name', 'description');
+    tag.setAttribute('content', 'site default');
+    document.head.appendChild(tag);
+
+    const { unmount } = renderHook(() => usePageMeta('About', 'page specific'));
+    expect(meta().getAttribute('content')).toBe('page specific');
+    unmount();
+    expect(meta().getAttribute('content')).toBe('site default');
+  });
+
   it('updates when the inputs change', () => {
     const { rerender } = renderHook(({ t }) => usePageMeta(t), { initialProps: { t: 'One' } });
     expect(document.title).toBe('One — PaperVault');
