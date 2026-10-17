@@ -67,4 +67,4 @@ create table if not exists public.hall_of_fame (
 );
 
 -- reports and app_settings: see 20260520_reports_rls.sql / 20260521_app_settings_rls.sql
--- catalog_requests: see supabase_catalog_requests.sql
+-- catalog_requests: see supabase/migrations/20260204_catalog_requests.sql

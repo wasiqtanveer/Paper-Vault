@@ -1,7 +1,7 @@
 -- ============================================================================
 -- PaperVault - "Request a subject / teacher"
 -- Run in Supabase Dashboard -> SQL Editor -> New query -> Run.
--- Safe to run more than once. Depends on public.is_admin() from supabase_rls_fix.sql.
+-- Safe to run more than once. Depends on public.is_admin() from supabase/migrations/20260201_rls_fix.sql.
 -- ============================================================================
 
 create table if not exists public.catalog_requests (
