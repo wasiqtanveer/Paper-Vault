@@ -22,6 +22,14 @@ export default defineConfig({
     css: false,
     // supabase.js throws without these; tests never hit the network.
     env: { VITE_SUPABASE_URL: 'http://localhost:54321', VITE_SUPABASE_ANON_KEY: 'test-anon-key' },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov'],
+      include: ['src/**'],
+      exclude: ['src/**/*.test.{js,jsx}', 'src/test/**'],
+      // Deliberately low starting floor; raise it as tests are added.
+      thresholds: { lines: 3 },
+    },
   },
   // Vitest transpiles with esbuild and needs the automatic JSX runtime so
   // source files (which don't import React) work under test. The production
