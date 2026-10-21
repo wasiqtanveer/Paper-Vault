@@ -7,7 +7,8 @@ import { logActivity } from '../lib/activity';
 import { confirmDialog } from '../lib/confirmDialog';
 import { useParams, useNavigate } from 'react-router-dom';
 import { m } from 'framer-motion';
-import { Flag, Trash2, Check, X, ArrowLeft, Download, Pencil } from 'lucide-react';
+import { Flag, Trash2, Check, X, ArrowLeft, Download, Pencil, Link2 } from 'lucide-react';
+import { copyText } from '../lib/contact';
 import { CONTENT_SWAP } from '../lib/motion';
 import { supabase } from '../lib/supabase';
 import { deleteImage } from '../lib/storage';
@@ -84,6 +85,11 @@ export default function PaperViewer() {
   function goBack() {
     if (window.history.state?.idx > 0) navigate(-1);
     else navigate('/browse');
+  }
+
+  async function handleCopyLink() {
+    await copyText(window.location.href);
+    addToast('Link copied to clipboard.', 'success');
   }
 
   async function handleDownload() {
@@ -306,6 +312,10 @@ export default function PaperViewer() {
                 style={{ gap: 7 }}
               >
                 <Download size={14} /> {downloading ? 'Downloading…' : 'Download'}
+              </button>
+
+              <button type="button" className="btn btn-ghost btn-sm" onClick={handleCopyLink} style={{ gap: 6 }}>
+                <Link2 size={13} /> Copy link
               </button>
 
               {user && !showReport && (
