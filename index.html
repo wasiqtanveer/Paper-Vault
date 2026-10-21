@@ -10,6 +10,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a0a0a" />
 
+    <!-- Sets the theme before first paint so light-theme users never see a dark flash.
+         Allowed by hash in the CSP (vercel.json); keep the two in sync if this changes. -->
+    <script>try{var t=localStorage.getItem('pv-theme')||'dark';document.documentElement.setAttribute('data-theme',t);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='light'?'#f5f5f5':'#0a0a0a')}catch(e){}</script>
+
     <title>PaperVault — Past Papers, Shared by Students</title>
     <meta name="description" content="PaperVault is a community library of past exam papers. Browse, search, and download approved papers, or upload your own to help other students." />
 
