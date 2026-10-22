@@ -10,6 +10,8 @@ export function ThemeProvider({ children }) {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     writeStorage('pv-theme', theme);
+    // Keep the browser chrome (mobile address bar) in step with the theme.
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#f5f5f5' : '#0a0a0a');
   }, [theme]);
 
   function toggle() {
