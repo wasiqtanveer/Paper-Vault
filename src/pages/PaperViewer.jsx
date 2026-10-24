@@ -346,7 +346,8 @@ export default function PaperViewer() {
                 </form>
               )}
 
-              {isOwner && (
+              {/* Staff can delete any paper; owners only until it is approved (matches the papers_delete policy). */}
+              {(isMod || (isOwner && paper.status !== 'approved')) && (
                 <button type="button" className="btn btn-danger btn-sm" onClick={handleDelete} style={{ gap: 6 }}>
                   <Trash2 size={13} /> Delete Paper
                 </button>
