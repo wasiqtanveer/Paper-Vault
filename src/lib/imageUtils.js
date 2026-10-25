@@ -38,13 +38,31 @@ export async function combineImages(files) {
   return new File([blob], 'combined.jpg', { type: 'image/jpeg' });
 }
 
-/** @param {number} [pages] how many pages were stacked; scales the size and dimension caps */
-export async function compressImage(file, pages = 1) {
+export const STANDARD_EDGE = 1920;
+export const DETAIL_EDGE = 2800;
+
+/** Longest side of an image in pixels, or 0 if it can't be read. */
+export async function imageLongEdge(file) {
+  try {
+    const bmp = await createImageBitmap(file);
+    const edge = Math.max(bmp.width, bmp.height);
+    bmp.close?.();
+    return edge;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * @param {number} [pages] how many pages were stacked; scales the size and dimension caps
+ * @param {{ highQuality?: boolean }} [options] keep more detail (bigger file) for small print
+ */
+export async function compressImage(file, pages = 1, { highQuality = false } = {}) {
   // Loaded on demand: the library is only needed once a file has been chosen.
   const { default: imageCompression } = await import('browser-image-compression');
   return imageCompression(file, {
-    maxSizeMB: Math.min(pages, 4),
-    maxWidthOrHeight: Math.min(1920 * pages, 8000),
+    maxSizeMB: highQuality ? Math.min(3 * pages, 4.5) : Math.min(pages, 4),
+    maxWidthOrHeight: Math.min((highQuality ? DETAIL_EDGE : STANDARD_EDGE) * pages, 8000),
     useWebWorker: true,
     // Always emit JPEG so the stored MIME type and extension match the bytes
     // (a PNG in, JPEG out would otherwise keep a .png name).

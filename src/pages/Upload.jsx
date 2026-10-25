@@ -6,7 +6,7 @@ import { m } from 'framer-motion';
 import { FileImage, CheckCircle2, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { uploadImage, deleteImage } from '../lib/storage';
-import { validateImage, compressImage, combineImages, formatBytes, MAX_PAGES } from '../lib/imageUtils';
+import { validateImage, compressImage, combineImages, imageLongEdge, formatBytes, MAX_PAGES, STANDARD_EDGE } from '../lib/imageUtils';
 import { useAuth } from '../context/useAuth';
 import { useToast } from '../context/useToast';
 import CustomSelect from '../components/CustomSelect';
@@ -39,6 +39,9 @@ export default function Upload() {
   const [error,        setError]        = useState('');
   const [fileError,    setFileError]    = useState('');
   const [loading,      setLoading]      = useState(false);
+  const [highQuality,   setHighQuality]   = useState(false); // keep more detail for small print
+  const [reduced,       setReduced]       = useState(false); // the photo was larger than the size cap
+  const lastFiles = useRef([]);
   const [progress,     setProgress]     = useState(0); // 0..1 while the image uploads
   const [success,      setSuccess]      = useState(false);
   const [dragOver,     setDragOver]     = useState(false);
@@ -69,9 +72,10 @@ export default function Upload() {
   }
   useEffect(() => () => { if (previewRef.current) URL.revokeObjectURL(previewRef.current); }, []);
 
-  async function processFile(fileOrList) {
+  async function processFile(fileOrList, detail = highQuality) {
     const files = Array.from(fileOrList?.length !== undefined && !fileOrList.name ? fileOrList : [fileOrList]).filter(Boolean);
     if (!files.length) return;
+    lastFiles.current = files;
     setFileError(''); setCompressed(null); replacePreview('');
     if (files.length > MAX_PAGES) { setFileError(`Choose up to ${MAX_PAGES} pages at once.`); return; }
     const total = files.reduce((n, f) => n + f.size, 0);
@@ -80,7 +84,9 @@ export default function Upload() {
     setCompressing(true);
     try {
       const source = files.length === 1 ? files[0] : await combineImages(files);
-      const comp = await compressImage(source, files.length);
+      const comp = await compressImage(source, files.length, { highQuality: detail });
+      // Warn when a large photo had to be shrunk, since small print may blur.
+      setReduced(!detail && (await imageLongEdge(source)) > STANDARD_EDGE * files.length);
       setCompressed(comp);
       replacePreview(URL.createObjectURL(comp));
     } catch (err) {
@@ -313,6 +319,21 @@ export default function Upload() {
               </label>
               {fileError && <div className="form-error">{fileError}</div>}
               {compressing && <div className="form-hint">Compressing image…</div>}
+              {file && !compressing && !fileError && (
+                <label className="form-hint" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input
+                    type="checkbox" checked={highQuality}
+                    style={{ width: 'auto' }}
+                    onChange={e => { setHighQuality(e.target.checked); processFile(lastFiles.current, e.target.checked); }}
+                  />
+                  Keep more detail (larger file). Helps when the paper has small print.
+                </label>
+              )}
+              {reduced && !compressing && !highQuality && (
+                <div className="form-hint" role="note">
+                  This photo was scaled down to fit the size limit, so small text may be hard to read. Turn on “Keep more detail” if so.
+                </div>
+              )}
               {compressed && !compressing && (
                 <div className="upload-preview">
                   <img src={preview} alt="Preview of the compressed paper image" />
