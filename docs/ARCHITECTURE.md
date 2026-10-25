@@ -101,3 +101,19 @@ decides which papers count.
 migration files through `npx supabase db query --remote --read-only` (RLS enabled per table,
 guard and stamp triggers present, rejection reasons, uploader names, teacher titles). It needs a
 linked Supabase project (`npx supabase link`) and is read-only; it never writes.
+
+## Link previews for shared papers
+
+PaperVault is a client-rendered SPA behind an auth wall: every route except
+`/login` and `/register` redirects signed-out visitors to `/login`, and
+`usePageMeta` sets per-page titles in the browser only. Social crawlers do not
+run JavaScript or sign in, so any shared link (including `/paper/:id`) previews
+with the static tags in `index.html` (site title, description and the
+1200x630 `og-image.png`).
+
+This is a deliberate trade-off: papers are student uploads gated to signed-in
+users, so a per-paper public preview would also expose the title and image to
+anyone with the link. If public sharing is wanted later, the least invasive
+route is a Vercel edge middleware that serves `/paper/:id` to crawlers with
+`og:title` and `og:image` taken from the (approved) paper row, leaving the SPA
+untouched for people.
