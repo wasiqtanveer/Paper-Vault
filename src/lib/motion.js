@@ -28,3 +28,13 @@ export const CONTENT_SWAP = {
   animate: { opacity: 1, transition: { duration: 0.18, ease: EASE_OUT } },
   exit:    { opacity: 0, transition: { duration: 0.08, ease: 'easeIn' } },
 };
+
+/**
+ * Staggered "fade up" entrance for a block on a page. `i` is the block's
+ * position in the stagger; pages tune distance, length and stagger step to
+ * their own density (see the one-line wrappers in each page).
+ */
+export const fadeUp = (i = 0, { y = 14, duration = 0.25, step = 0.06 } = {}) => ({
+  initial: { opacity: 0, y },
+  animate: { opacity: 1, y: 0, transition: { duration, delay: i * step, ease: 'easeOut' } },
+});

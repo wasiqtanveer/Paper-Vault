@@ -1,3 +1,4 @@
+import { fadeUp as baseFadeUp } from '../lib/motion';
 import { useState } from 'react';
 import { m } from 'framer-motion';
 import { Mail, Globe, ExternalLink, GitBranch, Heart, Code2, Check } from 'lucide-react';
@@ -8,10 +9,7 @@ import './About.css';
 
 const EMAIL = 'mwasiqt@gmail.com';
 
-const fadeUp = (i = 0) => ({
-  initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.28, delay: i * 0.07, ease: 'easeOut' } },
-});
+const fadeUp = i => baseFadeUp(i, { y: 16, duration: 0.28, step: 0.07 });
 
 export default function About() {
   usePageMeta('About', 'About PaperVault, the community past-paper library, and why it was built.');
