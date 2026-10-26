@@ -12,6 +12,7 @@
  *   );
  */
 
+import { reportError } from './logger';
 import { safeQuery } from './query';
 
 const store = new Map(); // key -> { value, expires, inflight }
@@ -92,7 +93,7 @@ export async function cachedSafeQuery(key, makeBuilder, { fallback = null, onErr
     );
   } catch (err) {
     if (onError) onError(err.message);
-    else console.error(err);
+    else reportError(err);
     return fallback;
   }
 }

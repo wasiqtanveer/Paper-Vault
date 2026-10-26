@@ -1,3 +1,4 @@
+import { reportWarning } from '../lib/logger';
 import { DATE_SHORT, DATE_SHORT_YEAR, DATE_TIME, DATE_TIME_YEAR, formatDate, formatDateTime } from '../lib/formatDate';
 import { fadeUp as baseFadeUp } from '../lib/motion';
 import { SUBJECTS_KEY, TEACHERS_KEY } from '../lib/lookups';
@@ -88,7 +89,7 @@ export default function AdminPanel() {
       safeQuery(supabase.from('activity_log').select('*').order('created_at', { ascending: false }).limit(50), { fallback: [], onError, label: 'activity log' }),
       safeQuery(supabase.from('hall_of_fame').select('*').order('created_at', { ascending: true }), { fallback: [], onError, label: 'hall of fame' }),
       // Silent on failure: the table only exists once supabase_catalog_requests.sql has been run.
-      safeQuery(supabase.from('catalog_requests').select('*').eq('status', 'pending').order('created_at', { ascending: true }), { fallback: [], onError: msg => console.warn(msg), label: 'requests' }),
+      safeQuery(supabase.from('catalog_requests').select('*').eq('status', 'pending').order('created_at', { ascending: true }), { fallback: [], onError: msg => reportWarning(msg), label: 'requests' }),
     ]).then(([u, s, t, p, log, hof, reqs]) => {
       setRequests(reqs);
       setUsers(u);

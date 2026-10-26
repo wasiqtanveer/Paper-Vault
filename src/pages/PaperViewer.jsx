@@ -1,3 +1,4 @@
+import { reportWarning } from '../lib/logger';
 import { DATE_LONG, formatDate } from '../lib/formatDate';
 import { getSubjects, getTeachers } from '../lib/lookups';
 import { paperAlt } from '../lib/paperTitle';
@@ -173,7 +174,7 @@ export default function PaperViewer() {
     if (err) { addToast(err.message, 'error'); return; }
     // RLS filters a forbidden delete to zero rows without raising an error.
     if (!removed?.length) { addToast('Could not delete this paper. You may not have permission.', 'error'); return; }
-    deleteImage(paper.image_url, paper.image_path).catch(err => console.warn('[storage] image cleanup failed:', err));
+    deleteImage(paper.image_url, paper.image_path).catch(err => reportWarning('[storage] image cleanup failed:', err));
     invalidatePapers();
     await logActivity({ action: 'delete', user, profile, fallbackRole: 'student', paperId: id, paperTitle: paper?.title });
     addToast('Paper deleted.', 'success');
