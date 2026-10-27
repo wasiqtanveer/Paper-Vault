@@ -1,3 +1,4 @@
+import { TERMS, EXAM_TYPES } from '../lib/paperOptions';
 import { getSubjects, SUBJECTS_KEY } from '../lib/lookups';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -202,23 +203,14 @@ export default function Browse() {
               onChange={v => setFilters(f => ({ ...f, semester: v }))}
               placeholder="All Semesters"
               ariaLabel="Filter by semester"
-              options={[
-                { value: '', label: 'All Semesters' },
-                { value: 'Spring', label: 'Spring' },
-                { value: 'Summer', label: 'Summer' },
-                { value: 'Fall',   label: 'Fall'   },
-              ]}
+              options={[{ value: '', label: 'All Semesters' }, ...TERMS.map(t => ({ value: t, label: t }))]}
             />
             <CustomSelect
               value={filters.type}
               onChange={v => setFilters(f => ({ ...f, type: v }))}
               placeholder="Mid & Final"
               ariaLabel="Filter by exam type"
-              options={[
-                { value: '',      label: 'Mid & Final' },
-                { value: 'Mid',   label: 'Mid only'    },
-                { value: 'Final', label: 'Final only'  },
-              ]}
+              options={[{ value: '', label: 'Mid & Final' }, ...EXAM_TYPES.map(t => ({ value: t, label: `${t} only` }))]}
             />
             <CustomSelect
               value={filters.sort}

@@ -1,3 +1,4 @@
+import { TERMS, EXAM_TYPES } from '../lib/paperOptions';
 import { getSubjects, getTeachers } from '../lib/lookups';
 import { useEffect, useRef, useState } from 'react';
 import { invalidatePapers } from '../lib/cache';
@@ -18,8 +19,6 @@ import { teacherLabel } from '../lib/teacherName';
 import { buildTitle } from '../lib/paperTitle';
 import './Upload.css';
 
-const TERMS      = ['Spring', 'Summer', 'Fall'];
-const EXAM_TYPES = ['Mid', 'Final'];
 
 export default function Upload() {
   const { user, profile } = useAuth();
