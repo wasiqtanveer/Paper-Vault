@@ -1,3 +1,4 @@
+import { SkeletonBlock, SkeletonLine } from '../components/Skeleton';
 import { getSubjects, getTeachers } from '../lib/lookups';
 import { paperAlt } from '../lib/paperTitle';
 import { CONTACT } from '../lib/contact';
@@ -18,14 +19,14 @@ const OWNER_EMAIL = CONTACT.email;
 function ModCardSkeleton() {
   return (
     <div className="mod-paper-card">
-      <div className="skel mod-skel-img" />
-      <div className="skel mod-skel-line" style={{ width: '85%', marginBottom: 8 }} />
-      <div className="skel mod-skel-line" style={{ width: '60%', marginBottom: 16 }} />
+      <SkeletonBlock height="auto" style={{ aspectRatio: '4 / 3', marginBottom: 10 }} />
+      <SkeletonLine width="85%" style={{ marginBottom: 8 }} />
+      <SkeletonLine width="60%" style={{ marginBottom: 16 }} />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="skel mod-skel-line" style={{ width: 48 }} />
+        <SkeletonLine width={48} />
         <div style={{ display: 'flex', gap: 5 }}>
-          <div className="skel" style={{ width: 32, height: 28, borderRadius: 6 }} />
-          <div className="skel" style={{ width: 32, height: 28, borderRadius: 6 }} />
+          <SkeletonBlock width={32} height={28} />
+          <SkeletonBlock width={32} height={28} />
         </div>
       </div>
     </div>
