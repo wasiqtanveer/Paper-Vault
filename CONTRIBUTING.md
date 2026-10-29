@@ -37,3 +37,7 @@ new file in `supabase/migrations/`, named with the next date prefix. Write it to
 
 Describe what changed and why, note any migration that needs to be run, and add or update tests
 for logic in `src/lib` and `src/hooks`.
+
+## The `supabase` CLI
+
+`supabase` is a devDependency only so that `npm run db:verify` and `npx supabase db query` work without a global install. It is not used at runtime or in the build. Link a project once with `npx supabase link`, then use `npx supabase db query --remote --read-only "<sql>"` to inspect the database. Schema changes go in `supabase/migrations/` as idempotent SQL.
