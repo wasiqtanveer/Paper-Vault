@@ -1,3 +1,4 @@
+import { PAPER_SELECT } from '../lib/paperColumns';
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { m, AnimatePresence } from 'framer-motion';
@@ -48,10 +49,9 @@ function StatCard({ label, value, sub, color, suffix = '' }) {
   );
 }
 
-const RECENT_SELECT = '*, subjects(name), teachers(name)';
 
 const fetchRecent = onError => cachedSafeQuery('papers:recent', () =>
-  supabase.from('papers').select(RECENT_SELECT)
+  supabase.from('papers').select(PAPER_SELECT)
     .eq('status', 'approved').order('uploaded_at', { ascending: false }).limit(12),
   { fallback: [], onError, label: 'recent papers', ttl: 30_000 });
 

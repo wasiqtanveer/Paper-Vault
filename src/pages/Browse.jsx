@@ -1,3 +1,4 @@
+import { PAPER_SELECT } from '../lib/paperColumns';
 import { TERMS, EXAM_TYPES } from '../lib/paperOptions';
 import { getSubjects, SUBJECTS_KEY } from '../lib/lookups';
 import { useEffect, useState, useCallback, useRef } from 'react';
@@ -82,7 +83,7 @@ export default function Browse() {
 
     let q = supabase
       .from('papers')
-      .select('*, subjects(name), teachers(name)', { count: 'exact' })
+      .select(PAPER_SELECT, { count: 'exact' })
       .eq('status', 'approved')
       .order(SORTS[currentFilters.sort]?.column ?? 'uploaded_at', { ascending: SORTS[currentFilters.sort]?.ascending ?? false })
       .range(currentOffset, currentOffset + PAGE_SIZE - 1);

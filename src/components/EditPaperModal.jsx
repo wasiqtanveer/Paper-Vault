@@ -9,6 +9,7 @@
  *  onSave       – (updatedPaper) => void
  *  onClose      – () => void
  */
+import { PAPER_SELECT } from '../lib/paperColumns';
 import { TERMS, EXAM_TYPES } from '../lib/paperOptions';
 import { invalidatePapers } from '../lib/cache';
 import { teacherLabel } from '../lib/teacherName';
@@ -93,7 +94,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
       .from('papers')
       .update(payload)
       .eq('id', paper.id)
-      .select('*, subjects(name), teachers(name)')
+      .select(PAPER_SELECT)
       .single();
     setSaving(false);
     if (error) { addToast(error.message, 'error'); return; }

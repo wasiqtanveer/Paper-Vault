@@ -1,3 +1,4 @@
+import { PAPER_SELECT } from '../lib/paperColumns';
 import { reportWarning } from '../lib/logger';
 import { DATE_LONG, formatDate } from '../lib/formatDate';
 import { getSubjects, getTeachers } from '../lib/lookups';
@@ -47,7 +48,7 @@ export default function PaperViewer() {
     try {
       res = await supabase
         .from('papers')
-        .select('*, subjects(name), teachers(name)')
+        .select(PAPER_SELECT)
         .eq('id', id)
         .single();
     } catch {
