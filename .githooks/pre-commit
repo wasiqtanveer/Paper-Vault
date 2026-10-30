@@ -1,0 +1,5 @@
+#!/bin/sh
+# Lints staged JS/JSX so the error count cannot grow back. Enable once with: npm run prepare
+files=$(git diff --cached --name-only --diff-filter=ACM | grep -E "\.(js|jsx)$")
+[ -z "$files" ] && exit 0
+npx eslint --max-warnings=0 $files
