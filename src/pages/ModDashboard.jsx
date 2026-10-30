@@ -163,7 +163,7 @@ export default function ModDashboard() {
   return (
     <div className="page-content">
       <div className="topbar">
-        <span style={{ fontSize: 18, fontWeight: 700 }}>Moderation</span>
+        <span className="topbar-title">Moderation</span>
       </div>
 
       <div className="page-inner">

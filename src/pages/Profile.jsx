@@ -145,7 +145,7 @@ export default function Profile() {
   return (
     <div className="page-content">
       <div className="topbar">
-        <span style={{ fontSize: 18, fontWeight: 700 }}>Profile</span>
+        <span className="topbar-title">Profile</span>
       </div>
 
       <div className="page-inner">

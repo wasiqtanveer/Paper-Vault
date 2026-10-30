@@ -369,7 +369,7 @@ export default function AdminPanel() {
 
   if (loading) return (
     <div className="page-content">
-      <div className="topbar"><span style={{ fontSize: 18, fontWeight: 700 }}>Admin Panel</span></div>
+      <div className="topbar"><span className="topbar-title">Admin Panel</span></div>
       <div className="page-inner">
         <div className="metrics-grid">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -393,7 +393,7 @@ export default function AdminPanel() {
   return (
     <div className="page-content">
       <div className="topbar">
-        <span style={{ fontSize: 18, fontWeight: 700 }}>Admin Panel</span>
+        <span className="topbar-title">Admin Panel</span>
       </div>
 
       <div className="page-inner">
