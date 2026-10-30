@@ -26,6 +26,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "check": "npm run lint && npm test",
     "test:coverage": "vitest run --coverage",
     "typecheck": "npx -p typescript tsc -p tsconfig.json",
     "db:verify": "bash scripts/db-verify.sh"
