@@ -208,7 +208,7 @@ export default function PaperViewer() {
       <div className="page-inner">
         <div className="paper-viewer-layout">
           <SkeletonBlock height={420} style={{ aspectRatio: '3 / 4', height: 'auto' }} />
-          <div className="paper-meta-panel" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className="paper-meta-panel paper-meta-panel-loading">
             <SkeletonLine width="70%" height={20} />
             <SkeletonLine width="30%" height={16} />
             <SkeletonLine width="100%" />
@@ -238,15 +238,14 @@ export default function PaperViewer() {
     // parent, so this is an enter-only fade rather than a true crossfade.
     <m.div className="page-content" initial={CONTENT_SWAP.initial} animate={CONTENT_SWAP.animate}>
       <div className="topbar">
-        <button type="button" className="btn btn-ghost btn-sm" onClick={goBack} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+        <button type="button" className="btn btn-ghost btn-sm pv-inline" onClick={goBack}>
           <ArrowLeft size={14} /> Back
         </button>
         {canEdit && (
           <button type="button"
-            className="btn btn-ghost btn-sm"
+            className="btn btn-ghost btn-sm pv-inline pv-push-right"
             onClick={openEdit}
             disabled={editLoading}
-            style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5 }}
           >
             <Pencil size={13} /> Edit Details
           </button>
@@ -266,7 +265,7 @@ export default function PaperViewer() {
               )}
             </div>
 
-            <div className="divider" style={{ margin: '0' }} />
+            <div className="divider" />
 
             <div className="meta-row">
               <span className="meta-label">Subject</span>
@@ -304,24 +303,23 @@ export default function PaperViewer() {
               <span className="meta-value">{uploadedAt}</span>
             </div>
 
-            <div className="divider" style={{ margin: '0' }} />
+            <div className="divider" />
 
             <div className="meta-actions">
               <button type="button"
                 className="btn btn-primary"
                 onClick={handleDownload}
                 disabled={downloading}
-                style={{ gap: 7 }}
               >
                 <Download size={14} /> {downloading ? 'Downloading…' : 'Download'}
               </button>
 
-              <button type="button" className="btn btn-ghost btn-sm" onClick={handleCopyLink} style={{ gap: 6 }}>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={handleCopyLink}>
                 <Link2 size={13} /> Copy link
               </button>
 
               {user && !showReport && (
-                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowReport(true)} style={{ gap: 6 }}>
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowReport(true)}>
                   <Flag size={13} /> Report
                 </button>
               )}
@@ -350,18 +348,18 @@ export default function PaperViewer() {
 
               {/* Staff can delete any paper; owners only until it is approved (matches the papers_delete policy). */}
               {(isMod || (isOwner && paper.status !== 'approved')) && (
-                <button type="button" className="btn btn-danger btn-sm" onClick={handleDelete} style={{ gap: 6 }}>
+                <button type="button" className="btn btn-danger btn-sm" onClick={handleDelete}>
                   <Trash2 size={13} /> Delete Paper
                 </button>
               )}
 
               {isMod && paper.status !== 'approved' && (
-                <button type="button" className="btn-approve" onClick={handleApprove} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <button type="button" className="btn-approve" onClick={handleApprove}>
                   <Check size={13} /> Approve
                 </button>
               )}
               {isMod && paper.status !== 'rejected' && !showReject && (
-                <button type="button" className="btn-reject" onClick={() => setShowReject(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+                <button type="button" className="btn-reject" onClick={() => setShowReject(true)}>
                   <X size={13} /> Reject
                 </button>
               )}
