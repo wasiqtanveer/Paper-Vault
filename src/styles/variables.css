@@ -15,6 +15,7 @@
   --text-secondary: #a8a8a8;
   --text-muted:     #868686;  /* ≥4.5:1 on card + elevated surfaces */
   --focus-ring:     rgba(79,142,247,0.38);
+  --text-on-accent: #ffffff;  /* text on filled accent/primary buttons */
 
   --accent-blue:   #4f8ef7;
   --accent-blue-h: #6fa5ff;
@@ -66,6 +67,7 @@
   --text-secondary: #444444;
   --text-muted:     #6b6b6b;  /* ≥4.5:1 on white + elevated surfaces */
   --focus-ring:     rgba(59,125,224,0.32);
+  --text-on-accent: #ffffff;
 
   --accent-blue:   #2169d3;
   --accent-blue-h: #2567c8;

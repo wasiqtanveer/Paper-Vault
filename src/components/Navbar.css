@@ -56,7 +56,7 @@
 
 .btn-nav-accent {
   background: var(--accent) !important;
-  color: #fff !important;
+  color: var(--text-on-accent) !important;
   padding: 0.35rem 0.9rem !important;
   border-radius: var(--radius-sm) !important;
 }
@@ -70,7 +70,7 @@
   height: 32px;
   border-radius: 50%;
   background: var(--accent);
-  color: #fff;
+  color: var(--text-on-accent);
   font-size: 0.8rem;
   font-weight: 700;
   display: flex;
