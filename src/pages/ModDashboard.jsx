@@ -1,3 +1,4 @@
+import { DATE_SHORT, formatDate } from '../lib/formatDate';
 import { SkeletonBlock, SkeletonLine } from '../components/Skeleton';
 import { getSubjects, getTeachers } from '../lib/lookups';
 import { paperAlt } from '../lib/paperTitle';
@@ -174,7 +175,7 @@ export default function ModDashboard() {
           ) : (
             <div className="mod-grid">
               {pending.map(p => {
-                const date = new Date(p.uploaded_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const date = formatDate(p.uploaded_at, DATE_SHORT);
                 return (
                   <div key={p.id} className="mod-paper-card">
                     {p.image_url && (
@@ -251,7 +252,7 @@ export default function ModDashboard() {
                             <td className="report-reason">{r.reason}</td>
                             <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>{r.profiles?.full_name ?? '—'}</td>
                             <td style={{ color: 'var(--text-muted)', fontSize: 12, whiteSpace: 'nowrap' }}>
-                              {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              {formatDate(r.created_at, DATE_SHORT)}
                             </td>
                             <td>
                               <button type="button" className="btn btn-ghost btn-sm" onClick={() => resolveReport(r.id)}>Resolve</button>
@@ -280,7 +281,7 @@ export default function ModDashboard() {
                             <td className="report-reason">{r.reason}</td>
                             <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>{r.profiles?.full_name ?? '—'}</td>
                             <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>
-                              {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              {formatDate(r.created_at, DATE_SHORT)}
                             </td>
                           </tr>
                         ))}

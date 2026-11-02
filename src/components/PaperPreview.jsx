@@ -1,3 +1,4 @@
+import { DATE_LONG, formatDate } from '../lib/formatDate';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { m, useMotionValue, useSpring } from 'framer-motion';
@@ -92,7 +93,7 @@ export default function PaperPreview({ paper, origin }) {
   const teacher  = paper.teachers?.name ?? paper.teacher_name ?? null;
   const uploader = paper.profiles?.full_name ?? paper.uploader_name ?? null;
   const date     = paper.uploaded_at
-    ? new Date(paper.uploaded_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    ? formatDate(paper.uploaded_at, DATE_LONG)
     : null;
 
   const terms = [paper.year, paper.semester, paper.exam_type].filter(Boolean).join(' · ');

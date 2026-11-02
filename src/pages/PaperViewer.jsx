@@ -1,3 +1,4 @@
+import { DATE_LONG, formatDate } from '../lib/formatDate';
 import { getSubjects, getTeachers } from '../lib/lookups';
 import { paperAlt } from '../lib/paperTitle';
 import { useState } from 'react';
@@ -222,9 +223,7 @@ export default function PaperViewer() {
   // Staff can edit any paper (RLS allows it); gate on role, not an email address.
   const canEdit    = isOwner || isMod;
 
-  const uploadedAt = new Date(paper.uploaded_at).toLocaleDateString('en-US', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
+  const uploadedAt = formatDate(paper.uploaded_at, DATE_LONG);
 
   return (
     // Fades in over the outgoing skeleton instead of hard-cutting. The early
