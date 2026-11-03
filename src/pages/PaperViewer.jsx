@@ -24,7 +24,7 @@ import './PaperViewer.css';
 
 export default function PaperViewer() {
   const { id } = useParams();
-  const { user, profile } = useAuth();
+  const { user, profile, isStaff: isMod } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
 
@@ -218,7 +218,6 @@ export default function PaperViewer() {
     </div>
   );
 
-  const isMod      = profile?.role === 'moderator' || profile?.role === 'admin';
   const isOwner    = !!user && paper.uploader_id === user.id;
   // Staff can edit any paper (RLS allows it); gate on role, not an email address.
   const canEdit    = isOwner || isMod;

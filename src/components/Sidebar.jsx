@@ -44,8 +44,7 @@ function SidebarContent({ collapsed, onNav, onSignOut, dropOpen, setDropOpen, dr
   const initials = profile?.full_name
     ? profile.full_name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
     : '?';
-  const isMod   = profile?.role === 'moderator' || profile?.role === 'admin';
-  const isAdmin = profile?.role === 'admin';
+  const { isStaff: isMod, isAdmin } = useAuth();
   const { enabled: soundEnabled, toggle: toggleSound } = useSound();
 
   return (
