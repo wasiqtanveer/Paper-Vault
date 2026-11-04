@@ -42,29 +42,30 @@ export function AuthProvider({ children }) {
     // Past this point the app renders; the profile fills in whenever it lands.
     const safety = setTimeout(finish, 6000);
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // One path for every case. onAuthStateChange delivers the stored session as
+    // an INITIAL_SESSION event on subscribe, then sign-in, sign-out and account
+    // switches, so no separate getSession() call is needed.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      lastUserId.current = session?.user?.id ?? null;
-      if (session?.user) fetchProfile(session.user.id).finally(() => setProfileReady(true));
-      else setProfileReady(true);
-      finish();
-    }).catch(finish);
+      const id = session?.user?.id ?? null;
+      const switched = id !== lastUserId.current;
+      lastUserId.current = id;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+      if (!id) {
+        setProfile(null);
+        setProfileReady(true);
+        finish();
+        return;
+      }
+      // A different account's role isn't known until its profile loads.
+      if (switched) setProfileReady(false);
+      finish(); // the session is known; the profile fills in when it lands
       // Deferred: calling back into supabase synchronously inside this callback
       // can deadlock against the auth lock the client is holding.
-      if (session?.user) setTimeout(() => fetchProfile(session.user.id), 0);
-      else { setProfile(null); setProfileReady(true); }
-      // A different account signed in: its role isn't known until its profile loads.
-      const id = session?.user?.id ?? null;
-      if (id && id !== lastUserId.current) {
-        setProfileReady(false);
+      if (switched || event === 'USER_UPDATED') {
         setTimeout(() => fetchProfile(id).finally(() => setProfileReady(true)), 0);
       }
-      lastUserId.current = id;
     });
 
     return () => { clearTimeout(safety); subscription.unsubscribe(); };
