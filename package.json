@@ -30,7 +30,8 @@
     "prepare": "git config core.hooksPath .githooks || true",
     "test:coverage": "vitest run --coverage",
     "typecheck": "npx -p typescript tsc -p tsconfig.json",
-    "db:verify": "bash scripts/db-verify.sh"
+    "db:verify": "bash scripts/db-verify.sh",
+    "db:rls": "bash scripts/rls-regression.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",
