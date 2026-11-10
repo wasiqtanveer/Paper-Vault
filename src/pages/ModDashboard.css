@@ -202,3 +202,14 @@
 /* Resolved reports recede through tone, not opacity, so the text stays readable. */
 .report-resolved td { color: var(--text-muted); }
 .report-resolved td:first-child { text-decoration: line-through; text-decoration-color: var(--border-focus); }
+
+.mod-report-filter {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.mod-report-filter .btn.active {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border-color: var(--border-focus);
+}

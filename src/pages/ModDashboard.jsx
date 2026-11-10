@@ -40,6 +40,10 @@ export default function ModDashboard() {
   const [tab,     setTab]     = useState('pending');
   const [pending, setPending] = useState([]);
   const [reports, setReports] = useState([]);
+  // Open-report count for the nav badge, fetched up front: reports only load when
+  // the tab is opened, so the badge would otherwise stay empty until then.
+  const [openCount, setOpenCount] = useState(0);
+  const [reportFilter, setReportFilter] = useState('open'); // 'open' | 'resolved' | 'all'
   // Loading is derived: the tab whose data last arrived vs. the tab being shown.
   const [loadedTab, setLoadedTab] = useState(null);
   const loading = loadedTab !== tab;
@@ -50,6 +54,13 @@ export default function ModDashboard() {
   const [rejectBusy,   setRejectBusy]   = useState(false);
 
   const isSiteOwner = user?.email === OWNER_EMAIL;
+
+  useEffect(() => {
+    let alive = true;
+    supabase.from('reports').select('id', { count: 'exact', head: true }).eq('resolved', false)
+      .then(({ count }) => { if (alive) setOpenCount(count ?? 0); });
+    return () => { alive = false; };
+  }, []);
 
   useEffect(() => {
     let alive = true; // a fast tab switch must not let the slower response win
@@ -92,6 +103,7 @@ export default function ModDashboard() {
       .eq('id', reportId);
     if (error) { addToast(error.message, 'error'); return; }
     setReports(prev => prev.map(r => r.id === reportId ? { ...r, resolved: true } : r));
+    setOpenCount(n => Math.max(0, n - 1));
     addToast('Report marked as resolved.', 'success');
   }
 
@@ -161,7 +173,7 @@ export default function ModDashboard() {
           </button>
           <button type="button" className={`tab-btn${tab === 'reported' ? ' active' : ''}`} onClick={() => setTab('reported')}>
             Reports
-            {tab !== 'reported' && openReports.length > 0 && <span className="tab-badge tab-badge-warn">{openReports.length}</span>}
+            {openCount > 0 && <span className="tab-badge tab-badge-warn" aria-label={`${openCount} open`}>{openCount}</span>}
           </button>
         </div>
 
@@ -224,7 +236,23 @@ export default function ModDashboard() {
             <div className="empty-state">No reports yet.</div>
           ) : (
             <div className="reports-table-wrap">
-              {openReports.length > 0 && (
+              <div className="mod-report-filter" role="group" aria-label="Filter reports">
+                {[['open', 'Open'], ['resolved', 'Resolved'], ['all', 'All']].map(([value, label]) => (
+                  <button
+                    key={value} type="button"
+                    className={`btn btn-ghost btn-sm${reportFilter === value ? ' active' : ''}`}
+                    aria-pressed={reportFilter === value}
+                    onClick={() => setReportFilter(value)}
+                  >{label}</button>
+                ))}
+              </div>
+              {reportFilter === 'resolved' && closedReports.length === 0 && (
+                <div className="empty-state">No resolved reports.</div>
+              )}
+              {reportFilter !== 'resolved' && openReports.length === 0 && (
+                <div className="empty-state">No open reports.</div>
+              )}
+              {reportFilter !== 'resolved' && openReports.length > 0 && (
                 <>
                   <div className="reports-section-label">
                     <Flag size={12} /> Open · {openReports.length}
@@ -264,7 +292,7 @@ export default function ModDashboard() {
                   </div>
                 </>
               )}
-              {closedReports.length > 0 && (
+              {reportFilter !== 'open' && closedReports.length > 0 && (
                 <>
                   <div className="reports-section-label reports-section-label-closed">
                     <Check size={12} /> Resolved · {closedReports.length}
