@@ -13,7 +13,8 @@ import { TERMS, EXAM_TYPES } from '../lib/paperOptions';
 import { invalidatePapers } from '../lib/cache';
 import { teacherLabel } from '../lib/teacherName';
 import { buildTitle } from '../lib/paperTitle';
-import { useState, useEffect } from 'react';
+import { confirmDialog } from '../lib/confirmDialog';
+import { useState, useEffect, useRef } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -46,12 +47,33 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
     }, subjects, teachers));
   const shownTitle = titleManual ? form.title : buildTitle(form, subjects, teachers) || form.title;
 
+  // Closing with unsaved edits asks first, so a stray backdrop click or Escape
+  // can't throw away a long title edit.
+  const [initial] = useState(() => JSON.stringify(form));
+  const confirming = useRef(false);
+  const dirty = JSON.stringify(form) !== initial || (titleManual && form.title !== paper.title);
+
+  async function requestClose() {
+    if (confirming.current) return;
+    if (dirty) {
+      confirming.current = true;
+      const discard = await confirmDialog({
+        title: 'Discard your changes?',
+        body: 'You have unsaved edits to this paper. They will be lost.',
+        confirmLabel: 'Discard',
+      });
+      confirming.current = false;
+      if (!discard) return;
+    }
+    onClose();
+  }
+
   // Close on Escape
   useEffect(() => {
-    function onKey(e) { if (e.key === 'Escape') onClose(); }
+    function onKey(e) { if (e.key === 'Escape') requestClose(); }
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  });
 
   function setField(key) { return v => setForm(f => ({ ...f, [key]: v })); }
 
@@ -89,7 +111,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.18 }}
-        onClick={onClose}
+        onClick={requestClose}
       >
         <m.div
           ref={panelRef}
@@ -105,7 +127,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
         >
           <div className="epm-header">
             <span className="epm-title" id="epm-title">Edit Paper</span>
-            <button className="epm-close" onClick={onClose} type="button" aria-label="Close"><X size={16} aria-hidden="true" /></button>
+            <button className="epm-close" onClick={requestClose} type="button" aria-label="Close"><X size={16} aria-hidden="true" /></button>
           </div>
 
           <form className="epm-body" onSubmit={handleSave}>
@@ -188,7 +210,7 @@ export default function EditPaperModal({ paper, subjects, teachers, onSave, onCl
             </div>
 
             <div className="epm-footer">
-              <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
+              <button type="button" className="btn btn-ghost" onClick={requestClose}>Cancel</button>
               <button type="submit" className="btn btn-primary" disabled={saving}>
                 {saving ? 'Saving…' : 'Save Changes'}
               </button>
