@@ -1,3 +1,4 @@
+import { reportWarning } from './logger';
 import { supabase } from './supabase';
 
 const EXT_BY_MIME = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
@@ -59,5 +60,5 @@ export async function deleteImage(imageUrl, imagePath) {
     path = imageUrl.slice(idx + marker.length);
   }
   const { error } = await supabase.storage.from('papers').remove([path]);
-  if (error) console.warn('[storage] could not delete image:', path, error.message);
+  if (error) reportWarning('[storage] could not delete image:', path, error.message);
 }

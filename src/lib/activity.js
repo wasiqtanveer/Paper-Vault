@@ -1,3 +1,4 @@
+import { reportWarning } from './logger';
 import { supabase } from './supabase';
 
 /**
@@ -21,7 +22,7 @@ export async function logActivity({ action, user, profile, fallbackRole, paperId
     paper_title: paperTitle,
   });
   if (error) {
-    console.warn(`[activity_log] could not record "${action}":`, error.message);
+    reportWarning(`[activity_log] could not record "${action}":`, error.message);
     return false;
   }
   return true;

@@ -1,3 +1,4 @@
+import { reportError } from './logger';
 /**
  * Run a Supabase query, surfacing any error and returning a safe fallback.
  *
@@ -21,7 +22,7 @@ export async function safeQuery(builder, { fallback = null, onError, label, thro
       const msg = label ? `Failed to load ${label}: ${error.message}` : error.message;
       if (throwOnError) throw new Error(msg);
       if (onError) onError(msg);
-      else console.error(msg);
+      else reportError(msg);
       return fallback;
     }
     return data ?? fallback;
@@ -29,7 +30,7 @@ export async function safeQuery(builder, { fallback = null, onError, label, thro
     if (throwOnError) throw err;
     const msg = label ? `Failed to load ${label}.` : 'Something went wrong.';
     if (onError) onError(msg);
-    else console.error(msg, err);
+    else reportError(msg, err);
     return fallback;
   }
 }

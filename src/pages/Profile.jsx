@@ -1,3 +1,4 @@
+import { reportWarning } from '../lib/logger';
 import { DATE_SHORT_YEAR, MONTH_YEAR, formatDate } from '../lib/formatDate';
 import { fadeUp as baseFadeUp } from '../lib/motion';
 import { useEffect, useState } from 'react';
@@ -122,7 +123,7 @@ export default function Profile() {
     if (error) { addToast(error.message, 'error'); return; }
     // RLS filters a forbidden delete to zero rows without raising an error.
     if (!removed?.length) { addToast('Could not delete this paper. You may not have permission.', 'error'); return; }
-    deleteImage(paper.image_url, paper.image_path).catch(err => console.warn('[storage] image cleanup failed:', err));
+    deleteImage(paper.image_url, paper.image_path).catch(err => reportWarning('[storage] image cleanup failed:', err));
     invalidatePapers();
     logActivity({ action: 'delete', user, profile, fallbackRole: 'student', paperId: paper.id, paperTitle: paper.title });
     setPapers(prev => prev.filter(p => p.id !== paper.id));
