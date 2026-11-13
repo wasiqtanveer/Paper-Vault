@@ -1,3 +1,4 @@
+import { PAPER_MOD_SELECT } from '../lib/paperColumns';
 import { DATE_SHORT, formatDate } from '../lib/formatDate';
 import { SkeletonBlock, SkeletonLine } from '../components/Skeleton';
 import { getSubjects, getTeachers } from '../lib/lookups';
@@ -67,7 +68,7 @@ export default function ModDashboard() {
     const query = tab === 'pending'
       ? supabase
           .from('papers')
-          .select('*, subjects(name), profiles!papers_uploader_id_fkey(full_name)')
+          .select(PAPER_MOD_SELECT)
           .eq('status', 'pending')
           .order('uploaded_at', { ascending: false })
           .limit(100)
