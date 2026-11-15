@@ -1,4 +1,8 @@
 import { useEffect, useState } from 'react';
+import { invalidatePapers } from '../lib/cache';
+import { logActivity } from '../lib/activity';
+import { confirmDialog } from '../components/ConfirmDialog';
+import { cachedSafeQuery } from '../lib/cache';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Flag, Trash2, Check, X, ArrowLeft, Download, Pencil } from 'lucide-react';
@@ -40,28 +44,29 @@ export default function PaperViewer() {
   usePageMeta(paper?.title ?? 'Paper', paper?.title ? `View and download "${paper.title}" on PaperVault.` : undefined);
 
   useEffect(() => {
-    supabase
+    let alive = true;
+    setLoading(true);
+    setError('');
+    Promise.resolve(supabase
       .from('papers')
-      .select('*, subjects(name), profiles!papers_uploader_id_fkey(full_name, id)')
+      .select('*, subjects(name), teachers(name), profiles!papers_uploader_id_fkey(full_name, id)')
       .eq('id', id)
-      .single()
+      .single())
       .then(({ data, error: err }) => {
+        if (!alive) return;
         if (err || !data) setError('Paper not found.');
         else setPaper(data);
-        setLoading(false);
-      });
+      })
+      .catch(() => { if (alive) setError('Could not load this paper. Check your connection and try again.'); })
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
   }, [id]);
 
   // Load subjects/teachers when modal is about to open
   useEffect(() => {
     if (!showEdit) return;
-    Promise.all([
-      supabase.from('subjects').select('id, name').order('name'),
-      supabase.from('teachers').select('id, name').order('name'),
-    ]).then(([{ data: s }, { data: t }]) => {
-      setSubjects(s ?? []);
-      setTeachers(t ?? []);
-    });
+    cachedSafeQuery('lookup:subjects', () => supabase.from('subjects').select('id, name').order('name'), { fallback: [], ttl: 300_000 }).then(setSubjects);
+    cachedSafeQuery('lookup:teachers', () => supabase.from('teachers').select('id, name, department').order('name'), { fallback: [], ttl: 300_000 }).then(setTeachers);
   }, [showEdit]);
 
   async function handleDownload() {
@@ -79,7 +84,10 @@ export default function PaperViewer() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch {
-      addToast('Download failed. Try right-clicking the image.', 'error');
+      // iOS Safari and some in-app browsers block blob downloads: open the
+      // original instead, where long-press → Save Image works.
+      window.open(paper.image_url, '_blank', 'noopener');
+      addToast('Opened the full image in a new tab. Save it from there.', 'info');
     }
     setDownloading(false);
   }
@@ -108,16 +116,19 @@ export default function PaperViewer() {
   }
 
   async function handleDelete() {
-    if (!window.confirm('Delete this paper permanently?')) return;
-    try { await deleteImage(paper.image_url); } catch (_) {}
+    const ok = await confirmDialog({
+      title: 'Delete this paper?',
+      body: `"${paper.title}" and its image will be removed for everyone. This can't be undone.`,
+      confirmLabel: 'Delete paper',
+    });
+    if (!ok) return;
+    // Row first: if it fails nothing is lost. Deleting the image first could
+    // leave a live paper pointing at a missing file.
     const { error: err } = await supabase.from('papers').delete().eq('id', id);
     if (err) { addToast(err.message, 'error'); return; }
-    await supabase.from('activity_log').insert({
-      action: 'delete', actor_id: user.id,
-      actor_name: profile?.full_name ?? user.email,
-      actor_role: profile?.role ?? 'student',
-      paper_id: id, paper_title: paper?.title,
-    });
+    deleteImage(paper.image_url).catch(() => {});
+    invalidatePapers();
+    await logActivity({ action: 'delete', user, profile, fallbackRole: 'student', paperId: id, paperTitle: paper?.title });
     addToast('Paper deleted.', 'success');
     navigate('/profile');
   }
@@ -209,6 +220,18 @@ export default function PaperViewer() {
               <span className="meta-label">Subject</span>
               <span className="meta-value">{paper.subjects?.name ?? '—'}</span>
             </div>
+            {paper.teachers?.name && (
+              <div className="meta-row">
+                <span className="meta-label">Teacher</span>
+                <span className="meta-value">{paper.teachers.name}</span>
+              </div>
+            )}
+            {paper.exam_type && (
+              <div className="meta-row">
+                <span className="meta-label">Exam</span>
+                <span className="meta-value">{paper.exam_type}</span>
+              </div>
+            )}
             <div className="meta-row">
               <span className="meta-label">Year</span>
               <span className="meta-value">{paper.year}</span>

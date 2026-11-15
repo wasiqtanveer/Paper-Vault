@@ -5,7 +5,7 @@ import { Search } from 'lucide-react';
 import { CONTENT_SWAP } from '../lib/motion';
 import { supabase } from '../lib/supabase';
 import { safeQuery } from '../lib/query';
-import { cachedQuery } from '../lib/cache';
+import { cachedSafeQuery, peek } from '../lib/cache';
 import { usePageMeta } from '../lib/usePageMeta';
 import { useToast } from '../context/ToastContext';
 import './Browse.css';
@@ -16,11 +16,12 @@ import { SkeletonCardGrid } from '../components/Skeleton';
 const PAGE_SIZE = 20;
 
 export default function Browse() {
-  const [searchParams] = useSearchParams();
+  // Every filter is mirrored in the URL, so Back, refresh and shared links keep them.
+  const [searchParams, setSearchParams] = useSearchParams();
   const initialQ = searchParams.get('q') || '';
 
   const [papers,   setPapers]   = useState([]);
-  const [subjects, setSubjects] = useState([]);
+  const [subjects, setSubjects] = useState(peek('browse:subjects') ?? []);
   const [years,    setYears]    = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [hasMore,  setHasMore]  = useState(false);
@@ -36,7 +37,13 @@ export default function Browse() {
   // requests, and without this a slow earlier one can overwrite a fast later one.
   const requestId = useRef(0);
 
-  const [filters, setFilters] = useState({ q: initialQ, subject: '', year: '', semester: '' });
+  const [filters, setFilters] = useState({
+    q:        initialQ,
+    subject:  searchParams.get('subject')  || '',
+    year:     searchParams.get('year')     || '',
+    semester: searchParams.get('semester') || '',
+    type:     searchParams.get('type')     || '',
+  });
   const [debouncedQ, setDebouncedQ] = useState(initialQ);
   const { addToast } = useToast();
   usePageMeta('Browse Papers', 'Search and filter the full library of approved past exam papers by subject, year, and semester.');
@@ -49,14 +56,12 @@ export default function Browse() {
 
   useEffect(() => {
     const onError = msg => addToast(msg, 'error');
-    // Lookups are read-mostly — cache them so they don't refetch on every visit.
-    cachedQuery('browse:subjects', () =>
-      safeQuery(supabase.from('subjects').select('id, name').order('name'), { fallback: [], onError, label: 'subjects' }),
-    ).then(setSubjects);
-    cachedQuery('browse:years', () =>
-      safeQuery(supabase.from('papers').select('year').eq('status', 'approved'), { fallback: [], onError, label: 'years' })
-        .then(data => [...new Set(data.map(p => p.year))].sort((a, b) => b - a)),
-    ).then(setYears);
+    // Lookups are read-mostly — cached, but a failed request is never stored.
+    cachedSafeQuery('browse:subjects', () => supabase.from('subjects').select('id, name').order('name'),
+      { fallback: [], onError, label: 'subjects', ttl: 300_000 }).then(setSubjects);
+    cachedSafeQuery('browse:years', () => supabase.from('papers').select('year').eq('status', 'approved'),
+      { fallback: [], onError, label: 'years', ttl: 300_000 })
+      .then(data => setYears([...new Set(data.map(p => p.year))].sort((a, b) => b - a)));
   }, [addToast]);
 
   const fetchPapers = useCallback(async (currentFilters, currentOffset, append = false) => {
@@ -66,7 +71,7 @@ export default function Browse() {
 
     let q = supabase
       .from('papers')
-      .select('*, subjects(name), profiles!papers_uploader_id_fkey(full_name)')
+      .select('*, subjects(name), teachers(name), profiles!papers_uploader_id_fkey(full_name)')
       .eq('status', 'approved')
       .order('uploaded_at', { ascending: false })
       .range(currentOffset, currentOffset + PAGE_SIZE - 1);
@@ -75,6 +80,7 @@ export default function Browse() {
     if (currentFilters.subject)  q = q.eq('subject_id', currentFilters.subject);
     if (currentFilters.year)     q = q.eq('year', Number(currentFilters.year));
     if (currentFilters.semester) q = q.eq('semester', currentFilters.semester);
+    if (currentFilters.type)     q = q.eq('exam_type', currentFilters.type);
 
     const results = await safeQuery(q, { fallback: [], onError: msg => addToast(msg, 'error'), label: 'papers' });
 
@@ -93,7 +99,20 @@ export default function Browse() {
     setOffset(0);
     fetchPapers(effectiveFilters, 0, false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQ, filters.subject, filters.year, filters.semester, fetchPapers]);
+  }, [debouncedQ, filters.subject, filters.year, filters.semester, filters.type, fetchPapers]);
+
+  useEffect(() => {
+    const next = {};
+    if (debouncedQ)       next.q        = debouncedQ;
+    if (filters.subject)  next.subject  = filters.subject;
+    if (filters.year)     next.year     = String(filters.year);
+    if (filters.semester) next.semester = filters.semester;
+    if (filters.type)     next.type     = filters.type;
+    setSearchParams(next, { replace: true });
+  }, [debouncedQ, filters.subject, filters.year, filters.semester, filters.type, setSearchParams]);
+
+  const hasFilters = !!(filters.q || filters.subject || filters.year || filters.semester || filters.type);
+  function clearFilters() { setFilters({ q: '', subject: '', year: '', semester: '', type: '' }); }
 
   function set(key) { return e => setFilters(f => ({ ...f, [key]: e.target.value })); }
 
@@ -122,6 +141,7 @@ export default function Browse() {
                 value={filters.q}
                 onChange={set('q')}
                 placeholder="Search by title…"
+                aria-label="Search papers by title"
               />
             </div>
           </div>
@@ -132,18 +152,22 @@ export default function Browse() {
               value={filters.subject}
               onChange={v => setFilters(f => ({ ...f, subject: v }))}
               placeholder="All Subjects"
+              ariaLabel="Filter by subject"
+              searchable
               options={[{ value: '', label: 'All Subjects' }, ...subjects.map(s => ({ value: s.id, label: s.name }))]}
             />
             <CustomSelect
               value={filters.year}
               onChange={v => setFilters(f => ({ ...f, year: v }))}
               placeholder="All Years"
+              ariaLabel="Filter by year"
               options={[{ value: '', label: 'All Years' }, ...years.map(y => ({ value: y, label: String(y) }))]}
             />
             <CustomSelect
               value={filters.semester}
               onChange={v => setFilters(f => ({ ...f, semester: v }))}
               placeholder="All Semesters"
+              ariaLabel="Filter by semester"
               options={[
                 { value: '', label: 'All Semesters' },
                 { value: 'Spring', label: 'Spring' },
@@ -151,6 +175,20 @@ export default function Browse() {
                 { value: 'Fall',   label: 'Fall'   },
               ]}
             />
+            <CustomSelect
+              value={filters.type}
+              onChange={v => setFilters(f => ({ ...f, type: v }))}
+              placeholder="Mid & Final"
+              ariaLabel="Filter by exam type"
+              options={[
+                { value: '',      label: 'Mid & Final' },
+                { value: 'Mid',   label: 'Mid only'    },
+                { value: 'Final', label: 'Final only'  },
+              ]}
+            />
+            {hasFilters && (
+              <button type="button" className="btn btn-ghost btn-sm filters-clear" onClick={clearFilters}>Clear</button>
+            )}
           </div>
         </div>
 
@@ -169,7 +207,7 @@ export default function Browse() {
             ) : (
               // Keyed on the token so appending via Load More extends the existing
               // grid in place instead of remounting everything.
-              <motion.div key={`grid-${resultsToken}`} {...CONTENT_SWAP}>
+              <motion.div key={`grid-${resultsToken}`} {...CONTENT_SWAP} initial={{ opacity: 1 }}>
                 <div className="papers-grid papers-grid-inner">
                   {papers.map((p, i) => <PaperCard key={p.id} paper={p} index={i} />)}
                 </div>

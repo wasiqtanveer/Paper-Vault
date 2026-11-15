@@ -45,7 +45,9 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   cursor: pointer;
-  transition: var(--transition);
+  /* Named properties only: `all` also animates layout-affecting values and
+     forces extra style work on every card in a grid during hover. */
+  transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, box-shadow var(--dur-std) var(--ease-out);
   position: relative;
   height: 100%;
 }
@@ -77,6 +79,14 @@
   object-fit: cover;
   background: var(--bg-elevated);
   display: block;
+  /* Fade the photo in over the placeholder tone once it has decoded, instead
+     of popping in row by row as the network delivers it. */
+  opacity: 0;
+  transition: opacity 0.28s var(--ease-out);
+}
+.paper-card-image.is-loaded { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .paper-card-image { transition: none; }
 }
 
 .paper-card-image-placeholder {
@@ -102,14 +112,19 @@
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 3px;
-  white-space: nowrap;
+  line-height: 1.35;
+  /* Two lines: the structured title puts Year, Term and Type at the end,
+     which a one-line ellipsis always cut off. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 .paper-card-meta {
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   margin-bottom: 10px;
   flex: 1;
   /* Prevent very long meta strings from overflowing */
@@ -154,4 +169,21 @@
   max-width: 50%;
   text-align: right;
   flex-shrink: 1;
+}
+
+.paper-card-teacher {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Date + exam type share the existing footer chip, side by side. */
+.paper-card-chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }

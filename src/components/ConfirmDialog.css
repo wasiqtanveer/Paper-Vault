@@ -1,0 +1,33 @@
+.cfd-panel { max-width: 420px; }
+.cfd-body {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 20px 20px 4px;
+}
+.cfd-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--status-rejected);
+  background: var(--status-rejected-bg);
+}
+.cfd-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+  margin-top: 6px;
+}
+.cfd-text {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+.cfd-footer { padding: 16px 20px 18px; }

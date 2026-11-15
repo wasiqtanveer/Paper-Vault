@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { invalidatePapers } from '../lib/cache';
 import { motion } from 'framer-motion';
+import { FileImage, CheckCircle2, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { uploadImage } from '../lib/storage';
 import { validateImageSize, compressImage, formatBytes } from '../lib/imageUtils';
@@ -7,6 +9,10 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import CustomSelect from '../components/CustomSelect';
 import NumberField from '../components/NumberField';
+import RequestModal from '../components/RequestModal';
+import { Link } from 'react-router-dom';
+import { logActivity } from '../lib/activity';
+import { teacherLabel } from '../lib/teacherName';
 import './Upload.css';
 
 const TERMS      = ['Spring', 'Summer', 'Fall'];
@@ -40,11 +46,12 @@ export default function Upload() {
   const [loading,      setLoading]      = useState(false);
   const [success,      setSuccess]      = useState(false);
   const [dragOver,     setDragOver]     = useState(false);
+  const [requestKind,  setRequestKind]  = useState(null); // 'subject' | 'teacher' | null
 
   useEffect(() => {
     Promise.all([
       supabase.from('subjects').select('id, name').order('name'),
-      supabase.from('teachers').select('id, name').order('name'),
+      supabase.from('teachers').select('id, name, department').order('name'),
     ]).then(([{ data: s }, { data: t }]) => {
       setSubjects(s ?? []);
       setTeachers(t ?? []);
@@ -104,14 +111,10 @@ export default function Upload() {
         status: 'pending',
       }).select().single();
       if (dbErr) throw dbErr;
+      invalidatePapers();
 
       // Log activity
-      await supabase.from('activity_log').insert({
-        action: 'upload', actor_id: user.id,
-        actor_name: profile?.full_name ?? user.email,
-        actor_role: profile?.role ?? 'student',
-        paper_id: paper.id, paper_title: paper.title,
-      });
+      await logActivity({ action: 'upload', user, profile, fallbackRole: 'student', paperId: paper.id, paperTitle: paper.title });
 
       setSuccess(true);
       setForm({ subjectId: '', teacherId: '', year: new Date().getFullYear(), term: '', examType: '', title: '' });
@@ -134,12 +137,16 @@ export default function Upload() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.28 }}
         >
-          <div className="upload-success-icon">✓</div>
-          <div className="form-title">Submitted!</div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 13, margin: '8px 0 24px' }}>
-            Your paper is pending review by a moderator.
+          <CheckCircle2 size={40} strokeWidth={1.5} className="upload-success-icon" aria-hidden="true" />
+          <div className="form-title">Thanks, it&apos;s in the queue</div>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 13, margin: '8px 0 24px', lineHeight: 1.5 }}>
+            A moderator will review your paper. Once approved it appears in Browse for everyone.
+            You can track it on your profile.
           </p>
-          <button className="btn btn-primary btn-lg" onClick={() => setSuccess(false)}>Upload Another</button>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button className="btn btn-primary btn-lg" onClick={() => setSuccess(false)}>Upload another</button>
+            <Link to="/profile" className="btn btn-ghost btn-lg">View my papers</Link>
+          </div>
         </motion.div>
       </div>
     </div>
@@ -163,24 +170,38 @@ export default function Upload() {
           <form onSubmit={handleSubmit}>
             <div className="upload-two-col">
               <div className="form-group">
-                <label className="form-label">Subject</label>
+                <label className="form-label" htmlFor="up-subject">Subject <span className="req" aria-hidden="true">*</span></label>
                 <CustomSelect
+                  id="up-subject"
                   value={form.subjectId}
                   onChange={setField('subjectId')}
                   placeholder="Select subject…"
                   options={subjects.map(s => ({ value: s.id, label: s.name }))}
                   searchable
                 />
+                <p className="field-request">
+                  Not listed?
+                  <button type="button" className="field-request-btn" onClick={() => setRequestKind('subject')}>
+                    <Plus size={12} strokeWidth={2.4} aria-hidden="true" /> Request a subject
+                  </button>
+                </p>
               </div>
               <div className="form-group">
-                <label className="form-label">Teacher</label>
+                <label className="form-label" htmlFor="up-teacher">Teacher</label>
                 <CustomSelect
+                  id="up-teacher"
                   value={form.teacherId}
                   onChange={setField('teacherId')}
                   placeholder="Select teacher…"
-                  options={[{ value: '', label: 'Unknown / N/A' }, ...teachers.map(t => ({ value: t.id, label: t.name }))]}
+                  options={[{ value: '', label: 'Unknown / N/A' }, ...teachers.map(t => ({ value: t.id, label: teacherLabel(t) }))]}
                   searchable
                 />
+                <p className="field-request">
+                  Not listed?
+                  <button type="button" className="field-request-btn" onClick={() => setRequestKind('teacher')}>
+                    <Plus size={12} strokeWidth={2.4} aria-hidden="true" /> Request a teacher
+                  </button>
+                </p>
               </div>
             </div>
 
@@ -239,19 +260,21 @@ export default function Upload() {
 
             <div className="form-group">
               <label className="form-label">Paper Image</label>
-              <div
+              {/* A <label> wrapping a visually-hidden input: click, tap, Enter and
+                  Space all open the picker, and screen readers announce it. */}
+              <label
+                htmlFor="paper-file"
                 className={`upload-zone${dragOver ? ' drag-over' : ''}`}
                 onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
               >
-                <div className="upload-zone-icon">📄</div>
-                <div className="upload-zone-text">{file ? file.name : 'Click or drag an image here'}</div>
+                <FileImage size={28} strokeWidth={1.4} className="upload-zone-icon" aria-hidden="true" />
+                <div className="upload-zone-text">{file ? file.name : 'Choose or drag an image here'}</div>
                 <div className="upload-zone-sub">JPEG, PNG, WEBP · Max 5MB</div>
-                <input ref={fileInputRef} type="file" accept="image/*"
-                  onChange={e => processFile(e.target.files[0])} style={{ display: 'none' }} />
-              </div>
+                <input id="paper-file" ref={fileInputRef} type="file" accept="image/*" className="sr-only"
+                  onChange={e => processFile(e.target.files[0])} />
+              </label>
               {fileError && <div className="form-error">{fileError}</div>}
               {compressing && <div className="form-hint">Compressing image…</div>}
               {compressed && !compressing && (
@@ -265,6 +288,9 @@ export default function Upload() {
               )}
             </div>
 
+            {/* Repeat the error beside the button: on a long form the top of the
+                page is off-screen when Submit is pressed. */}
+            {error && <div className="inline-error" role="alert" style={{ marginBottom: 10 }}>{error}</div>}
             <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }}
               disabled={loading || compressing}>
               {loading ? 'Uploading…' : 'Submit Paper'}
@@ -272,6 +298,13 @@ export default function Upload() {
           </form>
         </motion.div>
       </div>
+      {requestKind && (
+        <RequestModal
+          kind={requestKind}
+          existing={requestKind === 'subject' ? subjects : teachers}
+          onClose={() => setRequestKind(null)}
+        />
+      )}
     </div>
   );
 }

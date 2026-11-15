@@ -12,8 +12,9 @@
   --border-focus:  #3a3a3a;
 
   --text-primary:   #f0f0f0;
-  --text-secondary: #888888;
-  --text-muted:     #4a4a4a;
+  --text-secondary: #a8a8a8;
+  --text-muted:     #868686;  /* ≥4.5:1 on card + elevated surfaces */
+  --focus-ring:     rgba(79,142,247,0.38);
 
   --accent-blue:   #4f8ef7;
   --accent-blue-h: #6fa5ff;
@@ -62,8 +63,9 @@
   --border-focus:  #b0b0b0;
 
   --text-primary:   #111111;
-  --text-secondary: #555555;
-  --text-muted:     #aaaaaa;
+  --text-secondary: #444444;
+  --text-muted:     #6b6b6b;  /* ≥4.5:1 on white + elevated surfaces */
+  --focus-ring:     rgba(59,125,224,0.32);
 
   --accent-blue:   #3b7de0;
   --accent-blue-h: #2567c8;

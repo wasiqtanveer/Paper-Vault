@@ -12,6 +12,8 @@
  *   );
  */
 
+import { safeQuery } from './query';
+
 const store = new Map(); // key -> { value, expires, inflight }
 
 const DEFAULT_TTL = 60_000; // 60s
@@ -64,4 +66,38 @@ export async function cachedQuery(key, fetcher, { ttl = DEFAULT_TTL } = {}) {
 export function invalidate(key) {
   if (key === undefined) store.clear();
   else store.delete(key);
+}
+
+/** Synchronous read of a cached value (fresh or stale), or undefined. Lets a page
+ *  paint instantly from the last visit instead of flashing a skeleton. */
+export function peek(key) {
+  return store.get(key)?.value;
+}
+
+/**
+ * Cache a Supabase query without ever caching a failure.
+ *
+ * `safeQuery` normally swallows errors and returns a fallback — which, passed
+ * through `cachedQuery`, would be stored as a legitimate empty result and served
+ * for the whole TTL. Here the query rethrows, so the cache stays empty on
+ * failure and the next call retries; the caller still gets the fallback and the
+ * error callback.
+ */
+export async function cachedSafeQuery(key, makeBuilder, { fallback = null, onError, label, ttl } = {}) {
+  try {
+    return await cachedQuery(
+      key,
+      () => safeQuery(makeBuilder(), { fallback, label, throwOnError: true }),
+      { ttl },
+    );
+  } catch (err) {
+    if (onError) onError(err.message);
+    else console.error(err);
+    return fallback;
+  }
+}
+
+/** Drop every cache entry derived from the papers table. Call after any paper mutation. */
+export function invalidatePapers() {
+  ['home:recent', 'home:stats', 'browse:years'].forEach(k => store.delete(k));
 }

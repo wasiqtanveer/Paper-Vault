@@ -9,15 +9,17 @@ export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
   const { play } = useSound();
 
-  const addToast = useCallback((message, type = 'info') => {
+  // `action` ({ label, onClick }) adds a button, e.g. Undo; such toasts stay
+  // longer so there's time to reach it.
+  const addToast = useCallback((message, type = 'info', { action } = {}) => {
     const id = Date.now() + Math.random();
     // Outcomes get their own sounds — the one place where a sound carries
     // information the visitor might otherwise miss while looking elsewhere.
     if (type === 'success' || type === 'error') play(type);
-    setToasts(prev => [...prev, { id, message, type }]);
+    setToasts(prev => [...prev, { id, message, type, action }]);
     setTimeout(() => {
       setToasts(prev => prev.filter(t => t.id !== id));
-    }, 3500);
+    }, action ? 7000 : 3500);
   }, [play]);
 
   const removeToast = useCallback((id) => {
