@@ -7,7 +7,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { SoundProvider } from './context/SoundContext';
 import Sidebar from './components/Sidebar';
 import ProtectedRoute from './components/ProtectedRoute';
-import Preloader from './components/Preloader';
+import { PageSkeleton, ShellSkeleton } from './components/Skeleton';
 import WelcomeModal from './components/WelcomeModal';
 import { EASE_OUT } from './lib/motion';
 import { routeLoaders, prefetchAllRoutes } from './lib/routes';
@@ -24,8 +24,10 @@ const AdminPanel   = lazy(routeLoaders['/admin']);
 const About        = lazy(routeLoaders['/about']);
 const HallOfFame   = lazy(routeLoaders['/hall-of-fame']);
 
+// Route code is prefetched at idle, so this only shows on a genuinely cold
+// chunk, and then as the page's shape rather than a spinner.
 function PageFallback() {
-  return <div className="spinner-wrap"><div className="spinner" /></div>;
+  return <PageSkeleton />;
 }
 
 const AUTH_ROUTES = ['/login', '/register'];
@@ -57,7 +59,7 @@ function PageWrap({ children }) {
 
 function Shell() {
   const location = useLocation();
-  const { loading, signingOut, user } = useAuth();
+  const { loading, user } = useAuth();
   const isAuthPage = AUTH_ROUTES.includes(location.pathname);
 
   /**
@@ -90,11 +92,9 @@ function Shell() {
     return () => clearTimeout(t);
   }, []);
 
-  // Initial auth loading preloader
-  if (loading) return <Preloader show message="Loading PaperVault…" />;
-
-  // Sign-out preloader
-  if (signingOut) return <Preloader show message="Signing out…" />;
+  // The session comes from local storage, so this is a frame or two at most:
+  // show the shell's shape rather than a full-screen loader.
+  if (loading) return <ShellSkeleton />;
 
   // Force auth wall — redirect to login if not authenticated and not on auth page
   if (!user && !isAuthPage) {
@@ -103,7 +103,7 @@ function Shell() {
 
   if (isAuthPage) {
     return (
-      <Suspense fallback={<PageFallback />}>
+      <Suspense fallback={null}>
         <AnimatePresence mode="wait">
           <Routes location={renderLocation} key={renderLocation.pathname}>
             <Route path="/login"    element={<PageWrap><Login /></PageWrap>} />

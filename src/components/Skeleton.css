@@ -38,3 +38,13 @@
 .skeleton-block {
   border-radius: var(--radius-md);
 }
+
+/* App-shell placeholder sidebar: same footprint as the real one. */
+.shell-skel-sidebar { width: var(--sidebar-current-width, 240px); padding-top: 4px; }
+.shell-skel-logo { height: 56px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--border); }
+@media (max-width: 768px) { .shell-skel-sidebar { display: none; } }
+
+/* Skeleton → content crossfade: both occupy the same grid cell, so the real
+   cards resolve on top of the placeholders instead of after a blank beat. */
+.swap-stack { display: grid; }
+.swap-stack > * { grid-area: 1 / 1; min-width: 0; }

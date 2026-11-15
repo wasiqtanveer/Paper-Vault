@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
-import { CONTENT_SWAP } from '../lib/motion';
+import { CONTENT_SWAP, EASE_OUT } from '../lib/motion';
 import { supabase } from '../lib/supabase';
 import { countRows } from '../lib/query';
 import { cachedQuery, cachedSafeQuery, peek } from '../lib/cache';
@@ -131,10 +131,11 @@ export default function Home() {
           <Link to="/browse" className="btn btn-ghost">View all →</Link>
         </div>
 
-        <AnimatePresence mode="wait" initial={false}>
+        <div className="swap-stack">
+        <AnimatePresence initial={false}>
           {loading ? (
-            <motion.div key="skeleton" {...CONTENT_SWAP}>
-              <SkeletonCardGrid count={8} />
+            <motion.div key="skeleton" {...CONTENT_SWAP} exit={{ opacity: 0, transition: { duration: 0.24, ease: EASE_OUT } }}>
+              <SkeletonCardGrid count={12} />
             </motion.div>
           ) : papers.length === 0 ? (
             <motion.div key="empty" {...CONTENT_SWAP} className="empty-state">
@@ -147,6 +148,7 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
     </div>
   );
