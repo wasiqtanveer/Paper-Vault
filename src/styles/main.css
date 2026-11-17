@@ -564,3 +564,8 @@ table td, .stat-value, .metric-value { font-variant-numeric: tabular-nums; }
   overflow: hidden; clip: rect(0 0 0 0);
   white-space: nowrap; border: 0;
 }
+
+.topbar-title {
+  font-size: 18px;
+  font-weight: 700;
+}

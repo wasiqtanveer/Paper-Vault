@@ -28,7 +28,7 @@ export default function About() {
   return (
     <div className="page-content">
       <div className="topbar">
-        <span style={{ fontSize: 18, fontWeight: 700 }}>About</span>
+        <span className="topbar-title">About</span>
       </div>
 
       <div className="page-inner">

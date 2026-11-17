@@ -109,7 +109,7 @@ export default function HallOfFame() {
       </button>
 
       <div className="topbar">
-        <span style={{ fontSize: 18, fontWeight: 700 }}>Hall of Fame</span>
+        <span className="topbar-title">Hall of Fame</span>
       </div>
 
       <div className="page-inner">
