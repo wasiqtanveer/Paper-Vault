@@ -67,3 +67,12 @@
     overflow-y: visible;
   }
 }
+
+/* Layout helpers that used to be inline styles */
+.pv-inline { display: flex; align-items: center; gap: 5px; }
+.pv-push-right { margin-left: auto; }
+.paper-meta-panel-loading { display: flex; flex-direction: column; gap: 14px; }
+.paper-meta-panel .divider { margin: 0; }
+.meta-actions .btn { gap: 6px; }
+.meta-actions .btn-approve,
+.meta-actions .btn-reject { display: flex; align-items: center; justify-content: center; gap: 5px; }
