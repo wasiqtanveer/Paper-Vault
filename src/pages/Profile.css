@@ -219,3 +219,15 @@
   align-items: center;
   justify-content: space-between;
 }
+
+/* Layout and colour helpers that used to be inline styles */
+.pf-name-field { margin-bottom: 12px; }
+.pw-form .btn[type="submit"] { align-self: flex-start; }
+.profile-stat-value.is-approved { color: var(--status-approved); }
+.profile-stat-value.is-pending  { color: var(--status-pending); }
+.profile-stat-value.is-rejected { color: var(--status-rejected); }
+.pf-no-margin { margin-bottom: 0; }
+.pf-link-accent { color: var(--accent-blue); }
+.pf-paper-link { color: var(--text-primary); font-weight: 500; }
+.pf-muted { color: var(--text-muted); }
+.pf-small { font-size: 12px; }

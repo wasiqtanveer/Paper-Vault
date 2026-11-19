@@ -183,7 +183,7 @@ export default function Profile() {
                 <form className="pw-form" onSubmit={handleChangeName}>
                   {nameSuccess && <div className="pw-success">Name updated!</div>}
                   {nameError   && <div className="form-error">{nameError}</div>}
-                  <div className="form-group" style={{ marginBottom: 12 }}>
+                  <div className="form-group pf-name-field">
                     <label className="form-label">Display Name</label>
                     <input value={nameValue} onChange={e => setNameValue(e.target.value)} placeholder="Your full name" maxLength={60} />
                   </div>
@@ -254,7 +254,7 @@ export default function Profile() {
                   </div>
                   {pwError   && <div className="form-error">{pwError}</div>}
                   {pwSuccess  && <div className="pw-success">Password updated successfully.</div>}
-                  <button type="submit" className="btn btn-primary btn-sm" disabled={pwLoading} style={{ alignSelf: 'flex-start' }}>
+                  <button type="submit" className="btn btn-primary btn-sm" disabled={pwLoading}>
                     {pwLoading ? 'Updating…' : 'Update Password'}
                   </button>
                 </form>
@@ -272,12 +272,12 @@ export default function Profile() {
           </div>
           <div className="profile-stat">
             <CheckCircle size={16} className="profile-stat-icon approved" />
-            <div className="profile-stat-value" style={{ color: 'var(--status-approved)' }}>{approvedCount}</div>
+            <div className="profile-stat-value is-approved">{approvedCount}</div>
             <div className="profile-stat-label">Approved</div>
           </div>
           <div className="profile-stat">
             <Clock size={16} className="profile-stat-icon pending" />
-            <div className="profile-stat-value" style={{ color: 'var(--status-pending)' }}>{pendingCount}</div>
+            <div className="profile-stat-value is-pending">{pendingCount}</div>
             <div className="profile-stat-label">Pending</div>
           </div>
         </m.div>
@@ -295,11 +295,11 @@ export default function Profile() {
                 <div className="profile-stat-label">Reviewed</div>
               </div>
               <div className="profile-stat">
-                <div className="profile-stat-value" style={{ color: 'var(--status-approved)' }}>{modStats.approved}</div>
+                <div className="profile-stat-value is-approved">{modStats.approved}</div>
                 <div className="profile-stat-label">Approved</div>
               </div>
               <div className="profile-stat">
-                <div className="profile-stat-value" style={{ color: 'var(--status-rejected)' }}>{modStats.rejected}</div>
+                <div className="profile-stat-value is-rejected">{modStats.rejected}</div>
                 <div className="profile-stat-label">Rejected</div>
               </div>
             </div>
@@ -329,7 +329,7 @@ export default function Profile() {
         {/* Papers table */}
         <m.div className="papers-table-wrap" {...fadeUp(isMod ? 4 : 3)}>
           <div className="papers-table-header">
-            <div className="section-title" style={{ marginBottom: 0 }}>My Papers</div>
+            <div className="section-title pf-no-margin">My Papers</div>
             <Link to="/upload" className="btn btn-primary btn-sm">+ Upload New</Link>
           </div>
 
@@ -348,7 +348,7 @@ export default function Profile() {
             </div>
           ) : papers.length === 0 ? (
             <div className="empty-state">
-              No papers yet. <Link to="/upload" style={{ color: 'var(--accent-blue)' }}>Upload one</Link>
+              No papers yet. <Link to="/upload" className="pf-link-accent">Upload one</Link>
             </div>
           ) : (
             <div className="table-wrap">
@@ -367,19 +367,19 @@ export default function Profile() {
                   {papers.map(p => (
                     <tr key={p.id}>
                       <td>
-                        <Link to={`/paper/${p.id}`} style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
+                        <Link to={`/paper/${p.id}`} className="pf-paper-link">
                           {p.title}
                         </Link>
                       </td>
-                      <td style={{ color: 'var(--text-muted)' }}>{p.subjects?.name ?? '—'}</td>
-                      <td style={{ color: 'var(--text-muted)' }}>{p.year}</td>
+                      <td className="pf-muted">{p.subjects?.name ?? '—'}</td>
+                      <td className="pf-muted">{p.year}</td>
                       <td>
                         <StatusBadge status={p.status} />
                         {p.status === 'rejected' && p.rejection_reason && (
                           <div className="rejection-note"><strong>Reason:</strong> {p.rejection_reason}</div>
                         )}
                       </td>
-                      <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>
+                      <td className="pf-muted pf-small">
                         {formatDate(p.uploaded_at, DATE_SHORT_YEAR)}
                       </td>
                       <td>
