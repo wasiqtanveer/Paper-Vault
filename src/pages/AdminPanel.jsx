@@ -1,10 +1,12 @@
+import SortTh from './admin/SortTh';
+import { actionLabel, actionColor } from '../lib/activityActions';
 import { reportWarning } from '../lib/logger';
 import { DATE_SHORT, DATE_SHORT_YEAR, DATE_TIME, DATE_TIME_YEAR, formatDate, formatDateTime } from '../lib/formatDate';
 import { fadeUp as baseFadeUp } from '../lib/motion';
 import { SUBJECTS_KEY, TEACHERS_KEY } from '../lib/lookups';
 import { useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight, ChevronUp, ArrowUpDown, Plus } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { safeQuery, countRows } from '../lib/query';
 import { invalidate } from '../lib/cache';
@@ -25,30 +27,6 @@ const OWNER_EMAIL = CONTACT.email;
 const USERS_PAGE_SIZE = 25;
 
 const fadeUp = i => baseFadeUp(i, { y: 12, duration: 0.22, step: 0.05 });
-
-/** Sortable column header with animated icon */
-function SortTh({ col, label, sort, onSort, style }) {
-  const active = sort.col === col;
-  return (
-    <th style={style}>
-      <button
-        type="button"
-        className={'sort-th-btn' + (active ? ' sort-th-active' : '')}
-        onClick={() => onSort(col)}
-      >
-        {label}
-        <m.span
-          className="sort-th-icon"
-          animate={active ? { rotate: sort.dir === 'asc' ? 0 : 180, opacity: 1 } : { rotate: 0, opacity: 0.4 }}
-          transition={{ duration: 0.2 }}
-          style={{ display: 'inline-flex', alignItems: 'center' }}
-        >
-          {active ? <ChevronUp size={11} /> : <ArrowUpDown size={11} />}
-        </m.span>
-      </button>
-    </th>
-  );
-}
 
 export default function AdminPanel() {
   const { addToast } = useToast();
@@ -296,26 +274,6 @@ export default function AdminPanel() {
     }, ...prev].slice(0, 50));
   }
 
-  const ACTIONS = {
-    upload:          ['Uploaded',         'var(--accent-blue)'],
-    approve:         ['Approved',         'var(--status-approved)'],
-    approved:        ['Approved',         'var(--status-approved)'],
-    reject:          ['Rejected',         'var(--status-rejected)'],
-    rejected:        ['Rejected',         'var(--status-rejected)'],
-    restore:         ['Back to pending',  'var(--status-pending)'],
-    delete:          ['Deleted',          'var(--status-rejected)'],
-    role_change:     ['Role changed',     'var(--accent-blue)'],
-    subject_add:     ['Subject added',    'var(--status-approved)'],
-    subject_delete:  ['Subject removed',  'var(--status-rejected)'],
-    teacher_add:     ['Teacher added',    'var(--status-approved)'],
-    teacher_delete:  ['Teacher removed',  'var(--status-rejected)'],
-    request_approve: ['Request approved', 'var(--status-approved)'],
-    request_decline: ['Request declined', 'var(--status-rejected)'],
-    hof_add:         ['Hall of Fame +',   'var(--accent-amber)'],
-    hof_remove:      ['Hall of Fame −',   'var(--status-rejected)'],
-  };
-  const actionLabel = action => ACTIONS[action]?.[0] ?? action;
-  const actionColor = action => ACTIONS[action]?.[1] ?? 'var(--text-muted)';
 
   // ── Hall of Fame helpers ─────────────────────────────────────────────
   // A bare "github.com/x" would render as a relative link on the Hall of Fame page.

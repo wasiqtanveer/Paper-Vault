@@ -10,7 +10,9 @@ import { supabase } from './supabase';
  * This surfaces the failure in the console and returns whether it worked.
  *
  * Action values are the canonical set the admin panel understands:
- * upload | approve | reject | delete | role_change
+ * upload | approve | reject | restore | delete | role_change | subject_add | subject_delete |
+ * teacher_add | teacher_delete | request_approve | request_decline | hof_add | hof_remove
+ * (enforced by the activity_log_action_check constraint; labels live in activityActions.js)
  */
 export async function logActivity({ action, user, profile, fallbackRole, paperId = null, paperTitle = null }) {
   const { error } = await supabase.from('activity_log').insert({
